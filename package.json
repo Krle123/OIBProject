@@ -1,0 +1,25 @@
+{
+  "name": "oibproject",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:gateway": "npm --prefix ./infrastructure/gateway-api run start",
+    "install:gateway": "npm --prefix ./infrastructure/gateway-api install",
+
+    "start:client": "npm --prefix ./client run start",
+    "install:client": "npm --prefix ./client install",
+
+    "start:microservice:auth": "npm --prefix ./infrastructure/microservices/auth-microservice run start",
+    "install:microservice:auth": "npm --prefix ./infrastructure/microservices/auth-microservice install",
+    "start:microservice:user": "npm --prefix ./infrastructure/microservices/user-microservice run start",
+    "install:microservice:user": "npm --prefix ./infrastructure/microservices/user-microservice install",
+
+    "start": "npm-run-all -p start:gateway start:client start:microservice:auth start:microservice:user"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

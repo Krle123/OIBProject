@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { LogType } from "../enums/LogType";
 
-@Entity("logs")
+@Entity("audit_logs")
 export class Log {
     @PrimaryGeneratedColumn()
     id!: number;

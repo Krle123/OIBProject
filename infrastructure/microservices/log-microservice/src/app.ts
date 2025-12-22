@@ -15,6 +15,10 @@ dotenv.config({ quiet: true });
 
 const app = express();
 
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Read CORS settings from environment
 const corsOrigin = process.env.CORS_ORIGIN ?? "*";
 const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];

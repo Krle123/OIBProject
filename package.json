@@ -16,7 +16,7 @@
     "start:microservice:log": "npm --prefix ./infrastructure/microservices/log-microservice run start",
     "install:microservice:log": "npm --prefix ./infrastructure/microservices/log-microservice install",
 
-    "start": "npm-run-all -p start:gateway start:client start:microservice:auth start:microservice:user start:microservice:log"
+    "start": "npm-run-all -p start:microservice:auth start:microservice:user start:microservice:log start:gateway"
   },
   "engines": {
     "node": ">=14"

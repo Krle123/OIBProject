@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import jwt from "jsonwebtoken";
 import { ILogService } from '../../Domain/services/ILogService';
 import { LogDTO } from '../../Domain/DTO/LogDTO';
+import { LogType } from '../../Domain/enums/LogType';
 
 export class LogController {
   private router: Router;
@@ -25,10 +26,26 @@ export class LogController {
   private async addLog(req: Request, res: Response): Promise<void> {
     try {
       const { type, description } = req.body;
+      console.log("LogController.addLog called with:", { type, description });
+
+      // Basic validation
+      if (!type || !description) {
+        res.status(400).json({ success: false, message: "Missing 'type' or 'description' in body" });
+        return;
+      }
+
+      const validTypes = Object.values(LogType);
+      if (!validTypes.includes(type as LogType)) {
+        res.status(400).json({ success: false, message: `Invalid log type. Valid types: ${validTypes.join(",")}` });
+        return;
+      }
+
       await this.logService.addLog(type, description);
+      console.log("LogController.addLog: Log added successfully");
       res.status(201).json({ success: true, message: "Log added successfully" });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      console.error("LogController.addLog error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }
 
@@ -39,7 +56,8 @@ export class LogController {
       await this.logService.updateLog(id, description);
       res.status(200).json({ success: true, message: "Log updated successfully" });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      console.error("LogController.updateLog error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }
   private async deleteLog(req: Request, res: Response): Promise<void> {
@@ -48,7 +66,8 @@ export class LogController {
       await this.logService.deleteLog(id);
       res.status(200).json({ success: true, message: "Log deleted successfully" });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      console.error("LogController.deleteLog error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }
 
@@ -62,7 +81,8 @@ export class LogController {
       );
       res.status(200).json({ success: true, logs });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      console.error("LogController.searchLogs error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }
 

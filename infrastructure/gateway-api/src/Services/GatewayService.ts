@@ -9,10 +9,12 @@ import { LogDTO } from "../Domain/DTOs/LogDTO";
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
   private readonly userClient: AxiosInstance;
+  private readonly logClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
     const userBaseURL = process.env.USER_SERVICE_API;
+    const logBaseURL = process.env.LOG_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -22,6 +24,12 @@ export class GatewayService implements IGatewayService {
 
     this.userClient = axios.create({
       baseURL: userBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.logClient = axios.create({
+      baseURL: logBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -61,15 +69,27 @@ export class GatewayService implements IGatewayService {
 
   // Log microservice
   async addLog(type: string, description: string): Promise<void> {
-    const response = await this.userClient.post<void>("/logs/add", { type, description });
+    try {
+      await this.logClient.post<void>("/logs/add", { type, description });
+    } catch (err) {
+      console.warn("GatewayService: failed to add log:", (err as Error).message);
+    }
   }
 
   async updateLog(id: number, description: string): Promise<void> {
-    const response = await this.userClient.put<void>(`/logs/update/${id}`, { description });
+    try {
+      await this.logClient.put<void>(`/logs/update/${id}`, { description });
+    } catch (err) {
+      console.warn("GatewayService: failed to update log:", (err as Error).message);
+    }
   }
 
   async deleteLog(id: number): Promise<void> {
-    const response = await this.userClient.delete<void>(`/logs/${id}`);
+    try {
+      await this.logClient.delete<void>(`/logs/${id}`);
+    } catch (err) {
+      console.warn("GatewayService: failed to delete log:", (err as Error).message);
+    }
   }
 
   async searchLogs(type?: string, fromTs?: string, toTs?: string): Promise<LogDTO[]> {
@@ -78,8 +98,13 @@ export class GatewayService implements IGatewayService {
     if (fromTs) params.fromTs = fromTs;
     if (toTs) params.toTs = toTs;
 
-    const response = await this.userClient.get<LogDTO[]>("/logs", { params });
-    return response.data;
+    try {
+      const response = await this.logClient.get<LogDTO[]>("/logs", { params });
+      return response.data;
+    } catch (err) {
+      console.warn("GatewayService: failed to search logs:", (err as Error).message);
+      return [];
+    }
   }
   // TODO: ADD MORE API CALLS
 }

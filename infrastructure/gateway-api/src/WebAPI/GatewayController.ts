@@ -31,21 +31,27 @@ export class GatewayController {
 
   // Auth
   private async login(req: Request, res: Response): Promise<void> {
+    await this.gatewayService.addLog("INFO", `Login attempt for user: ${req.body.username}`);
     const data: LoginUserDTO = req.body;
     const result = await this.gatewayService.login(data);
+    await this.gatewayService.addLog("INFO", `User logged in: ${data.username}`);
     res.status(200).json(result);
   }
 
   private async register(req: Request, res: Response): Promise<void> {
+    await this.gatewayService.addLog("INFO", `Registration attempt for user: ${req.body.username}`);
     const data: RegistrationUserDTO = req.body;
     const result = await this.gatewayService.register(data);
+    await this.gatewayService.addLog("INFO", `User registered: ${data.username}`);
     res.status(200).json(result);
   }
 
   // Users
   private async getAllUsers(req: Request, res: Response): Promise<void> {
     try {
+      await this.gatewayService.addLog("INFO", `Fetching all users by admin ID: ${req.user?.id}`);
       const users = await this.gatewayService.getAllUsers();
+      await this.gatewayService.addLog("INFO", `All users fetched by admin ID: ${req.user?.id}`);
       res.status(200).json(users);
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
@@ -55,14 +61,18 @@ export class GatewayController {
   private async getUserById(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id, 10);
+      await this.gatewayService.addLog("INFO", `Fetching user ID: ${id} by requester ID: ${req.user?.id}`);
       if (!req.user || req.user.id !== id) {
+        await this.gatewayService.addLog("WARNING", `Unauthorized access attempt to user ID: ${id} by requester ID: ${req.user?.id}`);
         res.status(401).json({ message: "You can only access your own data!" });
         return;
       }
 
       const user = await this.gatewayService.getUserById(id);
+      await this.gatewayService.addLog("INFO", `User ID: ${id} fetched by requester ID: ${req.user?.id}`);
       res.status(200).json(user);
     } catch (err) {
+      await this.gatewayService.addLog("ERROR", `User not found error: ${(err as Error).message}`);
       res.status(404).json({ message: (err as Error).message });
     }
   }

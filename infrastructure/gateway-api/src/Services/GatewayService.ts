@@ -4,6 +4,7 @@ import { LoginUserDTO } from "../Domain/DTOs/LoginUserDTO";
 import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../Domain/types/AuthResponse";
 import { UserDTO } from "../Domain/DTOs/UserDTO";
+import { LogDTO } from "../Domain/DTOs/LogDTO";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
@@ -58,5 +59,27 @@ export class GatewayService implements IGatewayService {
     return response.data;
   }
 
+  // Log microservice
+  async addLog(type: string, description: string): Promise<void> {
+    const response = await this.userClient.post<void>("/logs/add", { type, description });
+  }
+
+  async updateLog(id: number, description: string): Promise<void> {
+    const response = await this.userClient.put<void>(`/logs/update/${id}`, { description });
+  }
+
+  async deleteLog(id: number): Promise<void> {
+    const response = await this.userClient.delete<void>(`/logs/${id}`);
+  }
+
+  async searchLogs(type?: string, fromTs?: string, toTs?: string): Promise<LogDTO[]> {
+    const params: any = {};
+    if (type) params.type = type;
+    if (fromTs) params.fromTs = fromTs;
+    if (toTs) params.toTs = toTs;
+
+    const response = await this.userClient.get<LogDTO[]>("/logs", { params });
+    return response.data;
+  }
   // TODO: ADD MORE API CALLS
 }

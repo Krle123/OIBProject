@@ -1,4 +1,4 @@
-import type { LogDTO } from "../DTO/LogDTO";
+import type { LogDTO } from "../DTOs/LogDTO";
 
 
 export interface ILogService {

@@ -2,7 +2,7 @@ import { ILogService } from "../Domain/services/ILogService";
 import { Repository } from "typeorm";
 import { Log } from "../Domain/models/Log";
 import { LogType } from "../Domain/enums/LogType";
-import { LogDTO } from "../Domain/DTO/LogDTO";
+import { LogDTO } from "../Domain/DTOs/LogDTO";
 
 export class LogService implements ILogService {
     constructor(private logRepository: Repository<Log>) {}

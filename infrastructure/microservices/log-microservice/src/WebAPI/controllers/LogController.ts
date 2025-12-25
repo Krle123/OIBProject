@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import jwt from "jsonwebtoken";
 import { ILogService } from '../../Domain/services/ILogService';
-import { LogDTO } from '../../Domain/DTO/LogDTO';
+import { LogDTO } from '../../Domain/DTOs/LogDTO';
 import { LogType } from '../../Domain/enums/LogType';
 
 export class LogController {

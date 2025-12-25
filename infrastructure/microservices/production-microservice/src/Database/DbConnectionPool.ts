@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
-import { Plant } from "../Domain/models/Plant";
+import { FieldPlant } from "../Domain/models/FieldPlant";
 
 dotenv.config();
 
@@ -15,5 +15,5 @@ export const Db = new DataSource({
   ssl: { rejectUnauthorized: false },
   synchronize: true,
   logging: false,
-  entities: [Plant],
+  entities: [FieldPlant],
 });

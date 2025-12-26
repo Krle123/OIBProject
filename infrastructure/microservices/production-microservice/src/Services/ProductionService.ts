@@ -18,7 +18,7 @@ export class ProductionService implements IProductionService {
         }
         for (let i = 0; i < quantity; i++) {
             const newFieldPlant = this.fieldPlantRepository.create({
-                id: plantId,
+                plantId: plantId,
                 name: plant.name,
                 aromaticPower: getRandomAromaticPower(),
                 latinName: plant.latinName,
@@ -58,9 +58,9 @@ export class ProductionService implements IProductionService {
                 aromaticPower: fieldPlant.aromaticPower,
                 latinName: fieldPlant.latinName,
                 countryOrigin: fieldPlant.countryOrigin,
-                state: fieldPlant.state,
+                state: fieldPlant.state
             });
         }
-        return [];
+        return harvestedPlants;
     }
 }

@@ -5,16 +5,21 @@ import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../Domain/types/AuthResponse";
 import { UserDTO } from "../Domain/DTOs/UserDTO";
 import { LogDTO } from "../Domain/DTOs/LogDTO";
+import { FieldPlantDTO } from "../Domain/DTOs/FieldPlantDTO";
+import { PlantState } from "../Domain/enums/PlantState";
+import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
   private readonly userClient: AxiosInstance;
   private readonly logClient: AxiosInstance;
+  private readonly productionClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
     const userBaseURL = process.env.USER_SERVICE_API;
     const logBaseURL = process.env.LOG_SERVICE_API;
+    const productionBaseURL = process.env.PRODUCTION_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -34,7 +39,11 @@ export class GatewayService implements IGatewayService {
       timeout: 5000,
     });
 
-    // TODO: ADD MORE CLIENTS
+    this.productionClient = axios.create({
+      baseURL: productionBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
   }
 
   // Auth microservice
@@ -105,6 +114,42 @@ export class GatewayService implements IGatewayService {
       console.warn("GatewayService: failed to search logs:", (err as Error).message);
       return [];
     }
+  }
+
+  //Production microservice
+  async getPlantsById(plantId: number): Promise<FieldPlantDTO[]> {
+    const response = await this.productionClient.get<FieldPlantDTO[]>(`/plants/${plantId}`);
+    return response.data;
+  }
+
+  async getPlantsByState(plantState: PlantState): Promise<FieldPlantDTO[]> {
+    const response = await this.productionClient.get<FieldPlantDTO[]>(`/field-plants/state/${plantState}`);
+    return response.data;
+  }
+
+  async getAllPlants(): Promise<PlantDTO[]> {
+    const response = await this.productionClient.get<PlantDTO[]>(`/plants`);
+    return response.data;
+  }
+
+  async getAllFieldPlants(): Promise<FieldPlantDTO[]> {
+    const response = await this.productionClient.get<FieldPlantDTO[]>(`/field-plants`);
+    return response.data;
+  }
+
+  async plantHerb(plantId: number, quantity: number): Promise<boolean> {
+    const response = await this.productionClient.post<boolean>(`/production/plant`, { plantId, quantity });
+    return response.data;
+  }
+
+  async changeAromaticPower(fieldPlantId: number, changePercentage: number): Promise<boolean> {
+    const response = await this.productionClient.put<boolean>(`/production/aromatic-power/${fieldPlantId}`, { changePercentage });
+    return response.data;
+  }
+
+  async harvestPlant(plantId: number, quantity: number): Promise<boolean> {
+    const response = await this.productionClient.post<boolean>(`/production/harvest`, { plantId, quantity });
+    return response.data;
   }
   // TODO: ADD MORE API CALLS
 }

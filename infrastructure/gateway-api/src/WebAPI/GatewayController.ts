@@ -4,6 +4,7 @@ import { LoginUserDTO } from "../Domain/DTOs/LoginUserDTO";
 import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
 import { authenticate } from "../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../Middlewares/authorization/AuthorizeMiddleware";
+import { PlantState } from "../Domain/enums/PlantState";
 
 export class GatewayController {
   private readonly router: Router;
@@ -27,6 +28,15 @@ export class GatewayController {
     this.router.put("/logs/update/:id", authenticate, authorize("admin"), this.updateLog.bind(this));
     this.router.delete("/logs/:id", authenticate, authorize("admin"), this.deleteLog.bind(this));
     this.router.get("/logs", authenticate, authorize("admin"), this.searchLogs.bind(this));
+
+    // Production
+    this.router.get("/plants/:id", authenticate, authorize("admin", "seller"), this.getPlantsById.bind(this));
+    this.router.get("/plants", authenticate, authorize("admin", "seller"), this.getAllPlants.bind(this));
+    this.router.get("/field-plants/state/:state", authenticate, authorize("admin", "seller"), this.getPlantsByState.bind(this));
+    this.router.get("/field-plants", authenticate, authorize("admin", "seller"), this.getAllFieldPlants.bind(this));
+    this.router.post("/production/plant", authenticate, authorize("admin", "seller"), this.plantHerb.bind(this));
+    this.router.put("/production/aromatic-power/:id", authenticate, authorize("admin", "seller"), this.changeAromaticPower.bind(this));
+    this.router.post("/production/harvest", authenticate, authorize("admin", "seller"), this.harvestPlant.bind(this));
   }
 
   // Auth
@@ -35,6 +45,7 @@ export class GatewayController {
     const data: LoginUserDTO = req.body;
     const result = await this.gatewayService.login(data);
     await this.gatewayService.addLog("INFO", `User logged in: ${data.username}`);
+    await this.testProductionService();
     res.status(200).json(result);
   }
 
@@ -105,6 +116,137 @@ export class GatewayController {
       toTs as string | undefined
     );
     res.status(200).json(logs);
+  }
+
+  // Production
+  private async getPlantsById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const plants = await this.gatewayService.getPlantsById(parseInt(id));
+      await this.gatewayService.addLog("INFO", `Fetched plants by ID: ${id} requested by user ID: ${req.user?.id}`);
+      res.status(200).json({ success: true, plants });
+    } catch (error) {
+      console.error("GatewayController.getPlantsById error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching plants by ID: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getPlantsByState(req: Request, res: Response): Promise<void> {
+    try {
+      const { state } = req.params;
+      const plants = await this.gatewayService.getPlantsByState(state as PlantState);
+      await this.gatewayService.addLog("INFO", `Fetched plants by state: ${state} requested by user ID: ${req.user?.id}`);
+      res.status(200).json({ success: true, plants });
+    } catch (error) {
+      console.error("GatewayController.getPlantsByState error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching plants by state: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getAllPlants(req: Request, res: Response): Promise<void> {
+    try {
+      const plants = await this.gatewayService.getAllPlants();
+      await this.gatewayService.addLog("INFO", `Fetched all plants requested by user ID: ${req.user?.id}`);
+      res.status(200).json({ success: true, plants });
+    } catch (error) {
+      console.error("GatewayController.getAllPlants error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching all plants: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getAllFieldPlants(req: Request, res: Response): Promise<void> {
+    try {
+      const plants = await this.gatewayService.getAllFieldPlants();
+      await this.gatewayService.addLog("INFO", `Fetched all field plants requested by user ID: ${req.user?.id}`);
+      res.status(200).json({ success: true, plants });
+    } catch (error) {
+      console.error("GatewayController.getAllFieldPlants error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching all field plants: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async plantHerb(req: Request, res: Response): Promise<void> {
+    try {
+      const { plantId, quantity } = req.body;
+      const success = await this.gatewayService.plantHerb(plantId, quantity);
+      if (success) {
+        await this.gatewayService.addLog("INFO", `Planted herb ID: ${plantId} with quantity: ${quantity} by user ID: ${req.user?.id}`);
+        res.status(200).json({ success: true, message: "Herb planted successfully" });
+      } else {
+        res.status(400).json({ success: false, message: "Failed to plant herb" });
+      }
+    } catch (error) {
+      console.error("GatewayController.plantHerb error:", error);
+      await this.gatewayService.addLog("ERROR", `Error planting herb: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async changeAromaticPower(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { changePercentage } = req.body;
+      const success = await this.gatewayService.changeAromaticPower(parseInt(id), changePercentage);
+      if (success) {
+        await this.gatewayService.addLog("INFO", `Changed aromatic power for field plant ID: ${id} by user ID: ${req.user?.id}`);
+        res.status(200).json({ success: true, message: "Aromatic power changed successfully" });
+      } else {
+        res.status(400).json({ success: false, message: "Failed to change aromatic power" });
+      }
+    } catch (error) {
+      console.error("GatewayController.changeAromaticPower error:", error);
+      await this.gatewayService.addLog("ERROR", `Error changing aromatic power: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async harvestPlant(req: Request, res: Response): Promise<void> {
+    try {
+      const { plantId, quantity } = req.body;
+      const success = await this.gatewayService.harvestPlant(plantId, quantity);
+      if (success) {
+        await this.gatewayService.addLog("INFO", `Harvested plant ID: ${plantId} with quantity: ${quantity} by user ID: ${req.user?.id}`);
+        res.status(200).json({ success: true, message: "Plant harvested successfully" });
+      } else {
+        res.status(400).json({ success: false, message: "Failed to harvest plant" });
+      }
+    } catch (error) {
+      console.error("GatewayController.harvestPlant error:", error);
+      await this.gatewayService.addLog("ERROR", `Error harvesting plant: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async testProductionService(): Promise<void> {
+    try {
+      const plants = await this.gatewayService.getAllPlants();
+    } catch (error) {
+      console.error("GatewayController.testProductionService error:", error);
+    }
+    try {
+      const plants = await this.gatewayService.getAllFieldPlants();
+    } catch (error) {
+      console.error("GatewayController.testProductionService error:", error);
+    }
+    try {
+      const success = await this.gatewayService.plantHerb(1, 5);
+    } catch (error) {
+      console.error("GatewayController.testProductionService error:", error);
+    }
+    try {
+      const success = await this.gatewayService.changeAromaticPower(1, 10);
+    } catch (error) {
+      console.error("GatewayController.testProductionService error:", error);
+    }
+    try {
+      const success = await this.gatewayService.harvestPlant(1, 3);
+    } catch (error) {
+      console.error("GatewayController.testProductionService error:", error);
+    }
   }
 
   public getRouter(): Router {

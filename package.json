@@ -15,8 +15,10 @@
     "install:microservice:user": "npm --prefix ./infrastructure/microservices/user-microservice install",
     "start:microservice:log": "npm --prefix ./infrastructure/microservices/log-microservice run start",
     "install:microservice:log": "npm --prefix ./infrastructure/microservices/log-microservice install",
+    "start:microservice:production": "npm --prefix ./infrastructure/microservices/production-microservice run start",
+    "install:microservice:production": "npm --prefix ./infrastructure/microservices/production-microservice install",
 
-    "start": "npm-run-all -p start:microservice:auth start:microservice:user start:microservice:log start:gateway"
+    "start": "npm-run-all -p start:microservice:auth start:microservice:user start:microservice:log start:gateway start:microservice:production"
   },
   "engines": {
     "node": ">=14"

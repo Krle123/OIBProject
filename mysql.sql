@@ -1,0 +1,63 @@
+CREATE DATABASE IF NOT EXISTS users_db;
+
+USE users_db;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    username VARCHAR(100) NOT NULL UNIQUE,
+
+    role ENUM('SELLER', 'MANAGER', 'ADMIN') NOT NULL DEFAULT 'SELLER',
+
+    password VARCHAR(255) NOT NULL,
+
+    email VARCHAR(255) NOT NULL,
+
+    profileImage LONGTEXT NULL
+);
+
+CREATE DATABASE IF NOT EXISTS logs_db;
+
+USE logs_db;
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    type ENUM('INFO', 'WARNING', 'ERROR') NOT NULL DEFAULT 'INFO',
+
+    description VARCHAR(255)
+);
+
+CREATE DATABASE IF NOT EXISTS production_db;
+
+USE production_db;
+
+CREATE TABLE IF NOT EXISTS plants (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100),
+
+    latinName VARCHAR(100),
+
+    countryOrigin VARCHAR(100)
+);
+
+CREATE TABLE IF NOT EXISTS fields_plants (
+	plantId INT,
+    
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    name VARCHAR(100),
+    
+    aromaticPower FLOAT DEFAULT 1,
+
+    latinName VARCHAR(100),
+
+    countryOrigin VARCHAR(100),
+    
+	state ENUM('PLANTED', 'HARVESTED', 'PROCESSED') NOT NULL DEFAULT 'PLANTED',
+    
+    FOREIGN KEY(plantId) REFERENCES plants(id)
+);

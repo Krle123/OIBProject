@@ -11,7 +11,7 @@ export class PlantService implements IPlantService {
 
     async getPlantsById(plantId: number): Promise<FieldPlantDTO[]> 
     {
-        const plants = await this.fieldPlantRepository.find({ where: { id: plantId } });
+        const plants = await this.fieldPlantRepository.find({ where: { plantId: plantId } });
         if (plants.length > 0) {
             return plants.map(plant => ({
                 id: plant.id,

@@ -6,6 +6,9 @@ export class FieldPlant {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Column({ type: "int" })
+    plantId!: number;
+
     @Column({ type: "varchar", length: 100 })
     name!: string;
 
@@ -20,4 +23,4 @@ export class FieldPlant {
 
     @Column({ type: "enum", enum: PlantState, default: PlantState.PLANTED })
     state!: PlantState;
-}
+} 

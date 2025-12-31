@@ -29,5 +29,5 @@ export interface IGatewayService {
   getAllFieldPlants(): Promise<FieldPlantDTO[]>;
   plantHerb(plantId: number, quantity: number): Promise<boolean>;
   changeAromaticPower(fieldPlantId: number, changePercentage: number): Promise<boolean>;
-  harvestPlant(plantId: number, quantity: number): Promise<boolean>;
+  harvestPlant(fieldPlantId: number, quantity: number): Promise<boolean>;
 }

@@ -147,8 +147,8 @@ export class GatewayService implements IGatewayService {
     return response.data;
   }
 
-  async harvestPlant(plantId: number, quantity: number): Promise<boolean> {
-    const response = await this.productionClient.post<boolean>(`/production/harvest`, { plantId, quantity });
+  async harvestPlant(fieldPlantId: number, quantity: number): Promise<boolean> {
+    const response = await this.productionClient.post<boolean>(`/production/harvest`, { fieldPlantId, quantity });
     return response.data;
   }
   // TODO: ADD MORE API CALLS

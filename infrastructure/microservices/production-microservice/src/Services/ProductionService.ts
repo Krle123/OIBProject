@@ -10,11 +10,12 @@ import { Repository } from "typeorm";
 export class ProductionService implements IProductionService {
     constructor(private fieldPlantRepository: Repository<FieldPlant>, private plantRepository: Repository<Plant>) {}
 
-    async plantHerb(plantId: number, quantity: number): Promise<boolean> 
+    async plantHerb(plantId: number, quantity: number): Promise<number[]> 
     {
+        const plantIds: number[] = [];
         const plant = await this.plantRepository.findOne({ where: { id: plantId } });
         if (!plant) {
-            return false;
+            return plantIds;
         }
         for (let i = 0; i < quantity; i++) {
             const newFieldPlant = this.fieldPlantRepository.create({
@@ -26,8 +27,13 @@ export class ProductionService implements IProductionService {
                 state: PlantState.PLANTED
             });
             await this.fieldPlantRepository.save(newFieldPlant);
+            plantIds.push(newFieldPlant.id);
+            if (newFieldPlant.aromaticPower > 4)
+            {
+                this.changeAromaticPower(newFieldPlant.id, (5-newFieldPlant.aromaticPower) * 100);
+            }
         }
-        return true;
+        return plantIds;
     }
 
     async changeAromaticPower(plantId: number, changePercentage: number): Promise<boolean> 
@@ -36,7 +42,7 @@ export class ProductionService implements IProductionService {
         if (!plant) {
             return false;
         }
-        plant.aromaticPower += plant.aromaticPower * (changePercentage / 100);
+        plant.aromaticPower = plant.aromaticPower * (changePercentage / 100);
         await this.fieldPlantRepository.save(plant);
         return true;
     }
@@ -48,7 +54,12 @@ export class ProductionService implements IProductionService {
             return [];
         }
         const harvestedPlants: FieldPlantDTO[] = [];
-        const fieldPlants = await this.fieldPlantRepository.find({ where: { id: plantId, state: PlantState.PLANTED }, take: quantity });
+        const fieldPlants = await this.fieldPlantRepository.find({ where: { plantId: plantId, state: PlantState.PLANTED }, take: quantity });
+        if (fieldPlants.length < quantity) {
+            await this.plantHerb(plantId, quantity - fieldPlants.length);
+            const additionalFieldPlants = await this.fieldPlantRepository.find({ where: { plantId: plantId, state: PlantState.PLANTED }, order: { id: "DESC" }, take: quantity - fieldPlants.length });
+            fieldPlants.push(...additionalFieldPlants);
+        }
         for (const fieldPlant of fieldPlants) {
             fieldPlant.state = PlantState.HARVESTED;
             await this.fieldPlantRepository.save(fieldPlant);
@@ -62,5 +73,15 @@ export class ProductionService implements IProductionService {
             });
         }
         return harvestedPlants;
+    }
+
+    async processPlant(plantId: number): Promise<boolean> {
+        const plant = await this.fieldPlantRepository.findOne({ where: { id: plantId } });
+        if (!plant) {
+            return false;
+        }
+        plant.state = PlantState.PROCESSED;
+        await this.fieldPlantRepository.save(plant);
+        return true;
     }
 }

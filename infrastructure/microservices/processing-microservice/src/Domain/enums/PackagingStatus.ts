@@ -1,4 +1,4 @@
 export enum PackagingStatus {
-    packaged = 'packaged',
-    sent = 'sent'
+    PACKAGED = "PACKAGED",
+    SENT = "SENT"
 }

@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { PerfumeType } from "../enums/PerfumeType";
+import { PerfumeState } from "../enums/PerfumeState";
 
 @Entity("perfumes")
 export class Perfume {
@@ -20,6 +21,9 @@ export class Perfume {
 
     @Column({ type: "number"})
     plantId!: number;
+
+    @Column({ type: "enum", enum: PerfumeState })
+    state!: PerfumeState;
 
     @Column({ type: "date"})
     expirationDate!: string;

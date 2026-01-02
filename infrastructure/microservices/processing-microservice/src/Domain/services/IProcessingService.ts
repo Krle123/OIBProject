@@ -1,7 +1,7 @@
-import { PerfumeType } from "../enums/PerfumeType";
+import { PerfumeDTO } from "../DTOs/PerfumeDTO";
 import { Perfume } from "../models/Perfume";
 
 export interface IProcessingService {
-    beginPlantProcessing(plantId: string): Promise<void>;
-    createPerfumeBatch(serialNumber: string, numberOfBottles: number, quantity: number, type: PerfumeType): Promise<Perfume[]>;
+    beginPlantProcessing(plantId: number, quantity: number): Promise<boolean>;
+    createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number): Promise<Perfume[]>;
 }

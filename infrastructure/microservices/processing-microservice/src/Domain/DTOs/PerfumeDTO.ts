@@ -1,3 +1,4 @@
+import { PerfumeState } from "../enums/PerfumeState";
 import { PerfumeType } from "../enums/PerfumeType";
 
 export class PerfumeDTO {
@@ -6,6 +7,7 @@ export class PerfumeDTO {
     serialNumber!: string;
     type!: PerfumeType;
     quantity!: number;
-    plantId!: number
+    plantId!: number;
+    state!: PerfumeState;
     expirationDate!: string;
 }

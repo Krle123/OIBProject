@@ -24,6 +24,7 @@ export class ProductionController {
         this.router.post('/production/plant', this.plantHerb.bind(this));
         this.router.put('/production/aromatic-power/:id', this.changeAromaticPower.bind(this));
         this.router.post('/production/harvest', this.harvestPlant.bind(this));
+        this.router.post('/production/process', this.processPlant.bind(this));
         this.router.get('/plants/:id', this.getPlantsById.bind(this));
         this.router.get('/plants', this.getAllPlants.bind(this));
         this.router.get('/field-plants/state/:state', this.getPlantsByState.bind(this));
@@ -115,6 +116,21 @@ export class ProductionController {
             res.status(200).json({ success: true, plants });
         } catch (error) {
             console.error("ProductionController.getAllFieldPlants error:", error);
+            res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+        }
+    }
+
+    private async processPlant(req: Request, res: Response): Promise<void> {
+        try {
+            const { plantId } = req.body;
+            const result = await this.productionService.processPlant(plantId);
+            if (result) {
+                res.status(200).json({ success: true, message: "Plant processed successfully" });
+            } else {
+                res.status(400).json({ success: false, message: "Failed to process plant" });
+            }
+        } catch (error) {
+            console.error("ProductionController.processPlant error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
         }
     }

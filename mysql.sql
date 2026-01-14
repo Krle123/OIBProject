@@ -61,3 +61,25 @@ CREATE TABLE IF NOT EXISTS fields_plants (
     
     FOREIGN KEY(plantId) REFERENCES plants(id)
 );
+
+CREATE DATABASE IF NOT EXISTS processing_db;
+
+USE processing_db;
+
+CREATE TABLE IF NOT EXISTS perfumes (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    serialNumber VARCHAR(100),
+    
+    name VARCHAR(100),
+    
+    type ENUM('PERFUME', 'COLOGNE') NOT NULL,
+    
+    quantity INT,
+    
+    plantId INT,
+    
+    state ENUM('PRODUCED', 'PACKAGED') NOT NULL,
+    
+    expirationDate DATE
+);

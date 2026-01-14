@@ -8,18 +8,21 @@ import { LogDTO } from "../Domain/DTOs/LogDTO";
 import { FieldPlantDTO } from "../Domain/DTOs/FieldPlantDTO";
 import { PlantState } from "../Domain/enums/PlantState";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
+import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
   private readonly userClient: AxiosInstance;
   private readonly logClient: AxiosInstance;
   private readonly productionClient: AxiosInstance;
+  private readonly processingClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
     const userBaseURL = process.env.USER_SERVICE_API;
     const logBaseURL = process.env.LOG_SERVICE_API;
     const productionBaseURL = process.env.PRODUCTION_SERVICE_API;
+    const processingBaseURL = process.env.PROCESSING_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -41,6 +44,12 @@ export class GatewayService implements IGatewayService {
 
     this.productionClient = axios.create({
       baseURL: productionBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.processingClient = axios.create({
+      baseURL: processingBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -149,6 +158,12 @@ export class GatewayService implements IGatewayService {
 
   async harvestPlant(fieldPlantId: number, quantity: number): Promise<boolean> {
     const response = await this.productionClient.post<boolean>(`/production/harvest`, { fieldPlantId, quantity });
+    return response.data;
+  }
+
+  //Processing microservice
+  async createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number): Promise<PerfumeDTO[]> {
+    const response = await this.processingClient.post<PerfumeDTO[]>(`/processing/perfumes/create`, { perfume, numberOfBottles });
     return response.data;
   }
   // TODO: ADD MORE API CALLS

@@ -12,7 +12,7 @@ export class Packaging {
     @Column({ type: "varchar", length: 255 })
     adress!: string;
 
-    @Column({ type: "number"})
+    @Column({ type: "int"})
     storageId!: number;
 
     @Column({ type: "json"})

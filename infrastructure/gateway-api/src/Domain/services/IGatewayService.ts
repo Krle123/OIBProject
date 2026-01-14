@@ -1,6 +1,7 @@
 import { FieldPlantDTO } from "../DTOs/FieldPlantDTO";
 import { LogDTO } from "../DTOs/LogDTO";
 import { LoginUserDTO } from "../DTOs/LoginUserDTO";
+import { PerfumeDTO } from "../DTOs/PerfumeDTO";
 import { PlantDTO } from "../DTOs/PlantDTO";
 import { RegistrationUserDTO } from "../DTOs/RegistrationUserDTO";
 import { UserDTO } from "../DTOs/UserDTO";
@@ -30,4 +31,7 @@ export interface IGatewayService {
   plantHerb(plantId: number, quantity: number): Promise<boolean>;
   changeAromaticPower(fieldPlantId: number, changePercentage: number): Promise<boolean>;
   harvestPlant(fieldPlantId: number, quantity: number): Promise<boolean>;
+
+  //Processing
+  createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number): Promise<PerfumeDTO[]>;
 }

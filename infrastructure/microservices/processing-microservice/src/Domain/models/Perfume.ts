@@ -16,11 +16,11 @@ export class Perfume {
     @Column({ type: "enum", enum: PerfumeType })
     type!: PerfumeType;
 
-    @Column({ type: "number"})
+    @Column({ type: "int"})
     quantity!: number;
 
-    @Column({ type: "number"})
-    plantId!: number;
+    @Column({ type: "int"})
+    plantId!: number; 
 
     @Column({ type: "enum", enum: PerfumeState })
     state!: PerfumeState;

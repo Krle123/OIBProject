@@ -5,6 +5,9 @@ import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
 import { authenticate } from "../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../Middlewares/authorization/AuthorizeMiddleware";
 import { PlantState } from "../Domain/enums/PlantState";
+import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
+import { PerfumeType } from "../Domain/enums/PerfumeType";
+import { PerfumeState } from "../Domain/enums/PerfumeState";
 
 export class GatewayController {
   private readonly router: Router;
@@ -37,6 +40,8 @@ export class GatewayController {
     this.router.post("/production/plant", authenticate, authorize("admin", "seller"), this.plantHerb.bind(this));
     this.router.put("/production/aromatic-power/:id", authenticate, authorize("admin", "seller"), this.changeAromaticPower.bind(this));
     this.router.post("/production/harvest", authenticate, authorize("admin", "seller"), this.harvestPlant.bind(this));
+
+    this.router.post("/processing/perfumes/create", authenticate, authorize("admin", "seller"), this.createPerfumeBatch.bind(this));
   }
 
   // Auth
@@ -221,6 +226,24 @@ export class GatewayController {
     }
   }
 
+  // Processing
+  private async createPerfumeBatch(req: Request, res: Response): Promise<void> {
+    try {
+      const { perfume, numberOfBottles } = req.body;
+      const perfumes = await this.gatewayService.createPerfumeBatch(perfume, numberOfBottles);
+      if (perfumes.length > 0) {
+        await this.gatewayService.addLog("INFO", `Created perfume batch of size: ${numberOfBottles} by user ID: ${req.user?.id}`);
+        res.status(201).json({ success: true, perfumes });
+      } else {
+        res.status(400).json({ success: false, message: "Failed to create perfume batch" });
+      }
+    } catch (error) {
+      console.error("GatewayController.createPerfumeBatch error:", error);
+      await this.gatewayService.addLog("ERROR", `Error creating perfume batch: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
   private async testProductionService(): Promise<void> {
     try {
       const plants = await this.gatewayService.getAllPlants();
@@ -244,6 +267,21 @@ export class GatewayController {
     }
     try {
       const success = await this.gatewayService.harvestPlant(1, 3);
+    } catch (error) {
+      console.error("GatewayController.testProductionService error:", error);
+    }
+    try {
+      const perfume = {
+        id: 0,
+        name: "Test Perfume",
+        serialNumber: "PP-2025-0001",
+        type: PerfumeType.PERFUME,
+        quantity: 100,
+        plantId: 1,
+        state: PerfumeState.PRODUCED,
+        expirationDate: "2026-12-31"
+      } as PerfumeDTO;
+      const perfumes = await this.gatewayService.createPerfumeBatch(perfume, 10);
     } catch (error) {
       console.error("GatewayController.testProductionService error:", error);
     }

@@ -1,0 +1,1 @@
+//konekcija za bazu izvestaji_analize treba ovde da uradim -Vesic

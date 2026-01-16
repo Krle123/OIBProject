@@ -126,5 +126,5 @@ CREATE TABLE IF NOT EXISTS analysis_reports (
     periodEnd DATE NULL
 );
 
-GRANT ALL PRIVILEGES ON izvestaji_analize.* TO 'root'@'localhost'
-FLUSH PRIVILEGES
+GRANT ALL PRIVILEGES ON izvestaji_analize.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;

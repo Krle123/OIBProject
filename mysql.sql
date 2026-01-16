@@ -83,3 +83,48 @@ CREATE TABLE IF NOT EXISTS perfumes (
     
     expirationDate DATE
 );
+
+CREATE DATABASE IF NOT EXISTS izvestaji_analize;
+
+USE izvestaji_analize;
+
+CREATE TABLE IF NOT EXISTS fiscal_receipts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    saleType ENUM('RETAIL', 'WHOLESALE') NOT NULL,
+
+    paymentMethod ENUM('CASH', 'CARD', 'MIXED') NOT NULL,
+
+    soldPerfumes JSON NOT NULL,
+
+    totalAmount DECIMAL(10, 2) NOT NULL,
+
+    saleDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    sellerId INT NULL,
+
+    receiptNumber VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS analysis_reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    analysisType ENUM('SALES_BY_MONTH', 'SALES_BY_WEEK', 'SALES_BY_YEAR', 'TOTAL_SALES', 'SALES_TREND', 'TOP_10_PERFUMES', 'TOP_10_REVENUE') NOT NULL,
+
+    title VARCHAR(255) NOT NULL,
+
+    data JSON NOT NULL,
+
+    description TEXT NULL,
+
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    createdBy INT NULL,
+
+    periodStart DATE NULL,
+
+    periodEnd DATE NULL
+);
+
+GRANT ALL PRIVILEGES ON izvestaji_analize.* TO 'root'@'localhost'
+FLUSH PRIVILEGES

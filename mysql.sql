@@ -128,3 +128,44 @@ CREATE TABLE IF NOT EXISTS analysis_reports (
 
 GRANT ALL PRIVILEGES ON izvestaji_analize.* TO 'root'@'localhost';
 FLUSH PRIVILEGES;
+
+-- Sales Database
+CREATE DATABASE IF NOT EXISTS sales_db;
+
+USE sales_db;
+
+CREATE TABLE IF NOT EXISTS storages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100) NOT NULL,
+
+    location VARCHAR(255) NOT NULL,
+
+    maxCapacity INT NOT NULL,
+
+    currentCapacity INT DEFAULT 0,
+
+    type ENUM('DISTRIBUTION_CENTER', 'WAREHOUSE_CENTER') NOT NULL DEFAULT 'WAREHOUSE_CENTER'
+);
+
+CREATE TABLE IF NOT EXISTS fiscal_receipts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    saleType ENUM('RETAIL', 'WHOLESALE') NOT NULL,
+
+    paymentMethod ENUM('CASH', 'BANK_TRANSFER', 'CARD') NOT NULL,
+
+    soldPerfumes JSON NOT NULL,
+
+    totalAmount DECIMAL(10, 2) NOT NULL,
+
+    saleDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    sellerId INT NULL
+);
+
+-- Insert initial storage data
+INSERT INTO storages (name, location, maxCapacity, currentCapacity, type) VALUES
+('Distribution Center Paris', 'Rue de la Paix, Paris', 500, 250, 'DISTRIBUTION_CENTER'),
+('Warehouse Center Marseille', 'Port de Marseille, Marseille', 300, 150, 'WAREHOUSE_CENTER'),
+('Distribution Center Lyon', 'Avenue Charles de Gaulle, Lyon', 400, 200, 'DISTRIBUTION_CENTER');

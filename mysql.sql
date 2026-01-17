@@ -165,6 +165,34 @@ CREATE TABLE IF NOT EXISTS fiscal_receipts (
     sellerId INT NULL
 );
 
+CREATE DATABASE IF NOT EXISTS izvestaji_performanse;
+
+USE izvestaji_performanse;
+
+CREATE TABLE IF NOT EXISTS performance_reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    algorithmType ENUM('DISTRIBUTIVE_CENTER', 'WAREHOUSE_CENTER') NOT NULL,
+
+    title VARCHAR(255) NOT NULL,
+
+    simulationData JSON NOT NULL,
+
+    efficiencyMetrics JSON NOT NULL,
+
+    conclusions TEXT NULL,
+
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    createdBy INT NULL,
+
+    packagesProcessed INT DEFAULT 0,
+
+    averageProcessingTime DECIMAL(10, 2) DEFAULT 0,
+
+    totalSimulationTime DECIMAL(10, 2) DEFAULT 0
+);
+
 -- Insert initial storage data
 INSERT INTO storages (name, location, maxCapacity, currentCapacity, type) VALUES
 ('Distribution Center Paris', 'Rue de la Paix, Paris', 500, 250, 'DISTRIBUTION_CENTER'),

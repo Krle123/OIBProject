@@ -1,0 +1,4 @@
+export enum PerformanceAlgorithmType {
+    DISTRIBUTIVE_CENTER = "DISTRIBUTIVE_CENTER",
+    WAREHOUSE_CENTER = "WAREHOUSE_CENTER"
+}

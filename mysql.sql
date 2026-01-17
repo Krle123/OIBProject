@@ -126,15 +126,6 @@ CREATE TABLE IF NOT EXISTS analysis_reports (
     periodEnd DATE NULL
 );
 
-CREATE TABLE IF NOT EXISTS sales_reports (
-    id CHAR(36) NOT NULL PRIMARY KEY,
-    reportPeriod VARCHAR(20) NOT NULL,
-    totalRevenue DECIMAL(12,2) NOT NULL,
-    totalSales INT NOT NULL,
-    topProducts JSON NOT NULL,
-    trendAnalasys JSON NOT NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 GRANT ALL PRIVILEGES ON izvestaji_analize.* TO 'root'@'localhost';
 FLUSH PRIVILEGES;

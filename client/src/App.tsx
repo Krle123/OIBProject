@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { AuthPage } from "./pages/AuthPage";
 import { IAuthAPI } from "./api/auth/IAuthAPI";
 import { AuthAPI } from "./api/auth/AuthAPI";
@@ -6,46 +6,77 @@ import { UserAPI } from "./api/users/UserAPI";
 import { IUserAPI } from "./api/users/IUserAPI";
 import { ProtectedRoute } from "./components/protected_route/ProtectedRoute";
 import { DashboardPage } from "./pages/DashboardPage";
-
-// Pages
-import { PregledPage } from "./pages/PregledPage.tsx";
-import { ProizvodnjaPage } from "./pages/ProizvodnjaPage.tsx";
-import { PreradaPage } from "./pages/PreradaPage.tsx";
-import { PakovanjePage } from "./pages/PakovanjePage.tsx";
-import { SkladistenjePage } from "./pages/SkladistenjePage.tsx";
-import { ProdajaPage } from "./pages/ProdajaPage.tsx";
+import { SalesPage } from "./pages/SalesPage";
+import { SalesAPI } from "./api/sales/SalesAPI";
+import { ISalesAPI } from "./api/sales/ISalesAPI";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { AnalyticsAPI } from "./api/analytics/AnalyticsAPI";
+import { IAnalyticsAPI } from "./api/analytics/IAnalyticsAPI";
+import { PerformancePage } from "./pages/PerformancePage";
+import { PerformanceAPI } from "./api/performance/PerformanceAPI";
+import { IPerformanceAPI } from "./api/performance/IPerformanceAPI";
 
 const auth_api: IAuthAPI = new AuthAPI();
 const user_api: IUserAPI = new UserAPI();
+const sales_api: ISalesAPI = new SalesAPI();
+const analytics_api: IAnalyticsAPI = new AnalyticsAPI();
+const performance_api: IPerformanceAPI = new PerformanceAPI();
 
 function App() {
   return (
-    <Routes>
-      {/* Auth */}
-      <Route path="/" element={<AuthPage authAPI={auth_api} />} />
-
-      {/* Dashboard (layout route) */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute requiredRole="admin,seller">
-            <DashboardPage userAPI={user_api} />
-          </ProtectedRoute>
-        }
-      >
-        {/* Default dashboard page */}
-        <Route index element={<Navigate to="Pregled" replace />} />
-
-        {/* Dashboard sub-pages */}
-        <Route path="Pregled" element={<PregledPage />} />
-        <Route path="Proizvodnja" element={<ProizvodnjaPage />} />
-        <Route path="Prerada" element={<PreradaPage />} />
-        <Route path="Pakovanje" element={<PakovanjePage />} />
-        <Route path="Skladistenje" element={<SkladistenjePage />} />
-        <Route path="Prodaja" element={<ProdajaPage />} />
-        
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute requiredRole="admin,seller,manager">
+              <DashboardPage userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Prodaja"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <SalesPage salesAPI={sales_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <SalesPage salesAPI={sales_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Analiza"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <AnalyticsPage analyticsAPI={analytics_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <AnalyticsPage analyticsAPI={analytics_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/performance"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <PerformancePage performanceAPI={performance_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/" element={<AuthPage authAPI={auth_api} />} />
+      </Routes>
+    </>
   );
 }
 

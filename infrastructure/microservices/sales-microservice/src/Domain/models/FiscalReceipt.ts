@@ -7,6 +7,9 @@ export class FiscalReceipt {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Column({ type: "varchar", length: 50 })
+    receiptNumber!: string;
+
     @Column({ type: "enum", enum: SaleType })
     saleType!: SaleType;
 

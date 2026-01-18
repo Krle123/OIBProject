@@ -8,7 +8,10 @@ export class AuthAPI implements IAuthAPI {
   private readonly axiosInstance: AxiosInstance;
 
   constructor() {
-    this.axiosInstance = axios.create({baseURL: import.meta.env.VITE_GATEWAY_URL, headers: { "Content-Type": "application/json" }});
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_GATEWAY_URL || "http://localhost:4000/api/v1",
+      headers: { "Content-Type": "application/json" }
+    });
   }
 
   async login(data: LoginUserDTO): Promise<AuthResponseType> {

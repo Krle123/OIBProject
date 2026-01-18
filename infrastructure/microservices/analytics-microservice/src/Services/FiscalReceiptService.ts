@@ -17,8 +17,8 @@ export class FiscalReceiptService implements IFiscalReceiptService {
                 `Creating fiscal receipt for sale data: Receipt from Sales Microservice`
             );
 
-            // Generate unique receipt number
-            const receiptNumber = await this.generateReceiptNumber();
+            // Use receiptNumber from sales service if provided, otherwise generate new one
+            const receiptNumber = saleData.receiptNumber || this.generateUniqueReceiptNumber();
 
             const receipt = this.receiptRepository.create({
                 saleType: saleData.saleType,
@@ -64,24 +64,8 @@ export class FiscalReceiptService implements IFiscalReceiptService {
         return receipt ? new FiscalReceiptDTO(receipt) : null;
     }
 
-    private async generateReceiptNumber(): Promise<string> {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-
-        // Count receipts today to generate sequential number
-        const todayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const todayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-
-        const count = await this.receiptRepository.count({
-            where: {
-                saleDate: todayStart as any // TypeORM will handle the range
-            }
-        });
-
-        const sequentialNumber = String(count + 1).padStart(4, '0');
-
-        return `FR-${year}${month}${day}-${sequentialNumber}`;
+    private generateUniqueReceiptNumber(): string {
+        // Generate unique receipt number with timestamp and random string
+        return `FR-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     }
 }

@@ -3,14 +3,14 @@ import { IPDFService } from "../Domain/services/IPDFService";
 import { PerformanceReportDTO } from "../Domain/DTOs/PerformanceReportDTO";
 
 export class PDFService implements IPDFService {
-    
+    // Helper function to safely convert any value to number
     private toNumber(value: any): number {
         if (typeof value === 'number') return value;
         if (typeof value === 'string') return parseFloat(value) || 0;
         return 0;
     }
 
-    
+    // Convert Serbian characters to ASCII equivalents for PDF compatibility
     private toAscii(text: string): string {
         const map: { [key: string]: string } = {
             'č': 'c', 'Č': 'C',
@@ -32,12 +32,12 @@ export class PDFService implements IPDFService {
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
                 doc.on('error', reject);
 
-                
+                // Header
                 doc.fontSize(20).text(this.toAscii("O'Sinjel De Or Parfumerie"), { align: 'center' });
                 doc.fontSize(16).text(this.toAscii('IZVESTAJ ANALIZE PERFORMANSI'), { align: 'center' });
                 doc.moveDown();
 
-                
+                // Report details
                 doc.fontSize(12).font('Helvetica-Bold');
                 doc.text(this.toAscii(report.title));
                 doc.moveDown();
@@ -50,7 +50,7 @@ export class PDFService implements IPDFService {
                 }
                 doc.moveDown();
 
-                
+                // Metrics section
                 doc.fontSize(11).font('Helvetica-Bold').text(this.toAscii('Metrije Performansi:'));
                 doc.fontSize(10).font('Helvetica');
                 doc.text(this.toAscii(`Procesirano paketa: ${report.packagesProcessed || 0}`));
@@ -73,7 +73,7 @@ export class PDFService implements IPDFService {
 
                 doc.moveDown(2);
 
-                
+                // Simulation data
                 if (report.simulationData) {
                     doc.fontSize(11).font('Helvetica-Bold').text(this.toAscii('Podaci Simulacije:'));
                     doc.fontSize(10).font('Helvetica');
@@ -82,7 +82,7 @@ export class PDFService implements IPDFService {
                     doc.moveDown();
                 }
 
-                
+                // Conclusions
                 if (report.conclusions) {
                     doc.fontSize(11).font('Helvetica-Bold').text(this.toAscii('Zakljucci i Preporuke:'));
                     doc.fontSize(10).font('Helvetica');

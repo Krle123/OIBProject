@@ -23,6 +23,7 @@ export class CommunicationService implements ICommunicationService {
             });
         } catch (error: any) {
             console.error("Failed to log event:", error.message);
+            // Don't throw - logging failures shouldn't break the main flow
         }
     }
 }

@@ -81,7 +81,7 @@ export class PerformanceService implements IPerformanceService {
         algorithmType: PerformanceAlgorithmType,
         numberOfPackages: number
     ): Promise<SimulationResult> {
-        
+        // Simulacija logističkog algoritma
         const config = this.getAlgorithmConfig(algorithmType);
         const packageProcessingTimes: number[] = [];
         const bottlenecks: string[] = [];
@@ -90,11 +90,11 @@ export class PerformanceService implements IPerformanceService {
         let totalTime = 0;
         let packagesProcessed = 0;
 
-        
+        // Simulacija procesiranja paketa
         for (let i = 0; i < numberOfPackages; i++) {
             const processingTime = config.processingTimePerPackage;
             
-            
+            // Dodaj varijaciju u vremenu procesiranja (±20%)
             const variation = 1 + (Math.random() - 0.5) * 0.4;
             const actualTime = processingTime * variation;
             
@@ -102,7 +102,7 @@ export class PerformanceService implements IPerformanceService {
             totalTime += actualTime;
             packagesProcessed++;
 
-            
+            // Simulacija bottleneck-a
             if (actualTime > config.processingTimePerPackage * 1.3) {
                 bottlenecks.push(`Paket ${i + 1} ima duže vreme procesiranja: ${actualTime.toFixed(2)}s`);
             }
@@ -110,9 +110,9 @@ export class PerformanceService implements IPerformanceService {
 
         const averageTimePerPackage = totalTime / packagesProcessed;
         const efficiency = this.calculateEfficiency(config, averageTimePerPackage, packagesProcessed);
-        const throughput = packagesProcessed / totalTime; 
+        const throughput = packagesProcessed / totalTime; // paketa po sekundi
 
-        
+        // Generisanje preporuka
         if (averageTimePerPackage > config.processingTimePerPackage * 1.2) {
             recommendations.push("Preporučuje se optimizacija procesa obrade paketa");
         }
@@ -143,15 +143,15 @@ export class PerformanceService implements IPerformanceService {
         switch (algorithmType) {
             case PerformanceAlgorithmType.DISTRIBUTIVE_CENTER:
                 return {
-                    processingTimePerPackage: 0.5, 
+                    processingTimePerPackage: 0.5, // sekundi
                     maxPackagesPerBatch: 3,
-                    expectedThroughput: 6 
+                    expectedThroughput: 6 // paketa po sekundi
                 };
             case PerformanceAlgorithmType.WAREHOUSE_CENTER:
                 return {
-                    processingTimePerPackage: 2.5, 
+                    processingTimePerPackage: 2.5, // sekundi
                     maxPackagesPerBatch: 1,
-                    expectedThroughput: 0.4 
+                    expectedThroughput: 0.4 // paketa po sekundi
                 };
             default:
                 throw new Error(`Nepoznat tip algoritma: ${algorithmType}`);
@@ -163,10 +163,10 @@ export class PerformanceService implements IPerformanceService {
         averageTime: number,
         packagesProcessed: number
     ): number {
-        
+        // Efikasnost se računa kao odnos očekivanog i stvarnog vremena
         const expectedTime = config.processingTimePerPackage;
         const efficiency = (expectedTime / averageTime) * 100;
-        return Math.max(0, Math.min(100, efficiency)); 
+        return Math.max(0, Math.min(100, efficiency)); // Ograniči na 0-100%
     }
 
     private generateConclusions(result: SimulationResult): string {

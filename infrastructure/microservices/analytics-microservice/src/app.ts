@@ -49,12 +49,10 @@ export const initializeApp = async (): Promise<Application> => {
     const fiscalReceiptController = new FiscalReceiptController(fiscalReceiptService, pdfService);
     const analyticsController = new AnalyticsController(analyticsService, pdfService);
 
-    // Public route for receiving sales data from sales-microservice
+    // Public routes - gateway handles authentication
     app.post("/api/v1/analysis/sales", fiscalReceiptController.createFiscalReceipt);
-
-    // Protected routes (require authentication)
-    app.use("/api/v1", authMiddleware, createFiscalReceiptRoutes(fiscalReceiptController));
-    app.use("/api/v1/analytics", authMiddleware, createAnalyticsRoutes(analyticsController));
+    app.use("/api/v1", createFiscalReceiptRoutes(fiscalReceiptController));
+    app.use("/api/v1/analytics", createAnalyticsRoutes(analyticsController));
 
     return app;
 };

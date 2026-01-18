@@ -16,10 +16,10 @@ const startServer = async () => {
 ║   Performance Microservice - O'Sinjel De Or      ║
 ╚════════════════════════════════════════════════════╝
 
-Server running on port ${PORT}
-Environment: ${process.env.NODE_ENV || 'development'}
-API Base URL: http://localhost:${PORT}/api/v1
-Health Check: http://localhost:${PORT}/health
+✓ Server running on port ${PORT}
+✓ Environment: ${process.env.NODE_ENV || 'development'}
+✓ API Base URL: http://localhost:${PORT}/api/v1
+✓ Health Check: http://localhost:${PORT}/health
 
 Available Endpoints:
 

@@ -651,6 +651,7 @@ hr {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #eef2f7;
 }
 
 .dashboard-content {
@@ -719,4 +720,1123 @@ hr {
     padding: 6px 10px;
     font-size: 12px;
     background: #f4f6fb;
+}
+
+/* Sales Page Styles */
+.sales-page-content {
+    flex: 1;
+    padding: 24px;
+    background: #eef2f7;
+    overflow-y: auto;
+}
+
+.sales-page-content h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+}
+
+.sales-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.sales-form-panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.sales-form-panel .panel-header {
+    background: #2f6fed;
+    color: white;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.sales-form-content {
+    padding: 20px;
+}
+
+.sales-form-group {
+    margin-bottom: 20px;
+}
+
+.sales-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.sales-form-group select,
+.sales-form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    color: #333;
+}
+
+.sales-form-group select:focus,
+.sales-form-group input:focus {
+    outline: none;
+    border-color: #2f6fed;
+    box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.1);
+}
+
+.sales-perfume-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.sales-perfume-row input[type="text"] {
+    flex: 1;
+}
+
+.sales-perfume-row input[type="number"] {
+    width: 100px;
+}
+
+.sales-remove-btn {
+    padding: 10px 14px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.sales-remove-btn:hover {
+    background: #dc2626;
+}
+
+.sales-add-btn {
+    width: 100%;
+    padding: 12px;
+    background: #2f6fed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.sales-add-btn:hover {
+    background: #1d5ed9;
+}
+
+.sales-total-box {
+    padding: 16px;
+    background: #f0f7ff;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #d0e3ff;
+}
+
+.sales-total-box strong {
+    color: #1a1a1a;
+}
+
+.sales-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: background 0.2s;
+}
+
+.sales-submit-btn:hover:not(:disabled) {
+    background: #059669;
+}
+
+.sales-submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.sales-success-message {
+    background: #10b981;
+    color: white;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.sales-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sales-sidebar-panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.sales-sidebar-panel .panel-header {
+    background: #2f6fed;
+    color: white;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.sales-sidebar-content {
+    padding: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.sales-storage-item,
+.sales-receipt-item {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.sales-storage-item:last-child,
+.sales-receipt-item:last-child {
+    margin-bottom: 0;
+}
+
+.sales-storage-name,
+.sales-receipt-id {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 14px;
+}
+
+.sales-storage-location {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.sales-storage-capacity {
+    font-size: 12px;
+    color: #475569;
+    margin-top: 4px;
+}
+
+.sales-receipt-details {
+    font-size: 12px;
+    color: #475569;
+}
+
+.sales-receipt-amount {
+    color: #10b981;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.sales-empty-state {
+    text-align: center;
+    color: #94a3b8;
+    padding: 20px;
+    font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+    .sales-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Analytics Page Styles */
+.analytics-page-content {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.analytics-page-content h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #1e293b;
+}
+
+.analytics-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+.analytics-tab {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s;
+}
+
+.analytics-tab:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.analytics-tab.active {
+    background: #0078d4;
+    color: white;
+}
+
+.analytics-loading {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
+
+.analytics-overview {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.analytics-card-wide {
+    grid-column: span 2;
+}
+
+.analytics-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #334155;
+}
+
+.analytics-stats {
+    display: flex;
+    gap: 40px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0078d4;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.analytics-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-group label {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.analytics-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.analytics-actions button {
+    padding: 8px 16px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.analytics-actions button:hover {
+    background: #106ebe;
+}
+
+.analytics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.analytics-list li {
+    display: flex;
+    align-items: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 12px;
+}
+
+.analytics-list li:last-child {
+    border-bottom: none;
+}
+
+.analytics-list li:hover {
+    background: #f8fafc;
+}
+
+.analytics-list .rank {
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    background: #0078d4;
+    border-radius: 50%;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.analytics-list .name {
+    flex: 1;
+    color: #334155;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.analytics-list .value {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+    white-space: nowrap;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.analytics-table th,
+.analytics-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.analytics-table th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+    font-size: 13px;
+}
+
+.analytics-table td {
+    font-size: 14px;
+    color: #334155;
+}
+
+.btn-download {
+    padding: 6px 12px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-download:hover {
+    background: #059669;
+}
+
+.analytics-empty {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+    .analytics-overview {
+        grid-template-columns: 1fr;
+    }
+    .analytics-card-wide {
+        grid-column: span 1;
+    }
+}
+
+/* Performance Page Styles */
+.performance-page-content {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.performance-page-content h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #1e293b;
+}
+
+.performance-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+.performance-tab {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s;
+}
+
+.performance-tab:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.performance-tab.active {
+    background: #0078d4;
+    color: white;
+}
+
+.performance-loading {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
+
+.performance-simulation {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.performance-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.performance-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #334155;
+}
+
+.performance-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #334155;
+}
+
+.performance-description {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.performance-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.form-group select,
+.form-group input {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+
+.form-group small {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.btn-primary {
+    padding: 12px 24px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0063b1;
+}
+
+.btn-primary:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.metric-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.performance-conclusions {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.performance-conclusions h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #334155;
+}
+
+.performance-conclusions pre {
+    font-size: 13px;
+    color: #475569;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.performance-reports {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.performance-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.performance-filters label {
+    font-size: 14px;
+    color: #334155;
+}
+
+.performance-filters select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.performance-empty {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+    background: white;
+    border-radius: 12px;
+}
+
+.performance-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.performance-table thead {
+    background: #f8fafc;
+}
+
+.performance-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.performance-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #334155;
+    border-top: 1px solid #e2e8f0;
+}
+
+.performance-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.btn-view,
+.btn-download {
+    padding: 6px 12px;
+    margin-right: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-view {
+    background: #0078d4;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #0063b1;
+}
+
+.btn-download {
+    background: #10b981;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #059669;
+}
+
+.performance-report-detail {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.performance-report-detail h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #334155;
+}
+
+.btn-close {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #64748b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-close:hover {
+    background: #475569;
+}
+
+/* ============================================
+   Performance Page Styles
+   ============================================ */
+
+.performance-page {
+    min-height: 100vh;
+    background: var(--win11-bg);
+    color: var(--win11-text-primary);
+}
+
+.performance-page-content {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.performance-page-content h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--win11-text-primary);
+}
+
+/* Tabs */
+.performance-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--win11-divider);
+}
+
+.performance-tab {
+    padding: 1rem 2rem;
+    background: transparent;
+    border: none;
+    color: var(--win11-text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all var(--win11-transition-normal);
+}
+
+.performance-tab:hover {
+    color: var(--win11-text-primary);
+    background: var(--win11-hover);
+}
+
+.performance-tab.active {
+    color: var(--win11-accent);
+    border-bottom-color: var(--win11-accent);
+}
+
+/* Cards */
+.performance-card {
+    background: var(--win11-card-bg);
+    border-radius: var(--win11-radius-large);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--win11-shadow-medium);
+    backdrop-filter: blur(30px);
+}
+
+.performance-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--win11-text-primary);
+}
+
+.performance-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--win11-accent);
+}
+
+.performance-description {
+    color: var(--win11-text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+/* Form */
+.performance-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.performance-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.performance-form label {
+    color: var(--win11-text-primary);
+    font-weight: 500;
+}
+
+.performance-form select,
+.performance-form input {
+    padding: 0.75rem;
+    background: var(--win11-acrylic-bg);
+    border: 1px solid var(--win11-divider);
+    border-radius: var(--win11-radius-small);
+    color: var(--win11-text-primary);
+    font-size: 1rem;
+}
+
+.performance-form select:focus,
+.performance-form input:focus {
+    outline: none;
+    border-color: var(--win11-accent);
+}
+
+.performance-form small {
+    color: var(--win11-text-tertiary);
+    font-size: 0.875rem;
+}
+
+.btn-primary {
+    padding: 0.75rem 2rem;
+    background: var(--win11-accent);
+    color: var(--win11-bg);
+    border: none;
+    border-radius: var(--win11-radius-small);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--win11-transition-normal);
+}
+
+.btn-primary:hover {
+    background: var(--win11-accent-hover);
+}
+
+.btn-primary:active {
+    background: var(--win11-accent-pressed);
+}
+
+.btn-primary:disabled {
+    background: var(--win11-text-tertiary);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Metrics */
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+    background: var(--win11-acrylic-bg);
+    border-radius: var(--win11-radius-small);
+}
+
+.metric-label {
+    color: var(--win11-text-tertiary);
+    font-size: 0.875rem;
+}
+
+.metric-value {
+    color: var(--win11-text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Conclusions */
+.performance-conclusions {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--win11-acrylic-bg);
+    border-radius: var(--win11-radius-small);
+    border-left: 3px solid var(--win11-accent);
+}
+
+.performance-conclusions h4 {
+    color: var(--win11-accent);
+    margin-bottom: 0.5rem;
+}
+
+.performance-conclusions pre {
+    color: var(--win11-text-secondary);
+    white-space: pre-wrap;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+/* Reports Section */
+.performance-reports {
+    background: var(--win11-card-bg);
+    border-radius: var(--win11-radius-large);
+    padding: 2rem;
+    box-shadow: var(--win11-shadow-medium);
+    backdrop-filter: blur(30px);
+}
+
+.performance-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.performance-filters label {
+    color: var(--win11-text-primary);
+    font-weight: 500;
+}
+
+.performance-filters select {
+    padding: 0.5rem 1rem;
+    background: var(--win11-acrylic-bg);
+    border: 1px solid var(--win11-divider);
+    border-radius: var(--win11-radius-small);
+    color: var(--win11-text-primary);
+    font-size: 1rem;
+}
+
+/* Table */
+.performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+.performance-table thead {
+    background: var(--win11-acrylic-bg);
+}
+
+.performance-table th {
+    padding: 1rem;
+    text-align: left;
+    color: var(--win11-text-primary);
+    font-weight: 600;
+    border-bottom: 2px solid var(--win11-divider);
+}
+
+.performance-table td {
+    padding: 1rem;
+    color: var(--win11-text-secondary);
+    border-bottom: 1px solid var(--win11-divider);
+}
+
+.performance-table tbody tr {
+    transition: background var(--win11-transition-fast);
+}
+
+.performance-table tbody tr:hover {
+    background: var(--win11-hover);
+}
+
+.performance-table button {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border: none;
+    border-radius: var(--win11-radius-small);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--win11-transition-normal);
+}
+
+.btn-view {
+    background: var(--win11-accent);
+    color: var(--win11-bg);
+}
+
+.btn-view:hover {
+    background: var(--win11-accent-hover);
+}
+
+.btn-download {
+    background: var(--win11-text-tertiary);
+    color: var(--win11-bg);
+}
+
+.btn-download:hover {
+    background: var(--win11-text-secondary);
+}
+
+/* Empty State */
+.performance-empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--win11-text-tertiary);
+    font-size: 1.125rem;
+}
+
+/* Loading */
+.performance-loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--win11-text-secondary);
+    font-size: 1.125rem;
+}
+
+/* Report Detail */
+.performance-report-detail {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: var(--win11-acrylic-bg);
+    border-radius: var(--win11-radius-large);
+    border: 1px solid var(--win11-divider);
+}
+
+.performance-report-detail h3 {
+    color: var(--win11-accent);
+    margin-bottom: 1.5rem;
 }

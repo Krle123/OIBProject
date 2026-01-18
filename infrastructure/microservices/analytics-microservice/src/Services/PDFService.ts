@@ -16,17 +16,17 @@ export class PDFService implements IPDFService {
 
                 // Header
                 doc.fontSize(20).text("O'Sinjel De Or Parfumerie", { align: 'center' });
-                doc.fontSize(16).text('ФИСКАЛНИ РАЧУН', { align: 'center' });
+                doc.fontSize(16).text('FISKALNI RACUN', { align: 'center' });
                 doc.moveDown();
 
                 // Receipt details
                 doc.fontSize(10);
-                doc.text(`Број рачуна: ${receipt.receiptNumber}`);
-                doc.text(`Датум: ${new Date(receipt.saleDate).toLocaleString('sr-RS')}`);
-                doc.text(`Тип продаје: ${receipt.saleType === 'RETAIL' ? 'Мало' : 'Велико'}`);
-                doc.text(`Начин плаћања: ${this.getPaymentMethodText(receipt.paymentMethod)}`);
+                doc.text(`Broj racuna: ${receipt.receiptNumber}`);
+                doc.text(`Datum: ${this.formatDate(new Date(receipt.saleDate))}`);
+                doc.text(`Tip prodaje: ${receipt.saleType === 'RETAIL' ? 'Maloprodaja' : 'Veleprodaja'}`);
+                doc.text(`Nacin placanja: ${this.getPaymentMethodText(receipt.paymentMethod)}`);
                 if (receipt.sellerId) {
-                    doc.text(`ID продавца: ${receipt.sellerId}`);
+                    doc.text(`ID prodavca: ${receipt.sellerId}`);
                 }
                 doc.moveDown();
 
@@ -36,10 +36,10 @@ export class PDFService implements IPDFService {
 
                 // Table header
                 doc.fontSize(10).font('Helvetica-Bold');
-                doc.text('Парфем', 50, doc.y, { width: 200, continued: true });
-                doc.text('Кол.', 250, doc.y, { width: 50, continued: true });
-                doc.text('Цена', 300, doc.y, { width: 100, continued: true });
-                doc.text('Укупно', 400, doc.y, { width: 100 });
+                doc.text('Parfem', 50, doc.y, { width: 200, continued: true });
+                doc.text('Kol.', 250, doc.y, { width: 50, continued: true });
+                doc.text('Cena', 300, doc.y, { width: 100, continued: true });
+                doc.text('Ukupno', 400, doc.y, { width: 100 });
                 doc.moveDown();
 
                 doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
@@ -62,12 +62,12 @@ export class PDFService implements IPDFService {
 
                 // Total
                 doc.fontSize(12).font('Helvetica-Bold');
-                doc.text(`УКУПНО: ${Number(receipt.totalAmount).toFixed(2)} RSD`, { align: 'right' });
+                doc.text(`UKUPNO: ${Number(receipt.totalAmount).toFixed(2)} RSD`, { align: 'right' });
 
                 doc.moveDown(2);
                 doc.fontSize(8).font('Helvetica');
-                doc.text('Хвала на куповини!', { align: 'center' });
-                doc.text("O'Sinjel De Or Parfumerie - Ваша парфимерија", { align: 'center' });
+                doc.text('Hvala na kupovini!', { align: 'center' });
+                doc.text("O'Sinjel De Or Parfumerie - Vasa parfimerija", { align: 'center' });
 
                 doc.end();
             } catch (error) {
@@ -88,7 +88,7 @@ export class PDFService implements IPDFService {
 
                 // Header
                 doc.fontSize(20).text("O'Sinjel De Or Parfumerie", { align: 'center' });
-                doc.fontSize(16).text('ИЗВЕШТАЈ АНАЛИЗЕ', { align: 'center' });
+                doc.fontSize(16).text('IZVESTAJ ANALIZE', { align: 'center' });
                 doc.moveDown();
 
                 // Report details
@@ -102,9 +102,9 @@ export class PDFService implements IPDFService {
                     doc.moveDown();
                 }
 
-                doc.text(`Датум креирања: ${new Date(report.createdAt).toLocaleString('sr-RS')}`);
+                doc.text(`Datum kreiranja: ${this.formatDate(new Date(report.createdAt))}`);
                 if (report.periodStart && report.periodEnd) {
-                    doc.text(`Период: ${new Date(report.periodStart).toLocaleDateString('sr-RS')} - ${new Date(report.periodEnd).toLocaleDateString('sr-RS')}`);
+                    doc.text(`Period: ${this.formatDateShort(new Date(report.periodStart))} - ${this.formatDateShort(new Date(report.periodEnd))}`);
                 }
                 doc.moveDown(2);
 
@@ -113,8 +113,8 @@ export class PDFService implements IPDFService {
 
                 doc.moveDown(2);
                 doc.fontSize(8);
-                doc.text(`Број извештаја: ${report.id}`, { align: 'center' });
-                doc.text("O'Sinjel De Or Parfumerie - Систем за анализу података", { align: 'center' });
+                doc.text(`Broj izvestaja: ${report.id}`, { align: 'center' });
+                doc.text("O'Sinjel De Or Parfumerie - Sistem za analizu podataka", { align: 'center' });
 
                 doc.end();
             } catch (error) {
@@ -130,52 +130,52 @@ export class PDFService implements IPDFService {
             case 'SALES_BY_MONTH':
             case 'SALES_BY_WEEK':
             case 'SALES_BY_YEAR':
-                doc.fontSize(11).font('Helvetica-Bold').text('Резултати:');
+                doc.fontSize(11).font('Helvetica-Bold').text('Rezultati:');
                 doc.fontSize(10).font('Helvetica');
-                doc.text(`Укупна продаја: ${data.totalSales} RSD`);
-                doc.text(`Број трансакција: ${data.totalTransactions}`);
+                doc.text(`Ukupna prodaja: ${data.totalSales} RSD`);
+                doc.text(`Broj transakcija: ${data.totalTransactions}`);
                 if (data.averageTransaction) {
-                    doc.text(`Просечна трансакција: ${data.averageTransaction} RSD`);
+                    doc.text(`Prosecna transakcija: ${data.averageTransaction} RSD`);
                 }
                 break;
 
             case 'TOTAL_SALES':
-                doc.fontSize(11).font('Helvetica-Bold').text('Укупни резултати:');
+                doc.fontSize(11).font('Helvetica-Bold').text('Ukupni rezultati:');
                 doc.fontSize(10).font('Helvetica');
-                doc.text(`Укупна продаја: ${data.totalSales} RSD`);
-                doc.text(`Укупан број трансакција: ${data.totalTransactions}`);
-                doc.text(`Просечна вредност трансакције: ${data.averageTransaction} RSD`);
+                doc.text(`Ukupna prodaja: ${data.totalSales} RSD`);
+                doc.text(`Ukupan broj transakcija: ${data.totalTransactions}`);
+                doc.text(`Prosecna vrednost transakcije: ${data.averageTransaction} RSD`);
                 break;
 
             case 'TOP_10_PERFUMES':
-                doc.fontSize(11).font('Helvetica-Bold').text('Топ 10 најпродаванијих парфема:');
+                doc.fontSize(11).font('Helvetica-Bold').text('Top 10 najprodavanijih parfema:');
                 doc.moveDown();
                 data.top10Perfumes.forEach((perfume: any) => {
                     doc.fontSize(10).font('Helvetica');
                     doc.text(`${perfume.rank}. ${perfume.name} (${perfume.serialNumber})`);
-                    doc.text(`   Продато: ${perfume.totalQuantitySold} комада`);
+                    doc.text(`   Prodato: ${perfume.totalQuantitySold} komada`);
                     doc.moveDown(0.5);
                 });
                 break;
 
             case 'TOP_10_REVENUE':
-                doc.fontSize(11).font('Helvetica-Bold').text('Топ 10 парфема по приходу:');
+                doc.fontSize(11).font('Helvetica-Bold').text('Top 10 parfema po prihodu:');
                 doc.moveDown();
                 data.top10ByRevenue.forEach((perfume: any) => {
                     doc.fontSize(10).font('Helvetica');
                     doc.text(`${perfume.rank}. ${perfume.name} (${perfume.serialNumber})`);
-                    doc.text(`   Приход: ${perfume.totalRevenue} RSD | Продато: ${perfume.quantitySold} комада`);
+                    doc.text(`   Prihod: ${perfume.totalRevenue} RSD | Prodato: ${perfume.quantitySold} komada`);
                     doc.moveDown(0.5);
                 });
                 doc.moveDown();
-                doc.font('Helvetica-Bold').text(`Укупан приход топ 10: ${data.totalRevenueFromTop10} RSD`);
+                doc.font('Helvetica-Bold').text(`Ukupan prihod top 10: ${data.totalRevenueFromTop10} RSD`);
                 break;
 
             case 'SALES_TREND':
-                doc.fontSize(11).font('Helvetica-Bold').text('Анализа тренда продаје:');
+                doc.fontSize(11).font('Helvetica-Bold').text('Analiza trenda prodaje:');
                 doc.fontSize(10).font('Helvetica');
-                doc.text(`Укупна продаја: ${data.totalSales} RSD`);
-                doc.text(`Просечна дневна продаја: ${data.averageDailySales} RSD`);
+                doc.text(`Ukupna prodaja: ${data.totalSales} RSD`);
+                doc.text(`Prosecna dnevna prodaja: ${data.averageDailySales} RSD`);
                 break;
 
             default:
@@ -186,10 +186,27 @@ export class PDFService implements IPDFService {
 
     private getPaymentMethodText(method: string): string {
         switch (method) {
-            case 'CASH': return 'Готовина';
-            case 'CARD': return 'Картица';
-            case 'MIXED': return 'Мешовито';
+            case 'CASH': return 'Gotovina';
+            case 'CARD': return 'Kartica';
+            case 'MIXED': return 'Mesovito';
             default: return method;
         }
+    }
+
+    private formatDate(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${day}.${month}.${year}. ${hours}:${minutes}:${seconds}`;
+    }
+
+    private formatDateShort(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}.`;
     }
 }

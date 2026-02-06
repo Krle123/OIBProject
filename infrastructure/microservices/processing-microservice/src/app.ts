@@ -10,6 +10,8 @@ import { ProcessingService } from './Services/ProcessingService';
 import { ICommunicationService } from './Domain/services/ICommunicationService';
 import { CommunicationService } from './Services/CommunicationService';
 import { Perfume } from './Domain/models/Perfume';
+import { LogerService } from './Services/LogerService';
+import { ILogerService } from './Domain/services/ILogerService';
 
 dotenv.config({ quiet: true });
 
@@ -31,7 +33,8 @@ app.use(cors({
 
 const processingRepository = Db.getRepository(Perfume);
 const communicationService: ICommunicationService = new CommunicationService();
-const processingService: IProcessingService = new ProcessingService(communicationService, processingRepository);
+const logerService: ILogerService = new LogerService();
+const processingService: IProcessingService = new ProcessingService(communicationService, processingRepository, logerService);
 
 initialize_database();
 

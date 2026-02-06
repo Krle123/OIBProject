@@ -3,7 +3,6 @@ import { FiscalReceipt } from "../Domain/models/FiscalReceipt";
 import { FiscalReceiptDTO } from "../Domain/DTOs/FiscalReceiptDTO";
 import { ISalesService } from "../Domain/services/ISalesService";
 import { ICommunicationService } from "../Domain/services/ICommunicationService";
-import { IStorageService } from "../Domain/services/IStorageService";
 import { SaleType } from "../Domain/enums/SaleType";
 import { PaymentMethod } from "../Domain/enums/PaymentMethod";
 
@@ -11,7 +10,6 @@ export class SalesService implements ISalesService {
     constructor(
         private readonly receiptRepository: Repository<FiscalReceipt>,
         private readonly communicationService: ICommunicationService,
-        private readonly storageService: IStorageService
     ) {}
 
     async processSale(

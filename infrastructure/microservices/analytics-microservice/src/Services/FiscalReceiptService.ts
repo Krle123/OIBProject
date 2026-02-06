@@ -10,7 +10,7 @@ export class FiscalReceiptService implements IFiscalReceiptService {
         private readonly communicationService: ICommunicationService
     ) {}
 
-    async createFiscalReceipt(saleData: any): Promise<FiscalReceiptDTO> {
+    async createFiscalReceipt(saleData: FiscalReceiptDTO): Promise<FiscalReceiptDTO> {
         try {
             await this.communicationService.logEvent(
                 "INFO",

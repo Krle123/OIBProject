@@ -12,6 +12,8 @@ import { Plant } from './Domain/models/Plant';
 import { Repository } from 'typeorm';
 import { IPlantService } from './Domain/services/IPlantService';
 import { PlantService } from './Services/PlantService';
+import { LogerService } from './Services/LogerService';
+import { ILogerService } from './Domain/services/ILogerService';
 
 dotenv.config({ quiet: true });
 
@@ -34,8 +36,9 @@ app.use(cors({
 const fieldPlantRepository: Repository<FieldPlant> = Db.getRepository(FieldPlant);
 const plantRepository: Repository<Plant> = Db.getRepository(Plant);
 
-const productionService: IProductionService = new ProductionService(fieldPlantRepository, plantRepository);
-const plantService: IPlantService = new PlantService(plantRepository, fieldPlantRepository);
+const logerService: ILogerService = new LogerService();
+const productionService: IProductionService = new ProductionService(fieldPlantRepository, plantRepository, logerService);
+const plantService: IPlantService = new PlantService(plantRepository, fieldPlantRepository, logerService);
 
 initialize_database();
 

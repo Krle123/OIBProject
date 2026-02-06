@@ -9,6 +9,11 @@ import { FieldPlantDTO } from "../Domain/DTOs/FieldPlantDTO";
 import { PlantState } from "../Domain/enums/PlantState";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
+import { AnalysisReportDTO } from "../Domain/DTOs/AnalysisReportDTO";
+import { AnalysisType } from "../Domain/enums/AnalysisType";
+import { FiscalReceiptDTO } from "../Domain/DTOs/FiscalReceiptDTO";
+import { PerformanceReportDTO } from "../Domain/DTOs/PerformanceReportDTO";
+import { PerformanceAlgorithmType } from "../Domain/enums/PerformanceAlgorithmType";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
@@ -165,6 +170,134 @@ export class GatewayService implements IGatewayService {
   async createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number): Promise<PerfumeDTO[]> {
     const response = await this.processingClient.post<PerfumeDTO[]>(`/processing/perfumes/create`, { perfume, numberOfBottles });
     return response.data;
+  }
+
+  //Analytics microservice
+  async calculateSalesByMonth(month: number, year: number, userId?: number) {
+    const params: any = { month, year };
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO>(`/analytics/sales/by-month`, { params });
+    return response.data;
+  }
+  
+  async calculateSalesByYear(year: number, userId?: number) {
+    const params: any = { year };
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO>(`/analytics/sales/by-year`, { params });
+    return response.data;
+  }
+
+  async calculateSalesByWeek(weekNumber: number, year: number, userId?: number) {
+    const params: any = { weekNumber, year };
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO>(`/analytics/sales/by-week`, { params });
+    return response.data;
+  }
+
+  async calculateTotalSales(userId?: number) {
+    const params: any = {};
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO>(`/analytics/sales/total`, { params });
+    return response.data;
+  }
+
+  async analyzeSalesTrend(startDate: string, endDate: string, userId?: number) {
+    const params: any = { startDate, endDate };
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO>(`/analytics/sales/trend`, { params });
+    return response.data;
+  }
+
+  async getTop10BestSellingPerfumes(userId?: number) {
+    const params: any = {};
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO[]>(`/analytics/top-10/best-selling`, { params });
+    return response.data;
+  }
+
+  async getTop10RevenueByPerfume(userId?: number) {
+    const params: any = {};
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.get<AnalysisReportDTO[]>(`/analytics/top-10/revenue`, { params });
+    return response.data;
+  }
+
+  async getAllAnalysisReports(): Promise<AnalysisReportDTO[]> {
+    const response = await this.processingClient.get<AnalysisReportDTO[]>(`/analytics/reports`);
+    return response.data;
+  }
+
+  async getAnalysisReportById(reportId: number): Promise<AnalysisReportDTO> {
+    const response = await this.processingClient.get<AnalysisReportDTO>(`/analytics/reports/${reportId}`);
+    return response.data;
+  }
+
+  async getAnalysisReportsByType(type: AnalysisType): Promise<AnalysisReportDTO[]> {
+    const response = await this.processingClient.get<AnalysisReportDTO[]>(`/analytics/reports/type/${type}`);
+    return response.data;
+  }
+
+  async downloadAnalysisReportPDF(reportId: number): Promise<Buffer> {
+    const response = await this.processingClient.get(`/analytics/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
+    return Buffer.from(response.data);
+  }
+
+  async createFiscalReceipt(saleData: FiscalReceiptDTO): Promise<FiscalReceiptDTO> {
+    const response = await this.processingClient.post<FiscalReceiptDTO>(`/analytics/receipts`, saleData);
+    return response.data;
+  }
+
+  async getAllReceipts(): Promise<FiscalReceiptDTO[]> {
+    const response = await this.processingClient.get<FiscalReceiptDTO[]>(`/analytics/receipts`);
+    return response.data;
+  }
+
+  async getReceiptById(receiptId: number): Promise<FiscalReceiptDTO> {
+    const response = await this.processingClient.get<FiscalReceiptDTO>(`/analytics/receipts/${receiptId}`);
+    return response.data;
+  }
+
+  async getReceiptByNumber(receiptNumber: string): Promise<FiscalReceiptDTO> {
+    const response = await this.processingClient.get<FiscalReceiptDTO>(`/analytics/receipts/number/${receiptNumber}`);
+    return response.data;
+  }
+
+  async downloadReceiptPDF(receiptId: number): Promise<Buffer> {
+    const response = await this.processingClient.get(`/analytics/receipts/${receiptId}/pdf`, { responseType: "arraybuffer" });
+    return Buffer.from(response.data);
+  }
+
+  //performance
+  async runSimulation(algorithmType: PerformanceAlgorithmType, numberOfPackages: number, userId?: number): Promise<PerformanceReportDTO> {
+    const params: any = { algorithmType, numberOfPackages };
+    if (userId) params.userId = userId;
+    const response = await this.processingClient.post<PerformanceReportDTO>(`/performance/simulate`, params);
+    return response.data;
+  }
+
+  async getAllPerformanceReports(): Promise<PerformanceReportDTO[]> {
+    const response = await this.processingClient.get<PerformanceReportDTO[]>(`/performance/reports`);
+    return response.data;
+  }
+
+  async getPerformanceReportById(id: number): Promise<PerformanceReportDTO | null> {
+    try {
+      const response = await this.processingClient.get<PerformanceReportDTO>(`/performance/reports/${id}`);
+      return response.data;
+    } catch (err) {
+      console.warn("GatewayService: failed to get performance report by id:", (err as Error).message);
+      return null;
+    }
+  }
+
+  async getPerformanceReportsByAlgorithmType(algorithmType: PerformanceAlgorithmType): Promise<PerformanceReportDTO[]> {
+    const response = await this.processingClient.get<PerformanceReportDTO[]>(`/performance/reports/algorithm/${algorithmType}`);
+    return response.data;
+  }
+
+  async downloadPerformanceReportPDF(reportId: number): Promise<Buffer> {
+    const response = await this.processingClient.get(`/performance/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
+    return Buffer.from(response.data);
   }
   // TODO: ADD MORE API CALLS
 }

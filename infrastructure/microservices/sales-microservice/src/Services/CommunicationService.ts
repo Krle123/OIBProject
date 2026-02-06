@@ -7,9 +7,9 @@ export class CommunicationService implements ICommunicationService {
     private readonly analysisClient: AxiosInstance;
 
     constructor() {
-        const processingBaseURL = process.env.PROCESSING_SERVICE_API || "http://localhost:3003/api/v1";
-        const logBaseURL = process.env.LOG_SERVICE_API || "http://localhost:3004/api/v1";
-        const analysisBaseURL = process.env.ANALYSIS_SERVICE_API || "http://localhost:3005/api/v1";
+        const processingBaseURL = process.env.PROCESSING_SERVICE_API;
+        const logBaseURL = process.env.LOG_SERVICE_API;
+        const analysisBaseURL = process.env.ANALYSIS_SERVICE_API;
 
         this.processingClient = axios.create({
             baseURL: processingBaseURL,

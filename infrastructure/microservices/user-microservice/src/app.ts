@@ -34,8 +34,8 @@ initialize_database();
 const userRepository: Repository<User> = Db.getRepository(User);
 
 // Services
-const userService: IUsersService = new UsersService(userRepository);
 const logerService: ILogerService = new LogerService();
+const userService: IUsersService = new UsersService(userRepository, logerService);
 
 // WebAPI routes
 const userController = new UsersController(userService, logerService);

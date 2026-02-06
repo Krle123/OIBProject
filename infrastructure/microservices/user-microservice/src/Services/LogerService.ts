@@ -1,12 +1,27 @@
+import axios, { AxiosInstance } from "axios";
 import { ILogerService } from "../Domain/services/ILogerService";
 
 export class LogerService implements ILogerService {
+    private readonly logClient: AxiosInstance;
+
     constructor() {
-        console.log(`\x1b[35m[Logger@1.45.4]\x1b[0m Service started`);
+        const logBaseURL = process.env.LOG_SERVICE_API || "http://localhost:5566/api/v1";
+
+        this.logClient = axios.create({
+            baseURL: logBaseURL,
+            headers: { "Content-Type": "application/json" },
+            timeout: 5000,
+        });
     }
 
-    async log(message: string): Promise<boolean> {
-        console.log(`\x1b[35m[Logger@1.45.4]\x1b[0m ${message}`);
-        return true;
+    async logEvent(type: string, description: string): Promise<void> {
+        try {
+            await this.logClient.post("/logs/add", {
+                type: type,
+                description: description,
+            });
+        } catch (error: any) {
+            console.error(`Failed to log event: ${error.message}`);
+        }
     }
 }

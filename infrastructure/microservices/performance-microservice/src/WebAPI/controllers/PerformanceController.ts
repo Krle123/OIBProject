@@ -1,15 +1,31 @@
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { IPerformanceService } from "../../Domain/services/IPerformanceService";
 import { IPDFService } from "../../Domain/services/IPDFService";
 import { PerformanceAlgorithmType } from "../../Domain/enums/PerformanceAlgorithmType";
 
 export class PerformanceController {
+    private router: Router;
     constructor(
         private readonly performanceService: IPerformanceService,
         private readonly pdfService: IPDFService
-    ) {}
+    ) 
+    {
+        this.router = Router();
+        this.initializeRoutes();
+    }
 
-    runSimulation = async (req: Request, res: Response): Promise<void> => {
+    private initializeRoutes(): void {
+        // Simulation
+        this.router.post("/simulate", this.runSimulation);
+
+        // Reports management
+        this.router.get("/performance/reports", this.getAllReports);
+        this.router.get("/performance/reports/:id", this.getReportById);
+        this.router.get("/performance/reports/algorithm/:algorithmType", this.getReportsByAlgorithmType);
+        this.router.get("/performance/reports/:id/pdf", this.downloadReportPDF);
+    }
+
+    private async runSimulation (req: Request, res: Response): Promise<void> {
         try {
             const { algorithmType, numberOfPackages } = req.body;
             const userId = (req as any).user?.userId;
@@ -51,7 +67,7 @@ export class PerformanceController {
         }
     };
 
-    getAllReports = async (req: Request, res: Response): Promise<void> => {
+    private async getAllReports (req: Request, res: Response): Promise<void> {
         try {
             const reports = await this.performanceService.getAllReports();
             res.status(200).json(reports);
@@ -64,7 +80,7 @@ export class PerformanceController {
         }
     };
 
-    getReportById = async (req: Request, res: Response): Promise<void> => {
+    private async getReportById (req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id)) {
@@ -88,7 +104,7 @@ export class PerformanceController {
         }
     };
 
-    getReportsByAlgorithmType = async (req: Request, res: Response): Promise<void> => {
+    private async getReportsByAlgorithmType (req: Request, res: Response): Promise<void> {
         try {
             const { algorithmType } = req.params;
 
@@ -112,7 +128,7 @@ export class PerformanceController {
         }
     };
 
-    downloadReportPDF = async (req: Request, res: Response): Promise<void> => {
+    private async downloadReportPDF (req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id)) {
@@ -139,4 +155,8 @@ export class PerformanceController {
             });
         }
     };
+
+    public getRouter(): Router {
+        return this.router = Router();
+    }
 }

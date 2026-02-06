@@ -1,3 +1,3 @@
 export interface ILogerService {
-    log(message: string): Promise<boolean>;
+    logEvent(type: string, description: string): Promise<void>;
 }

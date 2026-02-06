@@ -7,7 +7,6 @@ import { CommunicationService } from "./Services/CommunicationService";
 import { PerformanceService } from "./Services/PerformanceService";
 import { PDFService } from "./Services/PDFService";
 import { PerformanceController } from "./WebAPI/controllers/PerformanceController";
-import { createPerformanceRoutes } from "./WebAPI/routes/performanceRoutes";
 
 dotenv.config({ quiet: true });
 
@@ -42,7 +41,7 @@ export const initializeApp = async (): Promise<Application> => {
     const performanceController = new PerformanceController(performanceService, pdfService);
 
     // Public routes - gateway handles authentication
-    app.use("/api/v1/performance", createPerformanceRoutes(performanceController));
+    app.use("/api/v1", performanceController.getRouter());
 
     return app;
 };

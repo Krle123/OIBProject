@@ -30,7 +30,7 @@ export class AuthController {
    */
   private async login(req: Request, res: Response): Promise<void> {
     try {
-      this.logerService.log("Login request received");
+      this.logerService.logEvent("INFO", "Login request received");
 
       const data: LoginUserDTO = req.body as LoginUserDTO;
 
@@ -55,7 +55,7 @@ export class AuthController {
         res.status(401).json({ success: false, message: "Invalid credentials!" });
       }
     } catch (error) {
-      this.logerService.log(error as string)
+      this.logerService.logEvent("ERROR", error as string)
       res.status(500).json({ success: false, message: "Server error" });
     }
   }
@@ -66,7 +66,7 @@ export class AuthController {
    */
   private async register(req: Request, res: Response): Promise<void> {
     try {
-      this.logerService.log("Registration request received");
+      this.logerService.logEvent("INFO", "Registration request received");
 
       const data: RegistrationUserDTO = req.body as RegistrationUserDTO;
 
@@ -91,7 +91,7 @@ export class AuthController {
         res.status(400).json({ success: false, message: "Registration failed. Username or email may already exist." });
       }
     } catch (error) {
-      this.logerService.log(error as string)
+      this.logerService.logEvent("ERROR", error as string)
       res.status(500).json({ success: false, message: "Server error" });
     }
   }

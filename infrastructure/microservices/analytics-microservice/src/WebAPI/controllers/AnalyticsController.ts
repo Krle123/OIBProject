@@ -1,15 +1,44 @@
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { IAnalyticsService } from "../../Domain/services/IAnalyticsService";
 import { IPDFService } from "../../Domain/services/IPDFService";
 import { AnalysisType } from "../../Domain/enums/AnalysisType";
+import { IFiscalReceiptService } from "../../Domain/services/IFiscalReceiptService";
 
 export class AnalyticsController {
+    private router: Router;
     constructor(
         private readonly analyticsService: IAnalyticsService,
-        private readonly pdfService: IPDFService
-    ) {}
+        private readonly pdfService: IPDFService,
+        private readonly fiscalReceiptService: IFiscalReceiptService
+    ) 
+    {
+        this.router = Router();
+        this.initializeRoutes();    
+    }
 
-    calculateSalesByMonth = async (req: Request, res: Response): Promise<void> => {
+    private initializeRoutes(): void {
+        this.router.get("/analytics/sales/by-month", this.calculateSalesByMonth.bind(this));
+        this.router.get("/analytics/sales/by-week", this.calculateSalesByWeek.bind(this));
+        this.router.get("/analytics/sales/by-year", this.calculateSalesByYear.bind(this));
+        this.router.get("/analytics/sales/total", this.calculateTotalSales.bind(this));
+        this.router.get("/analytics/sales/trend", this.analyzeSalesTrend.bind(this));
+
+        this.router.get("/analytics/top-10/best-selling", this.getTop10BestSellingPerfumes.bind(this));
+        this.router.get("/analytics/top-10/revenue", this.getTop10RevenueByPerfume.bind(this));
+
+        this.router.get("/analytics/reports", this.getAllReports.bind(this));
+        this.router.get("/analytics/reports/:id", this.getReportById.bind(this));
+        this.router.get("/analytics/reports/type/:type", this.getReportsByType.bind(this));
+        this.router.get("/analytics/reports/:id/pdf", this.downloadReportPDF.bind(this));
+
+        this.router.post("/analytics/receipts", this.createFiscalReceipt.bind(this));
+        this.router.get("/analytics/receipts", this.getAllReceipts.bind(this));
+        this.router.get("/analytics/receipts/:id", this.getReceiptById.bind(this));
+        this.router.get("/analytics/receipts/number/:number", this.getReceiptByNumber.bind(this));
+        this.router.get("/analytics/receipts/:id/pdf", this.downloadReceiptPDF.bind(this));
+    }
+
+    private async calculateSalesByMonth (req: Request, res: Response): Promise<void> {
         try {
             const { month, year } = req.query;
             const userId = (req as any).user?.id;
@@ -31,7 +60,7 @@ export class AnalyticsController {
         }
     };
 
-    calculateSalesByWeek = async (req: Request, res: Response): Promise<void> => {
+    private async calculateSalesByWeek (req: Request, res: Response): Promise<void> {
         try {
             const { week, year } = req.query;
             const userId = (req as any).user?.id;
@@ -53,7 +82,7 @@ export class AnalyticsController {
         }
     };
 
-    calculateSalesByYear = async (req: Request, res: Response): Promise<void> => {
+    private async calculateSalesByYear (req: Request, res: Response): Promise<void> {
         try {
             const { year } = req.query;
             const userId = (req as any).user?.id;
@@ -74,7 +103,7 @@ export class AnalyticsController {
         }
     };
 
-    calculateTotalSales = async (req: Request, res: Response): Promise<void> => {
+    private async calculateTotalSales (req: Request, res: Response): Promise<void> {
         try {
             const userId = (req as any).user?.id;
             const report = await this.analyticsService.calculateTotalSales(userId);
@@ -84,7 +113,7 @@ export class AnalyticsController {
         }
     };
 
-    analyzeSalesTrend = async (req: Request, res: Response): Promise<void> => {
+    private async analyzeSalesTrend (req: Request, res: Response): Promise<void> {
         try {
             const { startDate, endDate } = req.query;
             const userId = (req as any).user?.id;
@@ -106,7 +135,7 @@ export class AnalyticsController {
         }
     };
 
-    getTop10BestSellingPerfumes = async (req: Request, res: Response): Promise<void> => {
+    private async getTop10BestSellingPerfumes (req: Request, res: Response): Promise<void> {
         try {
             const userId = (req as any).user?.id;
             const report = await this.analyticsService.getTop10BestSellingPerfumes(userId);
@@ -116,7 +145,7 @@ export class AnalyticsController {
         }
     };
 
-    getTop10RevenueByPerfume = async (req: Request, res: Response): Promise<void> => {
+    private async getTop10RevenueByPerfume (req: Request, res: Response): Promise<void> {
         try {
             const userId = (req as any).user?.id;
             const report = await this.analyticsService.getTop10RevenueByPerfume(userId);
@@ -126,7 +155,7 @@ export class AnalyticsController {
         }
     };
 
-    getAllReports = async (req: Request, res: Response): Promise<void> => {
+    private async getAllReports (req: Request, res: Response): Promise<void> {
         try {
             const reports = await this.analyticsService.getAllReports();
             res.status(200).json(reports);
@@ -135,7 +164,7 @@ export class AnalyticsController {
         }
     };
 
-    getReportById = async (req: Request, res: Response): Promise<void> => {
+    private async getReportById (req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
             const report = await this.analyticsService.getReportById(id);
@@ -151,7 +180,7 @@ export class AnalyticsController {
         }
     };
 
-    getReportsByType = async (req: Request, res: Response): Promise<void> => {
+    private async getReportsByType (req: Request, res: Response): Promise<void> {
         try {
             const type = req.params.type as AnalysisType;
             const reports = await this.analyticsService.getReportsByType(type);
@@ -161,7 +190,7 @@ export class AnalyticsController {
         }
     };
 
-    downloadReportPDF = async (req: Request, res: Response): Promise<void> => {
+    private async downloadReportPDF (req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
             const report = await this.analyticsService.getReportById(id);
@@ -180,4 +209,78 @@ export class AnalyticsController {
             res.status(500).json({ error: error.message });
         }
     };
+    private async createFiscalReceipt (req: Request, res: Response): Promise<void> {
+        try {
+            const saleData = req.body;
+            const receipt = await this.fiscalReceiptService.createFiscalReceipt(saleData);
+            res.status(201).json(receipt);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    private async getAllReceipts (req: Request, res: Response): Promise<void> {
+        try {
+            const receipts = await this.fiscalReceiptService.getAllReceipts();
+            res.status(200).json(receipts);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    private async getReceiptById (req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const receipt = await this.fiscalReceiptService.getReceiptById(id);
+
+            if (!receipt) {
+                res.status(404).json({ error: "Receipt not found" });
+                return;
+            }
+
+            res.status(200).json(receipt);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    private async getReceiptByNumber (req: Request, res: Response): Promise<void> {
+        try {
+            const receiptNumber = req.params.number;
+            const receipt = await this.fiscalReceiptService.getReceiptByNumber(receiptNumber);
+
+            if (!receipt) {
+                res.status(404).json({ error: "Receipt not found" });
+                return;
+            }
+
+            res.status(200).json(receipt);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    private async downloadReceiptPDF (req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const receipt = await this.fiscalReceiptService.getReceiptById(id);
+
+            if (!receipt) {
+                res.status(404).json({ error: "Receipt not found" });
+                return;
+            }
+
+            const pdfBuffer = await this.pdfService.generateFiscalReceiptPDF(receipt);
+
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=receipt-${receipt.receiptNumber}.pdf`);
+            res.send(pdfBuffer);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    public getRouter(): Router {
+        return this.router;
+    }
 }

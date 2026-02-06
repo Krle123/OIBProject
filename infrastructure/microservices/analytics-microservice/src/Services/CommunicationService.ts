@@ -16,7 +16,7 @@ export class CommunicationService implements ICommunicationService {
 
     async logEvent(type: string, description: string): Promise<void> {
         try {
-            await this.logClient.post("/logs", {
+            await this.logClient.post("/logs/add", {
                 type: type,
                 description: description,
             });

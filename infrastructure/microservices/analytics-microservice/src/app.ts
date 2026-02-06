@@ -8,10 +8,7 @@ import { CommunicationService } from "./Services/CommunicationService";
 import { FiscalReceiptService } from "./Services/FiscalReceiptService";
 import { AnalyticsService } from "./Services/AnalyticsService";
 import { PDFService } from "./Services/PDFService";
-import { FiscalReceiptController } from "./WebAPI/controllers/FiscalReceiptController";
 import { AnalyticsController } from "./WebAPI/controllers/AnalyticsController";
-import { createFiscalReceiptRoutes } from "./WebAPI/routes/fiscalReceiptRoutes";
-import { createAnalyticsRoutes } from "./WebAPI/routes/analyticsRoutes";
 import { authMiddleware } from "./Helpers/authMiddleware";
 
 dotenv.config({ quiet: true });
@@ -46,13 +43,9 @@ export const initializeApp = async (): Promise<Application> => {
     const pdfService = new PDFService();
 
     // Controllers
-    const fiscalReceiptController = new FiscalReceiptController(fiscalReceiptService, pdfService);
-    const analyticsController = new AnalyticsController(analyticsService, pdfService);
+    const analyticsController = new AnalyticsController(analyticsService, pdfService, fiscalReceiptService);
 
-    // Public routes - gateway handles authentication
-    app.post("/api/v1/analysis/sales", fiscalReceiptController.createFiscalReceipt);
-    app.use("/api/v1", createFiscalReceiptRoutes(fiscalReceiptController));
-    app.use("/api/v1/analytics", createAnalyticsRoutes(analyticsController));
+    app.use("/api/v1", analyticsController.getRouter());
 
     return app;
 };

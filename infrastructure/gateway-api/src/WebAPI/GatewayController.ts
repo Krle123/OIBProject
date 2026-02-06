@@ -8,6 +8,8 @@ import { PlantState } from "../Domain/enums/PlantState";
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PerfumeType } from "../Domain/enums/PerfumeType";
 import { PerfumeState } from "../Domain/enums/PerfumeState";
+import { AnalysisType } from "../Domain/enums/AnalysisType";
+import { PerformanceAlgorithmType } from "../Domain/enums/PerformanceAlgorithmType";
 
 export class GatewayController {
   private readonly router: Router;
@@ -41,7 +43,31 @@ export class GatewayController {
     this.router.put("/production/aromatic-power/:id", authenticate, authorize("admin", "seller"), this.changeAromaticPower.bind(this));
     this.router.post("/production/harvest", authenticate, authorize("admin", "seller"), this.harvestPlant.bind(this));
 
+    // Processing
     this.router.post("/processing/perfumes/create", authenticate, authorize("admin", "seller"), this.createPerfumeBatch.bind(this));
+
+    // Analytics
+    this.router.get("/analytics/sales/by-month", authenticate, authorize("admin", "seller"), this.calculateSalesByMonth.bind(this));
+    this.router.get("/analytics/sales/by-year", authenticate, authorize("admin", "seller"), this.calculateSalesByYear.bind(this));
+    this.router.get("/analytics/sales/by-week", authenticate, authorize("admin", "seller"), this.calculateSalesByWeek.bind(this));
+    this.router.get("/analytics/sales/total", authenticate, authorize("admin", "seller"), this.calculateTotalSales.bind(this));
+    this.router.get("/analytics/sales/trend", authenticate, authorize("admin", "seller"), this.analyzeSalesTrend.bind(this));
+
+    this.router.get("/analytics/sales/top-10/best-selling", authenticate, authorize("admin", "seller"), this.getTop10BestSellingPerfumes.bind(this));
+    this.router.get("/analytics/sales/top-10/revenue", authenticate, authorize("admin", "seller"), this.getTop10RevenueByPerfume.bind(this));
+
+    this.router.get("/analytics/reports", authenticate, authorize("admin"), this.getAllAnalysisReports.bind(this));
+    this.router.get("/analytics/reports/:id", authenticate, authorize("admin"), this.getAnalysisReportById.bind(this));
+    this.router.get("/analytics/reports/type/:type", authenticate, authorize("admin"), this.getAnalysisReportsByType.bind(this));
+    this.router.get("/analytics/reports/download/:id", authenticate, authorize("admin"), this.downloadAnalysisReportPDF.bind(this));
+
+    // Performance
+    this.router.post("/simulate", authenticate, authorize("admin"), this.runSimulation.bind(this));
+
+    this.router.get("/performance/reports", authenticate, authorize("admin"), this.getAllPerformanceReports.bind(this));
+    this.router.get("/performance/reports/:id", authenticate, authorize("admin"), this.getPerformanceReportById.bind(this));
+    this.router.get("/performance/reports/algorithm/:algorithmType", authenticate, authorize("admin"), this.getPerformanceReportsByAlgorithmType.bind(this));
+    this.router.get("/performance/reports/:id/pdf", authenticate, authorize("admin"), this.downloadPerformanceReportPDF.bind(this));
   }
 
   // Auth
@@ -284,6 +310,191 @@ export class GatewayController {
       const perfumes = await this.gatewayService.createPerfumeBatch(perfume, 10);
     } catch (error) {
       console.error("GatewayController.testProductionService error:", error);
+    }
+  }
+
+  // Analytics
+  private async calculateSalesByMonth(req: Request, res: Response): Promise<void> {
+    try {
+      const { month, year } = req.query;
+      const userId = req.user?.id;
+      const report = await this.gatewayService.calculateSalesByMonth(parseInt(month as string), parseInt(year as string), userId);
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.calculateSalesByMonth error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async calculateSalesByYear(req: Request, res: Response): Promise<void> {
+    try {
+      const { year } = req.query;
+      const userId = req.user?.id;
+      const report = await this.gatewayService.calculateSalesByYear(parseInt(year as string), userId);
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.calculateSalesByYear error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async calculateSalesByWeek(req: Request, res: Response): Promise<void> {
+    try {
+      const { weekNumber, year } = req.query;
+      const userId = req.user?.id;
+      const report = await this.gatewayService.calculateSalesByWeek(parseInt(weekNumber as string), parseInt(year as string), userId);
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.calculateSalesByWeek error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async calculateTotalSales(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const report = await this.gatewayService.calculateTotalSales(userId);
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.calculateTotalSales error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async analyzeSalesTrend(req: Request, res: Response): Promise<void> {
+    try {
+      const { startDate, endDate } = req.query;
+      const userId = req.user?.id;
+      const report = await this.gatewayService.analyzeSalesTrend(startDate as string, endDate as string, userId);
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.analyzeSalesTrend error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getTop10BestSellingPerfumes(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const reports = await this.gatewayService.getTop10BestSellingPerfumes(userId);
+      res.status(200).json({ success: true, reports });
+    } catch (error) {
+      console.error("GatewayController.getTop10BestSellingPerfumes error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getTop10RevenueByPerfume(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const reports = await this.gatewayService.getTop10RevenueByPerfume(userId);
+      res.status(200).json({ success: true, reports });
+    } catch (error) {
+      console.error("GatewayController.getTop10RevenueByPerfume error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getAllAnalysisReports(req: Request, res: Response): Promise<void> {
+    try {
+      const reports = await this.gatewayService.getAllAnalysisReports();
+      res.status(200).json({ success: true, reports });
+    } catch (error) {
+      console.error("GatewayController.getAllAnalysisReports error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getAnalysisReportById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const report = await this.gatewayService.getAnalysisReportById(parseInt(id));
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.getAnalysisReportById error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getAnalysisReportsByType(req: Request, res: Response): Promise<void> {
+    try {
+      const { type } = req.params;
+      const reports = await this.gatewayService.getAnalysisReportsByType(type as AnalysisType);
+      res.status(200).json({ success: true, reports });
+    } catch (error) {
+      console.error("GatewayController.getAnalysisReportsByType error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async downloadAnalysisReportPDF(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const pdfBuffer = await this.gatewayService.downloadAnalysisReportPDF(parseInt(id));
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename=report_${id}.pdf`);
+      res.status(200).send(pdfBuffer);
+    } catch (error) {
+      console.error("GatewayController.downloadAnalysisReportPDF error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  // Performance
+  private async runSimulation(req: Request, res: Response): Promise<void> {
+    try {
+      const { algorithmType, numberOfPackages } = req.body;
+      const userId = req.user?.id;
+      const report = await this.gatewayService.runSimulation(algorithmType, numberOfPackages, userId);
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.runSimulation error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  } 
+
+  private async getAllPerformanceReports(req: Request, res: Response): Promise<void> {
+    try {
+      const reports = await this.gatewayService.getAllPerformanceReports();
+      res.status(200).json({ success: true, reports });
+    } catch (error) {
+      console.error("GatewayController.getAllPerformanceReports error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getPerformanceReportById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const report = await this.gatewayService.getPerformanceReportById(parseInt(id));
+      res.status(200).json({ success: true, report });
+    } catch (error) {
+      console.error("GatewayController.getPerformanceReportById error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getPerformanceReportsByAlgorithmType(req: Request, res: Response): Promise<void> {
+    try {
+      const { algorithmType } = req.params;
+      const reports = await this.gatewayService.getPerformanceReportsByAlgorithmType(algorithmType as PerformanceAlgorithmType);
+      res.status(200).json({ success: true, reports });
+    } catch (error) {
+      console.error("GatewayController.getPerformanceReportsByAlgorithmType error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async downloadPerformanceReportPDF(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const pdfBuffer = await this.gatewayService.downloadPerformanceReportPDF(parseInt(id));
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename=performance_report_${id}.pdf`);
+      res.status(200).send(pdfBuffer);
+    } catch (error) {
+      console.error("GatewayController.downloadPerformanceReportPDF error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }
 

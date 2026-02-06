@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { Storage } from "../Domain/models/Storage";
 import { StorageDTO } from "../Domain/DTOs/StorageDTO";
 import { IStorageService } from "../Domain/services/IStorageService";
-import { ICommunicationService } from "../Domain/services/ICommunicationService";
+import { ICommunicationService } from "../../../sales-microservice/src/Domain/services/ICommunicationService";
 import { StorageType } from "../Domain/enums/StorageType";
 
 export class StorageService implements IStorageService {

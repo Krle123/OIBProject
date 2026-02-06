@@ -5,7 +5,7 @@ export class CommunicationService implements ICommunicationService {
     private readonly logClient: AxiosInstance;
 
     constructor() {
-        const logBaseURL = process.env.LOG_SERVICE_API || "http://localhost:3004/api/v1";
+        const logBaseURL = process.env.LOG_SERVICE_API;
 
         this.logClient = axios.create({
             baseURL: logBaseURL,
@@ -23,7 +23,6 @@ export class CommunicationService implements ICommunicationService {
             });
         } catch (error: any) {
             console.error("Failed to log event:", error.message);
-            // Don't throw - logging failures shouldn't break the main flow
         }
     }
 }

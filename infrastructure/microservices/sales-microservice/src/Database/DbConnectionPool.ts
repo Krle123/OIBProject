@@ -1,5 +1,4 @@
 import { DataSource } from "typeorm";
-import { Storage } from "../Domain/models/Storage";
 import { FiscalReceipt } from "../Domain/models/FiscalReceipt";
 import dotenv from "dotenv";
 
@@ -12,7 +11,7 @@ export const Db = new DataSource({
     username: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "sales_db",
-    entities: [Storage, FiscalReceipt],
+    entities: [FiscalReceipt],
     synchronize: true,
     logging: false,
 });

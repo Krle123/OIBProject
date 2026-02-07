@@ -57,7 +57,7 @@ export class PerformanceController {
                 userId
             );
 
-            res.status(201).json(report);
+            res.status(201).json({ success: true, data: report });
         } catch (error: any) {
             console.error("Error running simulation:", error);
             res.status(500).json({
@@ -70,7 +70,7 @@ export class PerformanceController {
     private async getAllReports (req: Request, res: Response): Promise<void> {
         try {
             const reports = await this.performanceService.getAllReports();
-            res.status(200).json(reports);
+            res.status(200).json({ success: true, data: reports });
         } catch (error: any) {
             console.error("Error getting all reports:", error);
             res.status(500).json({
@@ -90,11 +90,11 @@ export class PerformanceController {
 
             const report = await this.performanceService.getReportById(id);
             if (!report) {
-                res.status(404).json({ error: "Izveštaj nije pronađen" });
+                res.status(404).json({ success: false, error: "Izveštaj nije pronađen" });
                 return;
             }
 
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             console.error("Error getting report by ID:", error);
             res.status(500).json({
@@ -118,7 +118,7 @@ export class PerformanceController {
             const reports = await this.performanceService.getReportsByAlgorithmType(
                 algorithmType as PerformanceAlgorithmType
             );
-            res.status(200).json(reports);
+            res.status(200).json({ success: true, data: reports });
         } catch (error: any) {
             console.error("Error getting reports by algorithm type:", error);
             res.status(500).json({

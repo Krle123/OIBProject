@@ -54,7 +54,7 @@ export class AnalyticsController {
                 userId
             );
 
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -76,7 +76,7 @@ export class AnalyticsController {
                 userId
             );
 
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -97,7 +97,7 @@ export class AnalyticsController {
                 userId
             );
 
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -107,7 +107,7 @@ export class AnalyticsController {
         try {
             const userId = (req as any).user?.id;
             const report = await this.analyticsService.calculateTotalSales(userId);
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -129,7 +129,7 @@ export class AnalyticsController {
                 userId
             );
 
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -139,7 +139,7 @@ export class AnalyticsController {
         try {
             const userId = (req as any).user?.id;
             const report = await this.analyticsService.getTop10BestSellingPerfumes(userId);
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -149,7 +149,7 @@ export class AnalyticsController {
         try {
             const userId = (req as any).user?.id;
             const report = await this.analyticsService.getTop10RevenueByPerfume(userId);
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -158,7 +158,7 @@ export class AnalyticsController {
     private async getAllReports (req: Request, res: Response): Promise<void> {
         try {
             const reports = await this.analyticsService.getAllReports();
-            res.status(200).json(reports);
+            res.status(200).json({ success: true, data: reports });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -170,11 +170,11 @@ export class AnalyticsController {
             const report = await this.analyticsService.getReportById(id);
 
             if (!report) {
-                res.status(404).json({ error: "Report not found" });
+                res.status(404).json({ success: false, error: "Report not found" });
                 return;
             }
 
-            res.status(200).json(report);
+            res.status(200).json({ success: true, data: report });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -184,7 +184,7 @@ export class AnalyticsController {
         try {
             const type = req.params.type as AnalysisType;
             const reports = await this.analyticsService.getReportsByType(type);
-            res.status(200).json(reports);
+            res.status(200).json({ success: true, data: reports });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -213,7 +213,7 @@ export class AnalyticsController {
         try {
             const saleData = req.body;
             const receipt = await this.fiscalReceiptService.createFiscalReceipt(saleData);
-            res.status(201).json(receipt);
+            res.status(201).json({ success: true, data: receipt });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -222,7 +222,7 @@ export class AnalyticsController {
     private async getAllReceipts (req: Request, res: Response): Promise<void> {
         try {
             const receipts = await this.fiscalReceiptService.getAllReceipts();
-            res.status(200).json(receipts);
+            res.status(200).json({ success: true, data: receipts });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -234,11 +234,11 @@ export class AnalyticsController {
             const receipt = await this.fiscalReceiptService.getReceiptById(id);
 
             if (!receipt) {
-                res.status(404).json({ error: "Receipt not found" });
+                res.status(404).json({ success: false, error: "Receipt not found" });
                 return;
             }
 
-            res.status(200).json(receipt);
+            res.status(200).json({ success: true, data: receipt });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -250,11 +250,11 @@ export class AnalyticsController {
             const receipt = await this.fiscalReceiptService.getReceiptByNumber(receiptNumber);
 
             if (!receipt) {
-                res.status(404).json({ error: "Receipt not found" });
+                res.status(404).json({ success: false, error: "Receipt not found" });
                 return;
             }
 
-            res.status(200).json(receipt);
+            res.status(200).json({ success: true, data: receipt });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }

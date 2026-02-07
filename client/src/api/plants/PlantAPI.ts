@@ -19,13 +19,19 @@ export class PlantAPI implements IPlantAPI {
   }
 
   async getAllPlants(token: string): Promise<PlantDTO[]> {
-    const response: AxiosResponse<PlantDTO[]> = await this.axiosInstance.get("/plants", {
+    const response: AxiosResponse<{ success: boolean; data: PlantDTO[] }> = await this.axiosInstance.get("/plants", {
       headers: this.getAuthHeaders(token),
     });
-    console.log("Fetched plants:", response.data);
-    console.log("Response status:", response.status);
-    console.log("RESPONSE", response);
-    return response.data;
+    return response.data.data;
+  }
+
+  async getAllFieldPlants(token: string): Promise<PlantDTO[]> {
+    const response: AxiosResponse<{ success: boolean; data: PlantDTO[] }> = await this.axiosInstance.get("/field-plants", {
+      headers: this.getAuthHeaders(token),
+    });
+    console.log("PlantAPI.getAllFieldPlants response data:", response.data);
+    console.log("PlantAPI.getAllFieldPlants response:", response);
+    return response.data.data;
   }
 
   async getPlantById(id: number, token: string): Promise<PlantDTO> {

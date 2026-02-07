@@ -37,7 +37,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
 
         setIsLoading(true);
         try {
-            const plantsData = await plantAPI.getAllPlants(token);
+            const plantsData = await plantAPI.getAllFieldPlants(token);
             setPlants(plantsData);
         } catch (error) {
             console.error("Failed to load plants:", error);

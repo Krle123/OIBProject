@@ -195,7 +195,7 @@ export class GatewayController {
     try {
       const plants = await this.gatewayService.getAllPlants();
       await this.gatewayService.addLog("INFO", `Fetched all plants requested by user ID: ${req.user?.id}`);
-      res.status(200).json({ success: true, plants });
+      res.status(200).json({ success: true, data:plants });
     } catch (error) {
       console.error("GatewayController.getAllPlants error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching all plants: ${(error as Error).message}`);
@@ -207,7 +207,7 @@ export class GatewayController {
     try {
       const plants = await this.gatewayService.getAllFieldPlants();
       await this.gatewayService.addLog("INFO", `Fetched all field plants requested by user ID: ${req.user?.id}`);
-      res.status(200).json({ success: true, plants });
+      res.status(200).json({ success: true, data:plants });
     } catch (error) {
       console.error("GatewayController.getAllFieldPlants error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching all field plants: ${(error as Error).message}`);

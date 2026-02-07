@@ -32,7 +32,7 @@ export class ProcessingController {
                 res.status(500).json({ success: false, message: "Failed to create perfume batch" });
                 return;
             }
-            res.status(201).json({ success: true, perfumes });
+            res.status(201).json({ success: true, data: perfumes });
         } catch (error) {
             console.error("ProcessingController.createPerfumeBatch error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -44,7 +44,7 @@ export class ProcessingController {
             const storageId: number = req.body.storageId;
             console.log("ProcessingController.sendPackagingToStorage called with:", { storageId });
             const packaging = await this.packagingService.sendPackagingToStoraging(storageId);
-            res.status(200).json({ success: true, packaging });
+            res.status(200).json({ success: true, data: packaging });
         } catch (error) {
             console.error("ProcessingController.sendPackagingToStorage error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -57,7 +57,7 @@ export class ProcessingController {
             const numberOfBottles: number = req.body.numberOfBottles;
             console.log("ProcessingController.packagePerfume called with:", { serialNumber, numberOfBottles });
             const packaging = await this.packagingService.packagePerfume(serialNumber, numberOfBottles);
-            res.status(200).json({ success: true, packaging });
+            res.status(200).json({ success: true, data: packaging });
         } catch (error) {
             console.error("ProcessingController.packagePerfume error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });

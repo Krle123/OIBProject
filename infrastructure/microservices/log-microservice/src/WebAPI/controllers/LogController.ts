@@ -79,7 +79,7 @@ export class LogController {
         fromTs as string | undefined,
         toTs as string | undefined
       );
-      res.status(200).json({ success: true, logs });
+      res.status(200).json({ success: true, data: logs });
     } catch (error) {
       console.error("LogController.searchLogs error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });

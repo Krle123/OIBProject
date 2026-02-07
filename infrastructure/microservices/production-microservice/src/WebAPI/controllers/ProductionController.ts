@@ -68,7 +68,7 @@ export class ProductionController {
             const { plantId, quantity } = req.body;
             const harvestedPlants = await this.productionService.harvestPlant(plantId, quantity);
             if (harvestedPlants.length > 0) {
-                res.status(200).json({ success: true, harvestedPlants });
+                res.status(200).json({ success: true, data: harvestedPlants });
             } else {
                 res.status(400).json({ success: false, message: "Failed to harvest plants" });
             }
@@ -82,7 +82,7 @@ export class ProductionController {
         try {
             const { id } = req.params;
             const plants = await this.plantService.getPlantsById(parseInt(id));
-            res.status(200).json({ success: true, plants });
+            res.status(200).json({ success: true, data: plants });
         } catch (error) {
             console.error("ProductionController.getPlantsById error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -93,7 +93,7 @@ export class ProductionController {
         try {
             const { state } = req.params;
             const plants = await this.plantService.getPlantsByState(state as PlantState);
-            res.status(200).json({ success: true, plants });
+            res.status(200).json({ success: true, data: plants });
         } catch (error) {
             console.error("ProductionController.getPlantsByState error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -103,7 +103,7 @@ export class ProductionController {
     private async getAllPlants(req: Request, res: Response): Promise<void> {
         try {
             const plants = await this.plantService.getAllPlants();
-            res.status(200).json({ success: true, plants });
+            res.status(200).json({ success: true, data: plants });
         } catch (error) {
             console.error("ProductionController.getAllPlants error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -113,7 +113,7 @@ export class ProductionController {
     private async getAllFieldPlants(req: Request, res: Response): Promise<void> {
         try {
             const plants = await this.plantService.getAllFieldPlants();
-            res.status(200).json({ success: true, plants });
+            res.status(200).json({ success: true, data: plants });
         } catch (error) {
             console.error("ProductionController.getAllFieldPlants error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });

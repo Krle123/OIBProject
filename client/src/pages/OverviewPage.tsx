@@ -31,7 +31,9 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ plantAPI, salesAPI, 
                 plantAPI.getAllPlants(token),
                 salesAPI.getReceipts(token)
             ]);
+            console.log("Fetched plants:", plantsData);
             setPlants(plantsData);
+            console.log("Fetched receipts:", receiptsData);
             setReceipts(receiptsData);
         } catch (error) {
             console.error("Failed to load data:", error);

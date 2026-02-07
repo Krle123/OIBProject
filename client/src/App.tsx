@@ -15,10 +15,16 @@ import { IAnalyticsAPI } from "./api/analytics/IAnalyticsAPI";
 import { PerformancePage } from "./pages/PerformancePage";
 import { PerformanceAPI } from "./api/performance/PerformanceAPI";
 import { IPerformanceAPI } from "./api/performance/IPerformanceAPI";
+import { OverviewPage } from "./pages/OverviewPage";
+import { PlantAPI } from "./api/plants/PlantAPI";
+import { IPlantAPI } from "./api/plants/IPlantAPI";
+import { ProductionPage } from "./pages/ProductionPage";
 
 const auth_api: IAuthAPI = new AuthAPI();
 const user_api: IUserAPI = new UserAPI();
 const sales_api: ISalesAPI = new SalesAPI();
+const plant_api: IPlantAPI = new PlantAPI();
+//const processing_api: IProcessingAPI = new ProcessingAPI();
 const analytics_api: IAnalyticsAPI = new AnalyticsAPI();
 const performance_api: IPerformanceAPI = new PerformanceAPI();
 
@@ -34,6 +40,45 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/Pregled"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <OverviewPage plantAPI={plant_api} salesAPI={sales_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/Proizvodnja"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <ProductionPage plantAPI={plant_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* }
+         <Route
+          path="/Prerada"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <ProcessingPage processingAPI={processing_api} salesAPI={sales_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+        */}
+
+        <Route
+          path="/Pakovanje"
+          element={
+            <ProtectedRoute requiredRole="seller,manager">
+              <AnalyticsPage analyticsAPI={analytics_api} userAPI={user_api}/>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/Prodaja"
           element={
@@ -42,30 +87,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/sales"
-          element={
-            <ProtectedRoute requiredRole="seller,manager">
-              <SalesPage salesAPI={sales_api} userAPI={user_api}/>
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/Analiza"
           element={
-            <ProtectedRoute requiredRole="seller,manager">
+            <ProtectedRoute requiredRole="admin">
               <AnalyticsPage analyticsAPI={analytics_api} userAPI={user_api}/>
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute requiredRole="seller,manager">
-              <AnalyticsPage analyticsAPI={analytics_api} userAPI={user_api}/>
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/performance"
           element={
@@ -74,6 +105,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
         <Route path="/" element={<AuthPage authAPI={auth_api} />} />
       </Routes>
     </>

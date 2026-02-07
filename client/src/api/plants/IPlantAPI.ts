@@ -1,5 +1,4 @@
 import { PlantDTO } from "../../models/plants/PlantDTO";
-
 export interface IPlantAPI {
   getAllPlants(token: string): Promise<PlantDTO[]>;
   getPlantById(id: number, token: string): Promise<PlantDTO>;

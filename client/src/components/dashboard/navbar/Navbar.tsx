@@ -25,12 +25,15 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
     <nav className="titlebar" style={{ height: "60px", borderRadius: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
       {/* Navigacija */}
       <div className="flex items-center gap-4">
+        <button className="btn btn-ghost" onClick={() => navigate("/Pregled")}>Proizvodnja</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Proizvodnja")}>Proizvodnja</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Prerada")}>Prerada</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Pakovanje")}>Pakovanje</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Skladistenje")}>Skladistenje</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Prodaja")}>Prodaja</button>
-        <button className="btn btn-ghost" onClick={() => navigate("/Analiza")}>Analiza</button>
+        {(user?.role === "admin" || user?.role === "ADMIN") && (
+          <button className="btn btn-ghost" onClick={() => navigate("/Analiza")}>Analiza</button>
+        )}
         {(user?.role === "admin" || user?.role === "ADMIN") && (
           <button className="btn btn-ghost" onClick={() => navigate("/performance")}>Performanse</button>
         )}

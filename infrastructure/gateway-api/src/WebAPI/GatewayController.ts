@@ -10,6 +10,9 @@ import { PerfumeType } from "../Domain/enums/PerfumeType";
 import { PerfumeState } from "../Domain/enums/PerfumeState";
 import { AnalysisType } from "../Domain/enums/AnalysisType";
 import { PerformanceAlgorithmType } from "../Domain/enums/PerformanceAlgorithmType";
+import { StorageDTO } from "../Domain/DTOs/StorageDTO";
+import { SaleType } from "../Domain/enums/SaleType";
+import { PaymentMethod } from "../Domain/enums/PaymentMethod";
 
 export class GatewayController {
   private readonly router: Router;
@@ -68,6 +71,18 @@ export class GatewayController {
     this.router.get("/performance/reports/:id", authenticate, authorize("admin"), this.getPerformanceReportById.bind(this));
     this.router.get("/performance/reports/algorithm/:algorithmType", authenticate, authorize("admin"), this.getPerformanceReportsByAlgorithmType.bind(this));
     this.router.get("/performance/reports/:id/pdf", authenticate, authorize("admin"), this.downloadPerformanceReportPDF.bind(this));
+
+    // Storage
+    this.router.get("/storage/all", authenticate, authorize("admin", "seller"), this.getAllStorages.bind(this));
+    this.router.get("/storage/:id", authenticate, authorize("admin", "seller"), this.getStorageById.bind(this));
+    this.router.post("/storage/create", authenticate, authorize("admin"), this.createStorage.bind(this));
+    this.router.put("/storage/:id/capacity", authenticate, authorize("admin", "seller"), this.updateStorageCapacity.bind(this));
+
+    // Sales
+    this.router.post("/sales/process", authenticate, authorize("admin", "seller"), this.processSale.bind(this));
+    this.router.get("/sales/receipts", authenticate, authorize("admin", "seller"), this.getAllReceipts.bind(this));
+    this.router.get("/sales/receipts/:id", authenticate, authorize("admin", "seller"), this.getReceiptById.bind(this));
+    this.router.get("/sales/catalog", authenticate, authorize("admin", "seller"), this.getCatalog.bind(this));
   }
 
   // Auth
@@ -494,6 +509,120 @@ export class GatewayController {
       res.status(200).send(pdfBuffer);
     } catch (error) {
       console.error("GatewayController.downloadPerformanceReportPDF error:", error);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  // Storage
+  private async getAllStorages(req: Request, res: Response): Promise<void> {
+    try {
+      await this.gatewayService.addLog("INFO", `Fetching all storages requested by user ID: ${req.user?.id}`);
+      const storages = await this.gatewayService.getAllStorages();
+      res.status(200).json({ success: true, storages });
+    } catch (error) {
+      console.error("GatewayController.getAllStorages error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching all storages: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getStorageById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      await this.gatewayService.addLog("INFO", `Fetching storage ID: ${id} requested by user ID: ${req.user?.id}`);
+      const storage = await this.gatewayService.getStorageById(parseInt(id));
+      res.status(200).json({ success: true, storage });
+    } catch (error) {
+      console.error("GatewayController.getStorageById error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching storage: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async createStorage(req: Request, res: Response): Promise<void> {
+    try {
+      const { name, location, maxCapacity, type } = req.body;
+      await this.gatewayService.addLog("INFO", `Creating storage: ${name} by user ID: ${req.user?.id}`);
+      const storage = await this.gatewayService.createStorage({ name, location, maxCapacity, type, currentCapacity: 0 });
+      await this.gatewayService.addLog("INFO", `Storage created successfully: ${name}`);
+      res.status(201).json({ success: true, storage });
+    } catch (error) {
+      console.error("GatewayController.createStorage error:", error);
+      await this.gatewayService.addLog("ERROR", `Error creating storage: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async updateStorageCapacity(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { increment } = req.body;
+      await this.gatewayService.addLog("INFO", `Updating storage capacity for ID: ${id} by user ID: ${req.user?.id}`);
+      const storage = await this.gatewayService.updateStorageCapacity(parseInt(id), increment);
+      await this.gatewayService.addLog("INFO", `Storage capacity updated for ID: ${id}`);
+      res.status(200).json({ success: true, storage });
+    } catch (error) {
+      console.error("GatewayController.updateStorageCapacity error:", error);
+      await this.gatewayService.addLog("ERROR", `Error updating storage capacity: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  // Sales
+  private async processSale(req: Request, res: Response): Promise<void> {
+    try {
+      const { perfumeSerialNumber, quantity, saleType, paymentMethod, sellerId } = req.body;
+      await this.gatewayService.addLog("INFO", `Processing sale for perfume: ${perfumeSerialNumber} by user ID: ${req.user?.id}`);
+      const receipt = await this.gatewayService.processSale(
+        perfumeSerialNumber,
+        quantity,
+        saleType as SaleType,
+        paymentMethod as PaymentMethod,
+        sellerId || req.user?.id,
+        req.user?.role || "SELLER"
+      );
+      await this.gatewayService.addLog("INFO", `Sale processed successfully for perfume: ${perfumeSerialNumber}`);
+      res.status(201).json({ success: true, receipt });
+    } catch (error) {
+      console.error("GatewayController.processSale error:", error);
+      await this.gatewayService.addLog("ERROR", `Error processing sale: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getAllReceipts(req: Request, res: Response): Promise<void> {
+    try {
+      await this.gatewayService.addLog("INFO", `Fetching all receipts requested by user ID: ${req.user?.id}`);
+      const receipts = await this.gatewayService.getAllReceipts();
+      res.status(200).json({ success: true, receipts });
+    } catch (error) {
+      console.error("GatewayController.getAllReceipts error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching receipts: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getReceiptById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      await this.gatewayService.addLog("INFO", `Fetching receipt ID: ${id} requested by user ID: ${req.user?.id}`);
+      const receipt = await this.gatewayService.getReceiptById(parseInt(id));
+      res.status(200).json({ success: true, receipt });
+    } catch (error) {
+      console.error("GatewayController.getReceiptById error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching receipt: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+    }
+  }
+
+  private async getCatalog(req: Request, res: Response): Promise<void> {
+    try {
+      await this.gatewayService.addLog("INFO", `Fetching perfume catalog requested by user ID: ${req.user?.id}`);
+      const catalog = await this.gatewayService.getCatalog();
+      res.status(200).json({ success: true, catalog });
+    } catch (error) {
+      console.error("GatewayController.getCatalog error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching catalog: ${(error as Error).message}`);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }

@@ -22,6 +22,9 @@ export class PlantAPI implements IPlantAPI {
     const response: AxiosResponse<PlantDTO[]> = await this.axiosInstance.get("/plants", {
       headers: this.getAuthHeaders(token),
     });
+    console.log("Fetched plants:", response.data);
+    console.log("Response status:", response.status);
+    console.log("RESPONSE", response);
     return response.data;
   }
 

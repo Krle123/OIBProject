@@ -12,6 +12,8 @@ import { PlantState } from "../enums/PlantState";
 import { AuthResponseType } from "../types/AuthResponse";
 import { PerformanceAlgorithmType } from "../enums/PerformanceAlgorithmType";
 import { PerformanceReportDTO } from "../DTOs/PerformanceReportDTO";
+import { SaleType } from "../enums/SaleType";
+import { PaymentMethod } from "../enums/PaymentMethod";
 
 export interface IGatewayService {
   // Auth
@@ -68,4 +70,16 @@ export interface IGatewayService {
   getPerformanceReportById(id: number): Promise<PerformanceReportDTO | null>;
   getPerformanceReportsByAlgorithmType(algorithmType: PerformanceAlgorithmType): Promise<PerformanceReportDTO[]>;
   downloadPerformanceReportPDF(reportId: number): Promise<Buffer>;
+
+  // Storage
+  sendPackagingFromStorage(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]>;
+  getAllStorages(): Promise<any[]>;
+  getStorageById(id: number): Promise<any>;
+  createStorage(storageData: any): Promise<any>;
+  updateStorageCapacity(storageId: number, increment: number): Promise<any>;
+
+  // Sales
+  processSale(perfumeSerialNumber: string, quantity: number, saleType: SaleType, paymentMethod: PaymentMethod, sellerId?: number, userRole?: string): Promise<FiscalReceiptDTO>;
+  getCatalog(): Promise<any[]>;
+
 }

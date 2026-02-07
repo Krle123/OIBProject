@@ -5,11 +5,13 @@ export class CommunicationService implements ICommunicationService {
     private readonly processingClient: AxiosInstance;
     private readonly logClient: AxiosInstance;
     private readonly analysisClient: AxiosInstance;
+    private readonly storageClient: AxiosInstance;
 
     constructor() {
         const processingBaseURL = process.env.PROCESSING_SERVICE_API;
         const logBaseURL = process.env.LOG_SERVICE_API;
         const analysisBaseURL = process.env.ANALYSIS_SERVICE_API;
+        const storageBaseURL = process.env.STORAGE_SERVICE_API;
 
         this.processingClient = axios.create({
             baseURL: processingBaseURL,
@@ -27,6 +29,12 @@ export class CommunicationService implements ICommunicationService {
             baseURL: analysisBaseURL,
             headers: { "Content-Type": "application/json" },
             timeout: 5000,
+        });
+
+        this.storageClient = axios.create({
+            baseURL: storageBaseURL,
+            headers: { "Content-Type": "application/json" },
+            timeout: 10000,
         });
     }
 
@@ -97,6 +105,21 @@ export class CommunicationService implements ICommunicationService {
             await this.logEvent("INFO", `Sale data sent to analysis service: Receipt ID ${receiptData.id}`);
         } catch (error: any) {
             await this.logEvent("WARNING", `Failed to send sale to analysis service: ${error.message}`);
+        }
+    }
+
+    async sendPackagesToSales(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]> {
+        try {
+            const response = await this.storageClient.post("/storages/send-packaging", {
+                perfumeSerialNumber: perfumeSerialNumber,
+                quantity: quantity,
+                userRole: userRole
+            });
+            await this.logEvent("INFO", `Successfully retrieved ${quantity} packages from storage for perfume ${perfumeSerialNumber}`);
+            return response.data.data;
+        } catch (error: any) {
+            await this.logEvent("ERROR", `Failed to retrieve packages from storage: ${error.message}`);
+            throw new Error("Failed to retrieve packages from storage for sale");
         }
     }
 }

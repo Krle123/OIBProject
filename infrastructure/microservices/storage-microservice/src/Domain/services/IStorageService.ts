@@ -2,12 +2,13 @@ import { StorageDTO } from "../DTOs/StorageDTO";
 
 export interface IStorageService {
     /**
-     * Send packaging from storage based on user role
-     * @param numberOfPackages Number of packages to send
+     * Send packaging from storage for a specific perfume
+     * @param perfumeSerialNumber Perfume serial number
+     * @param quantity Quantity of perfume packages needed
      * @param userRole User role (MANAGER or SELLER)
      * @returns Array of packaging DTOs
      */
-    sendPackagingFromStorage(numberOfPackages: number, userRole: string): Promise<any[]>;
+    sendPackagingFromStorage(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]>;
 
     /**
      * Get all storages

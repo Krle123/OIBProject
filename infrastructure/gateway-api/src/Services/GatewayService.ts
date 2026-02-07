@@ -14,6 +14,9 @@ import { AnalysisType } from "../Domain/enums/AnalysisType";
 import { FiscalReceiptDTO } from "../Domain/DTOs/FiscalReceiptDTO";
 import { PerformanceReportDTO } from "../Domain/DTOs/PerformanceReportDTO";
 import { PerformanceAlgorithmType } from "../Domain/enums/PerformanceAlgorithmType";
+import { StorageDTO } from "../Domain/DTOs/StorageDTO";
+import { SaleType } from "../Domain/enums/SaleType";
+import { PaymentMethod } from "../Domain/enums/PaymentMethod";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
@@ -21,6 +24,8 @@ export class GatewayService implements IGatewayService {
   private readonly logClient: AxiosInstance;
   private readonly productionClient: AxiosInstance;
   private readonly processingClient: AxiosInstance;
+  private readonly storageClient: AxiosInstance;
+  private readonly salesClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
@@ -28,6 +33,8 @@ export class GatewayService implements IGatewayService {
     const logBaseURL = process.env.LOG_SERVICE_API;
     const productionBaseURL = process.env.PRODUCTION_SERVICE_API;
     const processingBaseURL = process.env.PROCESSING_SERVICE_API;
+    const storageBaseURL = process.env.STORAGE_SERVICE_API;
+    const salesBaseURL = process.env.SALES_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -55,6 +62,18 @@ export class GatewayService implements IGatewayService {
 
     this.processingClient = axios.create({
       baseURL: processingBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.storageClient = axios.create({
+      baseURL: storageBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.salesClient = axios.create({
+      baseURL: salesBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -299,5 +318,55 @@ export class GatewayService implements IGatewayService {
     const response = await this.processingClient.get(`/performance/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
     return Buffer.from(response.data);
   }
-  // TODO: ADD MORE API CALLS
+
+  // Storage microservice
+  async getAllStorages(): Promise<StorageDTO[]> {
+    const response = await this.storageClient.get<any>(`/api/v1/storages`);
+    return response.data.data;
+  }
+
+  async getStorageById(id: number): Promise<StorageDTO> {
+    const response = await this.storageClient.get<any>(`/api/v1/storages/${id}`);
+    return response.data.data;
+  }
+
+  async createStorage(data: { name: string; location: string; maxCapacity: number; type?: string; currentCapacity?: number }): Promise<StorageDTO> {
+    const response = await this.storageClient.post<any>(`/api/v1/storages`, data);
+    return response.data.data;
+  }
+
+  async updateStorageCapacity(id: number, increment: number): Promise<StorageDTO> {
+    const response = await this.storageClient.put<any>(`/api/v1/storages/${id}/capacity`, { increment });
+    return response.data.data;
+  }
+
+  async sendPackagingFromStorage(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]> {
+    const response = await this.storageClient.post<any>(`/api/v1/storages/send-packaging`, { perfumeSerialNumber, quantity, userRole });
+    return response.data;
+  }
+
+  // Sales microservice
+  async processSale(
+    perfumeSerialNumber: string,
+    quantity: number,
+    saleType: SaleType,
+    paymentMethod: PaymentMethod,
+    sellerId?: number,
+    userRole?: string
+  ): Promise<FiscalReceiptDTO> {
+    const response = await this.salesClient.post<any>(`/api/v1/sales/process`, {
+      perfumeSerialNumber,
+      quantity,
+      saleType,
+      paymentMethod,
+      sellerId: sellerId || null,
+      userRole: userRole || "SELLER"
+    });
+    return response.data.data;
+  }
+
+  async getCatalog(): Promise<any[]> {
+    const response = await this.salesClient.get<any>(`/api/v1/sales/catalog`);
+    return response.data.data;
+  }
 }

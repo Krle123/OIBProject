@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { Storage } from "../Domain/models/Storage";
 import { StorageDTO } from "../Domain/DTOs/StorageDTO";
 import { IStorageService } from "../Domain/services/IStorageService";
-import { ICommunicationService } from "../../../sales-microservice/src/Domain/services/ICommunicationService";
+import { ICommunicationService } from "../Domain/services/ICommunicationService";
 import { StorageType } from "../Domain/enums/StorageType";
 
 export class StorageService implements IStorageService {
@@ -11,7 +11,7 @@ export class StorageService implements IStorageService {
         private readonly communicationService: ICommunicationService
     ) {}
 
-    async sendPackagingFromStorage(numberOfPackages: number, userRole: string): Promise<any[]> {
+    async sendPackagingFromStorage(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]> {
         try {
             // Determine storage type based on user role
             const storageType = userRole === "MANAGER"
@@ -32,20 +32,26 @@ export class StorageService implements IStorageService {
             }
 
             // Check capacity
-            if (storage.currentCapacity < numberOfPackages) {
+            if (storage.currentCapacity < quantity) {
                 await this.communicationService.logEvent(
                     "WARNING",
-                    `Insufficient packages in storage ${storage.id}. Requested: ${numberOfPackages}, Available: ${storage.currentCapacity}`
+                    `Insufficient packages in storage ${storage.id}. Requested: ${quantity}, Available: ${storage.currentCapacity}`
                 );
-                throw new Error(`Insufficient packages in storage. Available: ${storage.currentCapacity}, Requested: ${numberOfPackages}`);
+                throw new Error(`Insufficient packages in storage. Available: ${storage.currentCapacity}, Requested: ${quantity}`);
             }
+
+            // Log perfume being requested
+            await this.communicationService.logEvent(
+                "INFO",
+                `Processing package delivery for sales: ${perfumeSerialNumber} (qty: ${quantity}). Storage type: ${storageType}`
+            );
 
             // Determine delivery parameters based on storage type
             const packagesPerDelivery = storageType === StorageType.DISTRIBUTION_CENTER ? 3 : 1;
             const deliveryTime = storageType === StorageType.DISTRIBUTION_CENTER ? 500 : 2500; // milliseconds
 
             // Calculate number of deliveries needed
-            const deliveriesNeeded = Math.ceil(numberOfPackages / packagesPerDelivery);
+            const deliveriesNeeded = Math.ceil(quantity / packagesPerDelivery);
             const packages: any[] = [];
 
             await this.communicationService.logEvent(
@@ -59,7 +65,7 @@ export class StorageService implements IStorageService {
 
                 const packagesInThisDelivery = Math.min(
                     packagesPerDelivery,
-                    numberOfPackages - packages.length
+                    quantity - packages.length
                 );
 
                 const retrievedPackages = await this.communicationService.getPackagingsFromStorage(
@@ -76,11 +82,11 @@ export class StorageService implements IStorageService {
             }
 
             // Update storage capacity
-            await this.updateStorageCapacity(storage.id, -numberOfPackages);
+            await this.updateStorageCapacity(storage.id, -quantity);
 
             await this.communicationService.logEvent(
                 "INFO",
-                `Successfully retrieved ${packages.length} packages from storage ${storage.id}`
+                `Successfully retrieved ${packages.length} packages from storage ${storage.id} for sale of ${perfumeSerialNumber}`
             );
 
             return packages;

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { IStorageService } from "../../Domain/services/IStorageService";
 
-export class SalesController {
+export class StorageController {
     private router: Router;
 
     constructor(
@@ -151,12 +151,20 @@ export class SalesController {
 
     private async sendPackagingFromStorage(req: Request, res: Response): Promise<void> {
         try {
-            const { numberOfPackages, userRole } = req.body;
+            const { perfumeSerialNumber, quantity, userRole } = req.body;
 
-            if (!numberOfPackages || numberOfPackages <= 0) {
+            if (!perfumeSerialNumber) {
                 res.status(400).json({
                     success: false,
-                    message: "Number of packages must be greater than 0"
+                    message: "Perfume serial number is required"
+                });
+                return;
+            }
+
+            if (!quantity || quantity <= 0) {
+                res.status(400).json({
+                    success: false,
+                    message: "Quantity must be greater than 0"
                 });
                 return;
             }
@@ -170,7 +178,8 @@ export class SalesController {
             }
 
             const packages = await this.storageService.sendPackagingFromStorage(
-                numberOfPackages,
+                perfumeSerialNumber,
+                quantity,
                 userRole
             );
 
@@ -178,12 +187,12 @@ export class SalesController {
                 success: true,
                 data: packages,
                 count: packages.length,
-                message: "Packages sent from storage successfully"
+                message: `Successfully retrieved ${quantity} packages of perfume ${perfumeSerialNumber} from storage`
             });
         } catch (error: any) {
-            res.status(500).json({
+            res.status(400).json({
                 success: false,
-                message: error.message || "Failed to send packages from storage"
+                message: error.message || "Failed to retrieve packages from storage"
             });
         }
     }

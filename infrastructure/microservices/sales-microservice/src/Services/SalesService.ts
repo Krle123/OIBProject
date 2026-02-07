@@ -26,8 +26,8 @@ export class SalesService implements ISalesService {
                 `Processing sale: ${perfumeSerialNumber}, Quantity: ${quantity}, Type: ${saleType}`
             );
 
-            // Simplified sale processing - create receipt directly
-            // In production, this would validate against inventory/packaging service
+            // Request packages from storage before creating receipt (fail-fast)
+            await this.communicationService.sendPackagesToSales(perfumeSerialNumber, quantity, userRole);
 
             // Calculate price based on sale type (simplified pricing)
             const basePrice = 1000; // Base price per unit in RSD

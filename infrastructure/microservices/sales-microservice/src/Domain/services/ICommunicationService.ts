@@ -40,4 +40,13 @@ export interface ICommunicationService {
      * @param receiptData Fiscal receipt data
      */
     sendSaleToAnalysis(receiptData: any): Promise<void>;
+
+    /**
+     * Request packages from storage for a sale
+     * @param perfumeSerialNumber Perfume serial number
+     * @param quantity Quantity of packages needed
+     * @param userRole User role (MANAGER or SELLER)
+     * @returns Array of packages from storage
+     */
+    sendPackagesToSales(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]>;
 }

@@ -12,6 +12,8 @@ import { CommunicationService } from './Services/CommunicationService';
 import { Perfume } from './Domain/models/Perfume';
 import { LogerService } from './Services/LogerService';
 import { ILogerService } from './Domain/services/ILogerService';
+import { PackagingService } from './Services/PackagingService';
+import { Packaging } from './Domain/models/Packaging';
 
 dotenv.config({ quiet: true });
 
@@ -32,13 +34,15 @@ app.use(cors({
 }));
 
 const processingRepository = Db.getRepository(Perfume);
+const packagingRepository = Db.getRepository(Packaging);
 const communicationService: ICommunicationService = new CommunicationService();
 const logerService: ILogerService = new LogerService();
 const processingService: IProcessingService = new ProcessingService(communicationService, processingRepository, logerService);
+const packagingService = new PackagingService(packagingRepository, processingRepository, logerService);
 
 initialize_database();
 
-const processingController = new ProcessingController(processingService);
+const processingController = new ProcessingController(processingService, packagingService);
 
 app.use('/api/v1', processingController.getRouter());
 

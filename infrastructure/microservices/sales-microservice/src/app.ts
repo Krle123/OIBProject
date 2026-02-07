@@ -5,13 +5,10 @@ import dotenv from 'dotenv';
 import { SalesController } from './WebAPI/controllers/SalesController';
 import { ISalesService } from './Domain/services/ISalesService';
 import { SalesService } from './Services/SalesService';
-import { IStorageService } from './Domain/services/IStorageService';
-import { StorageService } from './Services/StorageService';
 import { ICommunicationService } from './Domain/services/ICommunicationService';
 import { CommunicationService } from './Services/CommunicationService';
 import { Db } from './Database/DbConnectionPool';
 import { initialize_database } from './Database/InitializeConnection';
-import { Storage } from './Domain/models/Storage';
 import { FiscalReceipt } from './Domain/models/FiscalReceipt';
 import { Repository } from 'typeorm';
 
@@ -34,19 +31,18 @@ app.use(cors({
 }));
 
 // Initialize repositories
-const storageRepository: Repository<Storage> = Db.getRepository(Storage);
+
 const receiptRepository: Repository<FiscalReceipt> = Db.getRepository(FiscalReceipt);
 
 // Initialize services with dependency injection
 const communicationService: ICommunicationService = new CommunicationService();
-const storageService: IStorageService = new StorageService(storageRepository, communicationService);
-const salesService: ISalesService = new SalesService(receiptRepository, communicationService, storageService);
+const salesService: ISalesService = new SalesService(receiptRepository, communicationService);
 
 // Initialize database
 initialize_database();
 
 // Initialize controller
-const salesController = new SalesController(salesService, storageService);
+const salesController = new SalesController(salesService);
 
 // Register routes
 app.use('/api/v1', salesController.getRouter());

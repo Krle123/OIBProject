@@ -4,6 +4,7 @@ import { ISalesAPI } from "../api/sales/ISalesAPI";
 import { IUserAPI } from "../api/users/IUserAPI";
 import { DashboardNavbar } from "../components/dashboard/navbar/Navbar";
 import { useAuth } from "../hooks/useAuthHook";
+import { PlantDTO } from "../models/plants/PlantDTO";
 
 type OverviewPageProps = {
     plantAPI: IPlantAPI;
@@ -13,7 +14,7 @@ type OverviewPageProps = {
 
 export const OverviewPage: React.FC<OverviewPageProps> = ({ plantAPI, salesAPI, userAPI }) => {
     const { token } = useAuth();
-    const [plants, setPlants] = useState<any[]>([]);
+    const [plants, setPlants] = useState<PlantDTO[]>([]);
     const [receipts, setReceipts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 

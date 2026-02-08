@@ -2031,6 +2031,55 @@ hr {
     font-size: 14px;
 }
 
+/* Production layout */
+.production-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.production-main {
+    flex: 3;
+}
+
+
+.production-journal {
+    flex: 1;
+    background: #eef2f7;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Journal header */
+.production-journal-header {
+    background: #64748b;
+    color: white;
+    padding: 16px 20px;
+    border-bottom: 1px solid #475569;
+}
+
+.production-journal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+}
+
+/* Journal content */
+.production-journal-content {
+    background: white;
+    padding: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.production-journal-empty {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 24px 12px ;
+}
+
 /* Overview Page */
 .overview-page-content {
     flex: 1;
@@ -2319,3 +2368,4 @@ hr {
     background: #fff9c4;
     color: #f57f17;
 }
+

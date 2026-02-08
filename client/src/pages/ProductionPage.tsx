@@ -110,10 +110,14 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
     };
 
     return (
-        <div className="dashboard-root">
-            <DashboardNavbar userAPI={userAPI} />
+    <div className="dashboard-root">
+        <DashboardNavbar userAPI={userAPI} />
 
-            <div className="production-page-content">
+        {/* Main production layout – left and right */}
+        <div className="production-page-content production-layout">
+
+            {/* LEFT – existing content */}
+            <div className="production-main">
                 <div className="production-header">
                     <h1>Upravljanje biljkama</h1>
                 </div>
@@ -201,6 +205,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                         </button>
                     </div>
                 )}
+
                 {/* Plants Table */}
                 <div className="production-table-container">
                     {isLoading ? (
@@ -240,6 +245,20 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                     )}
                 </div>
             </div>
+
+            {/* RIGHT – production journal */}
+            <div className="production-journal">
+                <div className="production-journal-header">
+                    <h2>Dnevnik proizvodnje</h2>
+                </div>
+                <div className="production-journal-content">
+                    <p className="production-journal-empty">
+                        Nema zapisa
+                    </p>
+                </div>
+            </div>
+
         </div>
-    );
+    </div>
+);
 };

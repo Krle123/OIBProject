@@ -66,11 +66,4 @@ export class PlantAPI implements IPlantAPI {
     });
     return response.data.success;
   }
-
-  async getProductionLogs(token: string): Promise<any[]> {
-    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get(`/production/logs`, {
-      headers: this.getAuthHeaders(token),
-    });
-    return response.data.data || [];
-  }
 }

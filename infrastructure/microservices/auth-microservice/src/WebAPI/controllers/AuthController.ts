@@ -71,6 +71,12 @@ export class AuthController {
 
       const data: RegistrationUserDTO = req.body as RegistrationUserDTO;
 
+      // Normalize role to uppercase string to be resilient to client casing
+      if (data && data.role) {
+        // mutate incoming DTO role to normalized value
+        (data as any).role = String((data as any).role).toUpperCase();
+      }
+
       // Validate registration input
       const validation = validateRegistrationData(data);
       if (!validation.success) {

@@ -48,6 +48,9 @@ export class GatewayController {
 
     // Processing
     this.router.post("/processing/perfumes/create", authenticate, authorize("admin", "seller"), this.createPerfumeBatch.bind(this));
+    this.router.post('/processing/packaging/send-to-storage', authenticate, authorize("admin", "seller"), this.sendPackagingToStorage.bind(this));
+    this.router.post('/processing/packaging/package-perfume', authenticate, authorize("admin", "seller"), this.packagePerfume.bind(this));
+    this.router.get('/processing/perfumes', authenticate, authorize("admin", "seller"), this.getCatalogPerfumes.bind(this));
 
     // Analytics
     this.router.get("/analytics/sales/by-month", authenticate, authorize("admin", "seller"), this.calculateSalesByMonth.bind(this));
@@ -91,7 +94,6 @@ export class GatewayController {
     const data: LoginUserDTO = req.body;
     const result = await this.gatewayService.login(data);
     await this.gatewayService.addLog("INFO", `User logged in: ${data.username}`);
-    await this.testProductionService();
     res.status(200).json(result);
   }
 
@@ -286,46 +288,49 @@ export class GatewayController {
     }
   }
 
-  private async testProductionService(): Promise<void> {
+  private async sendPackagingToStorage(req: Request, res: Response): Promise<void> {
     try {
-      const plants = await this.gatewayService.getAllPlants();
+      const { storageId } = req.body;
+      const packaging = await this.gatewayService.sendPackagingToStorage(storageId);
+      if (packaging) {
+        await this.gatewayService.addLog("INFO", `Sent packaging to storage ID: ${storageId} by user ID: ${req.user?.id}`);
+        res.status(200).json({ success: true, data: packaging });
+      } else {
+        res.status(400).json({ success: false, message: "Failed to send packaging to storage" });
+      }
     } catch (error) {
-      console.error("GatewayController.testProductionService error:", error);
+      console.error("GatewayController.sendPackagingToStorage error:", error);
+      await this.gatewayService.addLog("ERROR", `Error sending packaging to storage: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
+  }
+
+  private async packagePerfume(req: Request, res: Response): Promise<void> {
     try {
-      const plants = await this.gatewayService.getAllFieldPlants();
+      const { serialNumber, numberOfBottles } = req.body;
+      const packaging = await this.gatewayService.packagePerfume(serialNumber, numberOfBottles);
+      if (packaging) {
+        await this.gatewayService.addLog("INFO", `Packaged perfume with serial number: ${serialNumber} and quantity: ${numberOfBottles} by user ID: ${req.user?.id}`);
+        res.status(200).json({ success: true, data: packaging });
+      } else {
+        res.status(400).json({ success: false, message: "Failed to package perfume" });
+      }
     } catch (error) {
-      console.error("GatewayController.testProductionService error:", error);
+      console.error("GatewayController.packagePerfume error:", error);
+      await this.gatewayService.addLog("ERROR", `Error packaging perfume: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
+  }
+
+  async getCatalogPerfumes(req: Request, res: Response): Promise<void> {
     try {
-      const success = await this.gatewayService.plantHerb(1, 5);
+      const perfumes = await this.gatewayService.getCatalogPerfumes();
+      await this.gatewayService.addLog("INFO", `Fetched catalog perfumes requested by user ID: ${req.user?.id}`);
+      res.status(200).json({ success: true, data: perfumes });
     } catch (error) {
-      console.error("GatewayController.testProductionService error:", error);
-    }
-    try {
-      const success = await this.gatewayService.changeAromaticPower(1, 10);
-    } catch (error) {
-      console.error("GatewayController.testProductionService error:", error);
-    }
-    try {
-      const success = await this.gatewayService.harvestPlant(1, 3);
-    } catch (error) {
-      console.error("GatewayController.testProductionService error:", error);
-    }
-    try {
-      const perfume = {
-        id: 0,
-        name: "Test Perfume",
-        serialNumber: "PP-2025-0001",
-        type: PerfumeType.PERFUME,
-        quantity: 100,
-        plantId: 1,
-        state: PerfumeState.PRODUCED,
-        expirationDate: "2026-12-31"
-      } as PerfumeDTO;
-      const perfumes = await this.gatewayService.createPerfumeBatch(perfume, 10);
-    } catch (error) {
-      console.error("GatewayController.testProductionService error:", error);
+      console.error("GatewayController.getCatalogPerfumes error:", error);
+      await this.gatewayService.addLog("ERROR", `Error fetching catalog perfumes: ${(error as Error).message}`);
+      res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
   }
 

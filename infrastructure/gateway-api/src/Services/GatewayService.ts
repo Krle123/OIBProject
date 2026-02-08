@@ -207,6 +207,20 @@ export class GatewayService implements IGatewayService {
     const response = await this.processingClient.post<{ success: boolean; data: PerfumeDTO[] }>(`/processing/perfumes/create`, { perfume, numberOfBottles });
     return response.data.data;
   }
+  async sendPackagingToStorage(storageId: number): Promise<any> {
+    const response = await this.processingClient.post<{ success: boolean; data: any }>(`/processing/packaging/send-to-storage`, { storageId });
+    return response.data.data;
+  }
+
+  async packagePerfume(serialNumber: string, numberOfBottles: number): Promise<any> {
+    const response = await this.processingClient.post<{ success: boolean; data: any }>(`/processing/packaging/package-perfume`, { serialNumber, numberOfBottles });
+    return response.data.data;
+  }
+
+  async getCatalogPerfumes(): Promise<PerfumeDTO[]> {
+    const response = await this.processingClient.get<{ success: boolean; data: PerfumeDTO[] }>(`/processing/perfumes`);
+    return response.data.data;
+  }
 
   //Analytics microservice
   async calculateSalesByMonth(month: number, year: number, userId?: number) {

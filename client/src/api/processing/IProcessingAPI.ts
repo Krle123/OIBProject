@@ -1,10 +1,9 @@
+import { CatalogPerfumeDTO } from "../../models/perfume/CatalogPerfumeDTO";
 import { PerfumeDTO } from "../../models/perfume/PerfumeDTO";
 
 export interface IProcessingAPI {
-    getAllPerfumes(token: string): Promise<PerfumeDTO[]>;
-    getPerfumeById(id: number, token: string): Promise<PerfumeDTO>;
-    createPerfume(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO>;
-    updatePerfume(id: number, perfume: PerfumeDTO, token: string): Promise<PerfumeDTO>;
-    deletePerfume(id: number, token: string): Promise<void>;
-    startProcessing(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO>;
+  createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number, token: string): Promise<PerfumeDTO[]>;
+  sendPackagingToStorage(storageId: number, token: string): Promise<any>;
+  packagePerfume(serialNumber: string, numberOfBottles: number, token: string): Promise<any>;
+  getCatalogPerfumes(token: string): Promise<CatalogPerfumeDTO[]>;
 }

@@ -17,6 +17,7 @@ export class ProcessingController {
 
     private initializeRoutes(): void {
         this.router.post('/processing/perfumes/create', this.createPerfumeBatch.bind(this));
+        this.router.get('/processing/perfumes', this.getCatalogPerfumes.bind(this));
         this.router.post('/processing/packaging/send-to-storage', this.sendPackagingToStorage.bind(this));
         this.router.post('/processing/packaging/package-perfume', this.packagePerfume.bind(this));
     }
@@ -62,6 +63,16 @@ export class ProcessingController {
             console.error("ProcessingController.packagePerfume error:", error);
             res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
         }
+    }
+
+    private async getCatalogPerfumes(req: Request, res: Response): Promise<void> {
+        try {
+            const perfumes = await this.packagingService.getCatalogPerfumes();
+            res.status(200).json({ success: true, data: perfumes });
+        } catch (error) {
+            console.error("ProcessingController.getCatalogPerfumes error:", error);
+            res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
+        }  
     }
 
     public getRouter(): Router {

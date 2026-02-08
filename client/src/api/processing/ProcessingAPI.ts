@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { PerfumeDTO } from "../../models/perfume/PerfumeDTO";
 import { IProcessingAPI } from "./IProcessingAPI";
+import { CatalogPerfumeDTO } from "../../models/perfume/CatalogPerfumeDTO";
 
 export class ProcessingAPI implements IProcessingAPI {
   private readonly axiosInstance: AxiosInstance;
@@ -18,42 +19,37 @@ export class ProcessingAPI implements IProcessingAPI {
     return { Authorization: `Bearer ${token}` };
   }
 
-  async getAllPerfumes(token: string): Promise<PerfumeDTO[]> {
-    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO[] }> = await this.axiosInstance.get("/processing/perfumes", {
+  async createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number, token: string): Promise<PerfumeDTO[]> {
+    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO[] }> = await this.axiosInstance.post("/processing/perfumes/create", {
+      perfume,
+      numberOfBottles,
+    }, {
       headers: this.getAuthHeaders(token),
     });
     return response.data.data;
   }
 
-  async getPerfumeById(id: number, token: string): Promise<PerfumeDTO> {
-    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.get(`/processing/perfumes/${id}`, {
+  async sendPackagingToStorage(storageId: number, token: string): Promise<any> {
+    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.post("/processing/packaging/send-to-storage", {
+      storageId,
+    }, {
       headers: this.getAuthHeaders(token),
     });
     return response.data.data;
   }
 
-  async createPerfume(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
-    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.post("/processing/perfumes", perfume, {
+  async packagePerfume(serialNumber: string, numberOfBottles: number, token: string): Promise<any> {
+    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.post("/processing/packaging/package-perfume", {
+      serialNumber,
+      numberOfBottles,
+    }, {
       headers: this.getAuthHeaders(token),
     });
     return response.data.data;
   }
 
-  async updatePerfume(id: number, perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
-    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.put(`/processing/perfumes/${id}`, perfume, {
-      headers: this.getAuthHeaders(token),
-    });
-    return response.data.data;
-  }
-
-  async deletePerfume(id: number, token: string): Promise<void> {
-    await this.axiosInstance.delete(`/processing/perfumes/${id}`, {
-      headers: this.getAuthHeaders(token),
-    });
-  }
-
-  async startProcessing(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
-    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.post(`/processing/perfumes/${perfume.id}/start-processing`, perfume, {
+  async getCatalogPerfumes(token: string): Promise<CatalogPerfumeDTO[]> {
+    const response: AxiosResponse<{ success: boolean; data: CatalogPerfumeDTO[] }> = await this.axiosInstance.get("/processing/perfumes", {
       headers: this.getAuthHeaders(token),
     });
     return response.data.data;

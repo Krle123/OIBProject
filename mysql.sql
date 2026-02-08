@@ -62,6 +62,13 @@ CREATE TABLE IF NOT EXISTS fields_plants (
     FOREIGN KEY(plantId) REFERENCES plants(id)
 );
 
+INSERT INTO plants (name, latinName, countryOrigin) VALUES
+('Rose', 'Rosa', 'France'),
+('Jasmin', 'Jasminum', 'India'),
+('Lavender', 'Lavandula', 'France'),
+('Sunflower', 'Helianthus annuus', 'USA'),
+('Aloe Vera', 'Aloe vera', 'Egypt');
+
 CREATE DATABASE IF NOT EXISTS processing_db;
 
 USE processing_db;
@@ -83,6 +90,32 @@ CREATE TABLE IF NOT EXISTS perfumes (
     
     expirationDate DATE
 );
+
+CREATE TABLE IF NOT EXISTS catalog (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    serialNumber VARCHAR(100),
+    
+    name VARCHAR(100),
+    
+    plantId INT
+);
+
+INSERT INTO catalog (serialNumber, name, plantId) VALUES
+('PP-2026-11', 'Rose Elegance', 1),
+('PP-2026-12', 'Midnight Rose', 1),
+
+('PP-2026-21', 'Jasmine Dream', 2),
+('PP-2026-22', 'White Jasmine Mist', 2),
+
+('PP-2026-31', 'Lavender Calm', 3),
+('PP-2026-32', 'Provence Lavender', 3),
+
+('PP-2026-41', 'Golden Sunflower', 4),
+('PP-2026-42', 'Summer Fields', 4),
+
+('PP-2026-51', 'Aloe Fresh', 5),
+('PP-2026-52', 'Desert Aloe Breeze', 5);
 
 CREATE DATABASE IF NOT EXISTS analytics_db;
 

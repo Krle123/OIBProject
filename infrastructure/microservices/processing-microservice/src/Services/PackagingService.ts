@@ -5,11 +5,13 @@ import { Perfume } from "../Domain/models/Perfume";
 import { PackagingStatus } from "../Domain/enums/PackagingStatus";
 import { PerfumeState } from "../Domain/enums/PerfumeState";
 import { ILogerService } from "../Domain/services/ILogerService";
+import { CatalogPerfume } from "../Domain/models/CatalogPerfume";
 
 export class PackagingService implements IPackagingService {
     constructor(
         private readonly packagingRepository: Repository<Packaging>,
         private readonly perfumeRepository: Repository<Perfume>,
+        private readonly catalogRepository: Repository<CatalogPerfume>,
         private readonly logerService: ILogerService
     ) {}
 
@@ -60,15 +62,23 @@ export class PackagingService implements IPackagingService {
                 throw new Error("No produced perfumes available to package and send");
             }
 
-            // Package the first produced perfume
             packaging = await this.packagePerfume(produced[0].serialNumber, 1);
         }
 
-        // Mark as sent and assign storage
         packaging.status = PackagingStatus.SENT;
         packaging.storageId = storageId;
         const updated = await this.packagingRepository.save(packaging);
         await this.logerService.logEvent("INFO", `Packaging ${updated.id} sent to storage ${storageId}`);
         return updated;
+    }
+
+    async getCatalogPerfumes(): Promise<CatalogPerfume[]> {
+        const perfumes = await this.catalogRepository.find();
+        return perfumes.map((p: CatalogPerfume) => ({
+            id: p.id,
+            name: p.name,
+            serialNumber: p.serialNumber,
+            plantId: p.plantId
+        }));
     }
 }

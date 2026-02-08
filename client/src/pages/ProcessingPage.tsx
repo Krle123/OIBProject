@@ -5,6 +5,7 @@ import { DashboardNavbar } from "../components/dashboard/navbar/Navbar";
 import { useAuth } from "../hooks/useAuthHook";
 import { PerfumeDTO } from "../models/perfume/PerfumeDTO";
 import { PerfumeState } from "../enums/PerfumeState";
+import { CatalogPerfumeDTO } from "../models/perfume/CatalogPerfumeDTO";
 
 type ProcessingPageProps = {
     processingAPI: IProcessingAPI;
@@ -13,7 +14,7 @@ type ProcessingPageProps = {
 
 export const ProcessingPage: React.FC<ProcessingPageProps> = ({ processingAPI, userAPI }) => {
     const { token } = useAuth();
-    const [perfumes, setPerfumes] = useState<PerfumeDTO[]>([]);
+    const [perfumes, setPerfumes] = useState<CatalogPerfumeDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -25,7 +26,7 @@ export const ProcessingPage: React.FC<ProcessingPageProps> = ({ processingAPI, u
 
         setIsLoading(true);
         try {
-            const perfumesData = await processingAPI.getAllPerfumes(token);
+            const perfumesData = await processingAPI.getCatalogPerfumes(token);
             console.log("Fetched perfumes:", perfumesData);
             setPerfumes(perfumesData);
         } catch (error) {
@@ -95,11 +96,8 @@ export const ProcessingPage: React.FC<ProcessingPageProps> = ({ processingAPI, u
                                     {perfumes.map((perfume) => (
                                         <tr key={perfume.id}>
                                             <td>{perfume.name}</td>
-                                            <td>{perfume.type}</td>
-                                            <td>{perfume.quantity} ml</td>
                                             <td>{perfume.serialNumber}</td>
-                                            <td>{new Date(perfume.expirationDate).toLocaleDateString('sr-RS')}</td>
-                                            <td>{getStatusBadge(perfume.state)}</td>
+                                            <td>{perfume.plantId}</td>
                                         </tr>
                                     ))}
                                 </tbody>

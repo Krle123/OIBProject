@@ -41,6 +41,9 @@ export interface IGatewayService {
 
   //Processing
   createPerfumeBatch(perfume: PerfumeDTO, numberOfBottles: number): Promise<PerfumeDTO[]>;
+  sendPackagingToStorage(storageId: number): Promise<any>;
+  packagePerfume(serialNumber: string, numberOfBottles: number): Promise<any>;
+  getCatalogPerfumes(): Promise<PerfumeDTO[]>;
 
   //Analytics
   calculateSalesByMonth(month: number, year: number, userId?: number): Promise<AnalysisReportDTO>;

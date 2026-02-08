@@ -14,6 +14,7 @@ import { LogerService } from './Services/LogerService';
 import { ILogerService } from './Domain/services/ILogerService';
 import { PackagingService } from './Services/PackagingService';
 import { Packaging } from './Domain/models/Packaging';
+import { CatalogPerfume } from './Domain/models/CatalogPerfume';
 
 dotenv.config({ quiet: true });
 
@@ -37,11 +38,12 @@ initialize_database();
 
 const processingRepository = Db.getRepository(Perfume);
 const packagingRepository = Db.getRepository(Packaging);
+const catalogRepository = Db.getRepository(CatalogPerfume);
 
 const communicationService: ICommunicationService = new CommunicationService();
 const logerService: ILogerService = new LogerService();
 const processingService: IProcessingService = new ProcessingService(communicationService, processingRepository, logerService);
-const packagingService = new PackagingService(packagingRepository, processingRepository, logerService);
+const packagingService = new PackagingService(packagingRepository, processingRepository, catalogRepository, logerService);
 
 const processingController = new ProcessingController(processingService, packagingService);
 

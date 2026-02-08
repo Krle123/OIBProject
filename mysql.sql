@@ -102,20 +102,20 @@ CREATE TABLE IF NOT EXISTS catalog (
 );
 
 INSERT INTO catalog (serialNumber, name, plantId) VALUES
-('PP-2026-11', 'Rose Elegance', 1),
-('PP-2026-12', 'Midnight Rose', 1),
+('PP-2026-1', 'Rose Elegance', 1),
+('PP-2026-2', 'Midnight Rose', 1),
 
-('PP-2026-21', 'Jasmine Dream', 2),
-('PP-2026-22', 'White Jasmine Mist', 2),
+('PP-2026-3', 'Jasmine Dream', 2),
+('PP-2026-4', 'White Jasmine Mist', 2),
 
-('PP-2026-31', 'Lavender Calm', 3),
-('PP-2026-32', 'Provence Lavender', 3),
+('PP-2026-5', 'Lavender Calm', 3),
+('PP-2026-6', 'Provence Lavender', 3),
 
-('PP-2026-41', 'Golden Sunflower', 4),
-('PP-2026-42', 'Summer Fields', 4),
+('PP-2026-7', 'Golden Sunflower', 4),
+('PP-2026-8', 'Summer Fields', 4),
 
-('PP-2026-51', 'Aloe Fresh', 5),
-('PP-2026-52', 'Desert Aloe Breeze', 5);
+('PP-2026-9', 'Aloe Fresh', 5),
+('PP-2026-10', 'Desert Aloe Breeze', 5);
 
 CREATE DATABASE IF NOT EXISTS analytics_db;
 
@@ -146,7 +146,13 @@ CREATE TABLE IF NOT EXISTS analysis_reports (
 
     title VARCHAR(255) NOT NULL,
 
-    data JSON NOT NULL,
+    total DOUBLE NULL,
+    
+    receipts JSON NULL,
+    
+    perfumes JSON NULL,
+    
+    extraData DOUBLE NULL,
 
     description TEXT NULL,
 

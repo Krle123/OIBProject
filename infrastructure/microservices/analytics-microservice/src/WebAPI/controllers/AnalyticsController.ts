@@ -1,6 +1,5 @@
 import { Request, Response, Router } from "express";
 import { IAnalyticsService } from "../../Domain/services/IAnalyticsService";
-import { IPDFService } from "../../Domain/services/IPDFService";
 import { AnalysisType } from "../../Domain/enums/AnalysisType";
 import { IFiscalReceiptService } from "../../Domain/services/IFiscalReceiptService";
 
@@ -8,7 +7,6 @@ export class AnalyticsController {
     private router: Router;
     constructor(
         private readonly analyticsService: IAnalyticsService,
-        private readonly pdfService: IPDFService,
         private readonly fiscalReceiptService: IFiscalReceiptService
     ) 
     {
@@ -24,18 +22,15 @@ export class AnalyticsController {
         this.router.get("/analytics/sales/trend", this.analyzeSalesTrend.bind(this));
 
         this.router.get("/analytics/top-10/best-selling", this.getTop10BestSellingPerfumes.bind(this));
-        this.router.get("/analytics/top-10/revenue", this.getTop10RevenueByPerfume.bind(this));
 
         this.router.get("/analytics/reports", this.getAllReports.bind(this));
         this.router.get("/analytics/reports/:id", this.getReportById.bind(this));
         this.router.get("/analytics/reports/type/:type", this.getReportsByType.bind(this));
-        this.router.get("/analytics/reports/:id/pdf", this.downloadReportPDF.bind(this));
 
         this.router.post("/analytics/receipts", this.createFiscalReceipt.bind(this));
         this.router.get("/analytics/receipts", this.getAllReceipts.bind(this));
         this.router.get("/analytics/receipts/:id", this.getReceiptById.bind(this));
         this.router.get("/analytics/receipts/number/:number", this.getReceiptByNumber.bind(this));
-        this.router.get("/analytics/receipts/:id/pdf", this.downloadReceiptPDF.bind(this));
     }
 
     private async calculateSalesByMonth (req: Request, res: Response): Promise<void> {
@@ -145,16 +140,6 @@ export class AnalyticsController {
         }
     };
 
-    private async getTop10RevenueByPerfume (req: Request, res: Response): Promise<void> {
-        try {
-            const userId = (req as any).user?.id;
-            const report = await this.analyticsService.getTop10RevenueByPerfume(userId);
-            res.status(200).json({ success: true, data: report });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
-    };
-
     private async getAllReports (req: Request, res: Response): Promise<void> {
         try {
             const reports = await this.analyticsService.getAllReports();
@@ -185,26 +170,6 @@ export class AnalyticsController {
             const type = req.params.type as AnalysisType;
             const reports = await this.analyticsService.getReportsByType(type);
             res.status(200).json({ success: true, data: reports });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
-    };
-
-    private async downloadReportPDF (req: Request, res: Response): Promise<void> {
-        try {
-            const id = parseInt(req.params.id);
-            const report = await this.analyticsService.getReportById(id);
-
-            if (!report) {
-                res.status(404).json({ error: "Report not found" });
-                return;
-            }
-
-            const pdfBuffer = await this.pdfService.generateAnalysisReportPDF(report);
-
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename=report-${report.id}.pdf`);
-            res.send(pdfBuffer);
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
@@ -258,26 +223,6 @@ export class AnalyticsController {
             }
 
             res.status(200).json({ success: true, data: receipt });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
-    };
-
-    private async downloadReceiptPDF (req: Request, res: Response): Promise<void> {
-        try {
-            const id = parseInt(req.params.id);
-            const receipt = await this.fiscalReceiptService.getReceiptById(id);
-
-            if (!receipt) {
-                res.status(404).json({ error: "Receipt not found" });
-                return;
-            }
-
-            const pdfBuffer = await this.pdfService.generateFiscalReceiptPDF(receipt);
-
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename=receipt-${receipt.receiptNumber}.pdf`);
-            res.send(pdfBuffer);
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }

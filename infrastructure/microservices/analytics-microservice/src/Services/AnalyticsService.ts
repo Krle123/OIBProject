@@ -28,22 +28,16 @@ export class AnalyticsService implements IAnalyticsService {
             const totalTransactions = receipts.length;
             const averageTransaction = totalTransactions > 0 ? totalSales / totalTransactions : 0;
 
-            const data = {
-                period: `${year}-${String(month).padStart(2, '0')}`,
-                totalSales: totalSales.toFixed(2),
-                totalTransactions,
-                averageTransaction: averageTransaction.toFixed(2),
-                receipts: receipts.map(r => ({
-                    receiptNumber: r.receiptNumber,
-                    date: r.saleDate,
-                    amount: r.totalAmount
-                }))
-            };
-
             const report = this.reportRepository.create({
                 analysisType: AnalysisType.SALES_BY_MONTH,
                 title: `Sales Analysis - ${startDate.toLocaleString('default', { month: 'long' })} ${year}`,
-                data: data,
+                total: Number(totalSales.toFixed(2)),
+                receipts: receipts.map(r => ({
+                    receiptNumber: r.receiptNumber,
+                    date: r.saleDate,
+                    amount: Number(r.totalAmount)
+                })),
+                extraData: Number(averageTransaction.toFixed(2)),
                 description: `Total sales and transactions for ${startDate.toLocaleString('default', { month: 'long' })} ${year}`,
                 createdBy: userId || null,
                 periodStart: startDate,
@@ -56,8 +50,8 @@ export class AnalyticsService implements IAnalyticsService {
                 "INFO",
                 `Sales by month analysis created: ${month}/${year}`
             );
-
-            return new AnalysisReportDTO(savedReport);
+            const reportDTO = savedReport as AnalysisReportDTO;
+            return reportDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -69,7 +63,6 @@ export class AnalyticsService implements IAnalyticsService {
 
     async calculateSalesByWeek(weekNumber: number, year: number, userId?: number): Promise<AnalysisReportDTO> {
         try {
-            // Calculate start and end dates for the week
             const startDate = this.getDateOfWeek(weekNumber, year);
             const endDate = new Date(startDate);
             endDate.setDate(endDate.getDate() + 6);
@@ -84,18 +77,11 @@ export class AnalyticsService implements IAnalyticsService {
             const totalSales = receipts.reduce((sum, r) => sum + Number(r.totalAmount), 0);
             const totalTransactions = receipts.length;
 
-            const data = {
-                period: `Week ${weekNumber}, ${year}`,
-                startDate: startDate.toISOString().split('T')[0],
-                endDate: endDate.toISOString().split('T')[0],
-                totalSales: totalSales.toFixed(2),
-                totalTransactions
-            };
-
             const report = this.reportRepository.create({
                 analysisType: AnalysisType.SALES_BY_WEEK,
                 title: `Sales Analysis - Week ${weekNumber}, ${year}`,
-                data: data,
+                total: Number(totalSales.toFixed(2)),
+                extraData: totalTransactions,
                 description: `Sales analysis for week ${weekNumber} of ${year}`,
                 createdBy: userId || null,
                 periodStart: startDate,
@@ -108,8 +94,8 @@ export class AnalyticsService implements IAnalyticsService {
                 "INFO",
                 `Sales by week analysis created: Week ${weekNumber}/${year}`
             );
-
-            return new AnalysisReportDTO(savedReport);
+            const reportDTO = savedReport as AnalysisReportDTO;
+            return reportDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -148,17 +134,11 @@ export class AnalyticsService implements IAnalyticsService {
                 };
             });
 
-            const data = {
-                year: year,
-                totalSales: totalSales.toFixed(2),
-                totalTransactions,
-                monthlyBreakdown: monthlyData
-            };
-
             const report = this.reportRepository.create({
                 analysisType: AnalysisType.SALES_BY_YEAR,
                 title: `Sales Analysis - Year ${year}`,
-                data: data,
+                total: Number(totalSales.toFixed(2)),
+                extraData: totalTransactions,
                 description: `Complete sales analysis for ${year}`,
                 createdBy: userId || null,
                 periodStart: startDate,
@@ -171,8 +151,8 @@ export class AnalyticsService implements IAnalyticsService {
                 "INFO",
                 `Sales by year analysis created: ${year}`
             );
-
-            return new AnalysisReportDTO(savedReport);
+            const reportDTO = savedReport as AnalysisReportDTO;
+            return reportDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -189,16 +169,11 @@ export class AnalyticsService implements IAnalyticsService {
             const totalSales = receipts.reduce((sum, r) => sum + Number(r.totalAmount), 0);
             const totalTransactions = receipts.length;
 
-            const data = {
-                totalSales: totalSales.toFixed(2),
-                totalTransactions,
-                averageTransaction: totalTransactions > 0 ? (totalSales / totalTransactions).toFixed(2) : "0.00"
-            };
-
             const report = this.reportRepository.create({
                 analysisType: AnalysisType.TOTAL_SALES,
                 title: `Total Sales - All Time`,
-                data: data,
+                total: Number(totalSales.toFixed(2)),
+                extraData: totalTransactions,
                 description: `Complete sales summary across all periods`,
                 createdBy: userId || null,
                 periodStart: null,
@@ -211,8 +186,8 @@ export class AnalyticsService implements IAnalyticsService {
                 "INFO",
                 `Total sales analysis created`
             );
-
-            return new AnalysisReportDTO(savedReport);
+            const reportDTO = savedReport as AnalysisReportDTO;
+            return reportDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -255,20 +230,12 @@ export class AnalyticsService implements IAnalyticsService {
             const totalSales = receipts.reduce((sum, r) => sum + Number(r.totalAmount), 0);
             const avgDailySales = trendData.length > 0 ? totalSales / trendData.length : 0;
 
-            const data = {
-                period: {
-                    start: startDate.toISOString().split('T')[0],
-                    end: endDate.toISOString().split('T')[0]
-                },
-                totalSales: totalSales.toFixed(2),
-                averageDailySales: avgDailySales.toFixed(2),
-                dailyTrend: trendData
-            };
-
             const report = this.reportRepository.create({
                 analysisType: AnalysisType.SALES_TREND,
                 title: `Sales Trend Analysis`,
-                data: data,
+                total: Number(totalSales.toFixed(2)),
+                trend: trendData.map(t => ({ date: t.date, value: Number(t.totalSales) })),
+                extraData: Number(avgDailySales.toFixed(2)),
                 description: `Sales trend from ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`,
                 createdBy: userId || null,
                 periodStart: startDate,
@@ -281,8 +248,8 @@ export class AnalyticsService implements IAnalyticsService {
                 "INFO",
                 `Sales trend analysis created`
             );
-
-            return new AnalysisReportDTO(savedReport);
+            const reportDTO = savedReport as AnalysisReportDTO;
+            return reportDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -296,43 +263,22 @@ export class AnalyticsService implements IAnalyticsService {
         try {
             const receipts = await this.receiptRepository.find();
 
-            // Aggregate perfume quantities
-            const perfumeStats = new Map<string, { name: string; serialNumber: string; totalQuantity: number }>();
+            const aggregates = this.computePerfumeAggregates(receipts);
 
-            receipts.forEach(receipt => {
-                receipt.soldPerfumes.forEach(perfume => {
-                    const existing = perfumeStats.get(perfume.serialNumber) || {
-                        name: perfume.name,
-                        serialNumber: perfume.serialNumber,
-                        totalQuantity: 0
-                    };
-                    perfumeStats.set(perfume.serialNumber, {
-                        ...existing,
-                        totalQuantity: existing.totalQuantity + perfume.quantity
-                    });
-                });
-            });
+            const topByQuantity = aggregates
+                .slice()
+                .sort((a, b) => b.quantitySold - a.quantitySold)
+                .slice(0, 10);
 
-            // Sort and get top 10
-            const top10 = Array.from(perfumeStats.values())
-                .sort((a, b) => b.totalQuantity - a.totalQuantity)
-                .slice(0, 10)
-                .map((item, index) => ({
-                    rank: index + 1,
-                    serialNumber: item.serialNumber,
-                    name: item.name,
-                    totalQuantitySold: item.totalQuantity
-                }));
+            const perfumesPayload = topByQuantity.map(p => ({ name: p.name, serialNumber: p.serialNumber}));
 
-            const data = {
-                top10Perfumes: top10,
-                generatedAt: new Date().toISOString()
-            };
+            const totalRevenue = aggregates.reduce((sum, a) => sum + a.totalRevenue, 0);
 
             const report = this.reportRepository.create({
                 analysisType: AnalysisType.TOP_10_PERFUMES,
                 title: `Top 10 Best-Selling Perfumes`,
-                data: data,
+                perfumes: perfumesPayload,
+                extraData: Number(totalRevenue.toFixed(2)),
                 description: `Top 10 perfumes by quantity sold`,
                 createdBy: userId || null,
                 periodStart: null,
@@ -341,12 +287,8 @@ export class AnalyticsService implements IAnalyticsService {
 
             const savedReport = await this.reportRepository.save(report);
 
-            await this.communicationService.logEvent(
-                "INFO",
-                `Top 10 best-selling perfumes analysis created`
-            );
-
-            return new AnalysisReportDTO(savedReport);
+            await this.communicationService.logEvent("INFO", `Top 10 best-selling perfumes analysis created`);
+            return savedReport as AnalysisReportDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -356,87 +298,16 @@ export class AnalyticsService implements IAnalyticsService {
         }
     }
 
-    async getTop10RevenueByPerfume(userId?: number): Promise<AnalysisReportDTO> {
-        try {
-            const receipts = await this.receiptRepository.find();
-
-            // Aggregate perfume revenue
-            const perfumeRevenue = new Map<string, { name: string; serialNumber: string; totalRevenue: number; quantitySold: number }>();
-
-            receipts.forEach(receipt => {
-                receipt.soldPerfumes.forEach(perfume => {
-                    const existing = perfumeRevenue.get(perfume.serialNumber) || {
-                        name: perfume.name,
-                        serialNumber: perfume.serialNumber,
-                        totalRevenue: 0,
-                        quantitySold: 0
-                    };
-                    const revenue = perfume.quantity * Number(perfume.pricePerUnit);
-                    perfumeRevenue.set(perfume.serialNumber, {
-                        ...existing,
-                        totalRevenue: existing.totalRevenue + revenue,
-                        quantitySold: existing.quantitySold + perfume.quantity
-                    });
-                });
-            });
-
-            // Sort and get top 10
-            const top10 = Array.from(perfumeRevenue.values())
-                .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                .slice(0, 10)
-                .map((item, index) => ({
-                    rank: index + 1,
-                    serialNumber: item.serialNumber,
-                    name: item.name,
-                    totalRevenue: item.totalRevenue.toFixed(2),
-                    quantitySold: item.quantitySold
-                }));
-
-            const totalRevenue = top10.reduce((sum, item) => sum + parseFloat(item.totalRevenue), 0);
-
-            const data = {
-                top10ByRevenue: top10,
-                totalRevenueFromTop10: totalRevenue.toFixed(2),
-                generatedAt: new Date().toISOString()
-            };
-
-            const report = this.reportRepository.create({
-                analysisType: AnalysisType.TOP_10_REVENUE,
-                title: `Top 10 Perfumes by Revenue`,
-                data: data,
-                description: `Top 10 perfumes generating highest revenue`,
-                createdBy: userId || null,
-                periodStart: null,
-                periodEnd: null
-            });
-
-            const savedReport = await this.reportRepository.save(report);
-
-            await this.communicationService.logEvent(
-                "INFO",
-                `Top 10 revenue by perfume analysis created`
-            );
-
-            return new AnalysisReportDTO(savedReport);
-        } catch (error: any) {
-            await this.communicationService.logEvent(
-                "ERROR",
-                `Failed to get top 10 revenue by perfume: ${error.message}`
-            );
-            throw error;
-        }
-    }
-
     async getAllReports(): Promise<AnalysisReportDTO[]> {
         const reports = await this.reportRepository.find({
             order: { createdAt: "DESC" }
         });
-        return reports.map(report => new AnalysisReportDTO(report));
+        return reports.map(report => report as AnalysisReportDTO);
     }
 
     async getReportById(id: number): Promise<AnalysisReportDTO | null> {
         const report = await this.reportRepository.findOne({ where: { id } });
-        return report ? new AnalysisReportDTO(report) : null;
+        return report ? report as AnalysisReportDTO : null;
     }
 
     async getReportsByType(type: AnalysisType): Promise<AnalysisReportDTO[]> {
@@ -444,7 +315,7 @@ export class AnalyticsService implements IAnalyticsService {
             where: { analysisType: type },
             order: { createdAt: "DESC" }
         });
-        return reports.map(report => new AnalysisReportDTO(report));
+        return reports.map(report => report as AnalysisReportDTO);
     }
 
     // Helper method to get the start date of a week
@@ -458,5 +329,28 @@ export class AnalyticsService implements IAnalyticsService {
             isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
         isoWeekStart.setHours(0, 0, 0, 0);
         return isoWeekStart;
+    }
+
+    private computePerfumeAggregates(receipts: FiscalReceipt[]) {
+        const map = new Map<string, { name: string; serialNumber: string; totalRevenue: number; quantitySold: number }>();
+
+        receipts.forEach(receipt => {
+            receipt.soldPerfumes.forEach(perfume => {
+                const existing = map.get(perfume.serialNumber) || {
+                    name: perfume.name,
+                    serialNumber: perfume.serialNumber,
+                    totalRevenue: 0,
+                    quantitySold: 0
+                };
+                const revenue = Number(perfume.pricePerUnit) * Number(perfume.quantity);
+                map.set(perfume.serialNumber, {
+                    ...existing,
+                    totalRevenue: existing.totalRevenue + revenue,
+                    quantitySold: existing.quantitySold + Number(perfume.quantity)
+                });
+            });
+        });
+
+        return Array.from(map.values());
     }
 }

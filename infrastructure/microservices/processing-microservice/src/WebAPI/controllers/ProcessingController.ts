@@ -43,6 +43,8 @@ export class ProcessingController {
     private async sendPackagingToStorage(req: Request, res: Response): Promise<void> {
         try {
             const storageId: number = req.body.storageId;
+            const numberOfPackages: number = req.body.numberOfPackages;
+            const perfumeSerialNumber: string | undefined = req.body.perfumeSerialNumber;
             console.log("ProcessingController.sendPackagingToStorage called with:", { storageId });
             const packaging = await this.packagingService.sendPackagingToStoraging(storageId);
             res.status(200).json({ success: true, data: packaging });

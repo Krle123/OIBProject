@@ -1,9 +1,9 @@
-import PDFDocument from "pdfkit";
-import { IPDFService } from "../Domain/services/IPDFService";
-import { FiscalReceiptDTO } from "../Domain/DTOs/FiscalReceiptDTO";
-import { AnalysisReportDTO } from "../Domain/DTOs/AnalysisReportDTO";
+import PDFDocument from 'pdfkit';
+import { AnalysisReportDTO } from "../models/analysis/AnalysisReportDTO";
+import { FiscalReceiptDTO } from "../models/analysis/FiscalReceiptDTO";
+import { PerfumeDTO } from '../models/perfume/PerfumeDTO';
 
-export class PDFService implements IPDFService {
+export class PDFService {
     async generateFiscalReceiptPDF(receipt: FiscalReceiptDTO): Promise<Buffer> {
         return new Promise((resolve, reject) => {
             try {
@@ -124,63 +124,42 @@ export class PDFService implements IPDFService {
     }
 
     private renderAnalysisData(doc: PDFKit.PDFDocument, report: AnalysisReportDTO): void {
-        const data = report.data;
-
         switch (report.analysisType) {
             case 'SALES_BY_MONTH':
             case 'SALES_BY_WEEK':
             case 'SALES_BY_YEAR':
                 doc.fontSize(11).font('Helvetica-Bold').text('Rezultati:');
                 doc.fontSize(10).font('Helvetica');
-                doc.text(`Ukupna prodaja: ${data.totalSales} RSD`);
-                doc.text(`Broj transakcija: ${data.totalTransactions}`);
-                if (data.averageTransaction) {
-                    doc.text(`Prosecna transakcija: ${data.averageTransaction} RSD`);
-                }
+                doc.text(`Ukupna prodaja: ${report.total ?? 'N/A'} RSD`);
                 break;
 
             case 'TOTAL_SALES':
                 doc.fontSize(11).font('Helvetica-Bold').text('Ukupni rezultati:');
                 doc.fontSize(10).font('Helvetica');
-                doc.text(`Ukupna prodaja: ${data.totalSales} RSD`);
-                doc.text(`Ukupan broj transakcija: ${data.totalTransactions}`);
-                doc.text(`Prosecna vrednost transakcije: ${data.averageTransaction} RSD`);
+                doc.text(`Ukupna prodaja: ${report.total ?? 'N/A'} RSD`);
                 break;
 
             case 'TOP_10_PERFUMES':
                 doc.fontSize(11).font('Helvetica-Bold').text('Top 10 najprodavanijih parfema:');
                 doc.moveDown();
-                data.top10Perfumes.forEach((perfume: any) => {
+                (report.perfumes || []).forEach((perfume: PerfumeDTO, index: number) => {
                     doc.fontSize(10).font('Helvetica');
-                    doc.text(`${perfume.rank}. ${perfume.name} (${perfume.serialNumber})`);
-                    doc.text(`   Prodato: ${perfume.totalQuantitySold} komada`);
+                    doc.text(`${index + 1}. ${perfume.name} (${perfume.serialNumber})`);
                     doc.moveDown(0.5);
                 });
-                break;
-
-            case 'TOP_10_REVENUE':
-                doc.fontSize(11).font('Helvetica-Bold').text('Top 10 parfema po prihodu:');
-                doc.moveDown();
-                data.top10ByRevenue.forEach((perfume: any) => {
-                    doc.fontSize(10).font('Helvetica');
-                    doc.text(`${perfume.rank}. ${perfume.name} (${perfume.serialNumber})`);
-                    doc.text(`   Prihod: ${perfume.totalRevenue} RSD | Prodato: ${perfume.quantitySold} komada`);
-                    doc.moveDown(0.5);
-                });
-                doc.moveDown();
-                doc.font('Helvetica-Bold').text(`Ukupan prihod top 10: ${data.totalRevenueFromTop10} RSD`);
+                doc.text(`   Ukupan prihod: ${report.extraData ?? 'N/A'} RSD`);
                 break;
 
             case 'SALES_TREND':
                 doc.fontSize(11).font('Helvetica-Bold').text('Analiza trenda prodaje:');
                 doc.fontSize(10).font('Helvetica');
-                doc.text(`Ukupna prodaja: ${data.totalSales} RSD`);
-                doc.text(`Prosecna dnevna prodaja: ${data.averageDailySales} RSD`);
+                doc.text(`Ukupna prodaja: ${report.total ?? 'N/A'} RSD`);
+                doc.text(`Prosecna dnevna prodaja: ${report.extraData ?? 'N/A'} RSD`);
                 break;
 
             default:
                 doc.fontSize(10).font('Helvetica');
-                doc.text(JSON.stringify(data, null, 2));
+                doc.text(JSON.stringify(report, null, 2));
         }
     }
 

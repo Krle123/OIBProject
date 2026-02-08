@@ -1,6 +1,6 @@
-import { AnalysisType } from "../enums/AnalysisType";
-import { FiscalReceiptDTO } from "../DTOs/FiscalReceiptDTO";
-import { PerfumeDTO } from "./PerfumeDTO";
+import { AnalysisType } from "../../enums/AnalysisType";
+import { FiscalReceiptDTO } from "./FiscalReceiptDTO";
+import { PerfumeDTO } from "../perfume/PerfumeDTO";
 
 export interface AnalysisReportDTO {
     id: number;
@@ -10,8 +10,8 @@ export interface AnalysisReportDTO {
     total?: number;
     receipts?: FiscalReceiptDTO[];
     perfumes?: PerfumeDTO[];
-    extraData?: number;
     trend?: { date: string; value: number }[];
+    extraData?: number;
     createdAt: Date;
     createdBy: number | null;
     periodStart: Date | null;

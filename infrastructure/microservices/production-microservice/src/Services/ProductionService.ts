@@ -57,7 +57,9 @@ export class ProductionService implements IProductionService {
     async harvestPlant(plantId: number, quantity: number): Promise<FieldPlantDTO[]> 
     {
         await this.logServiceApi.logEvent("INFO", `Harvesting ${quantity} plants with plant ID: ${plantId}`);
+        console.log(`Harvesting ${quantity} plants with plant ID: ${plantId}`);
         const plant = await this.plantRepository.findOne({ where: { id: plantId } });
+        console.log(`Found plant: ${plant ? plant.name : "none"}`);
         if (!plant) {
             await this.logServiceApi.logEvent("ERROR", `Plant with ID ${plantId} not found`);
             return [];

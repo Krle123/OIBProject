@@ -1,36 +1,36 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { AppDataSource } from "./Database/DbConnectionPool";
+import { Db } from "./Database/DbConnectionPool";
 import { PerformanceReport } from "./Domain/models/PerformanceReport";
 import { CommunicationService } from "./Services/CommunicationService";
 import { PerformanceService } from "./Services/PerformanceService";
 import { PDFService } from "./Services/PDFService";
 import { PerformanceController } from "./WebAPI/controllers/PerformanceController";
+import { initialize_database } from "./Database/InitializeConnection";
 
 dotenv.config({ quiet: true });
 
-const app: Application = express();
+const app = express();
 
-// Middleware
-app.use(cors());
+// Body parsing
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get("/health", (req: Request, res: Response) => {
-    res.status(200).json({
-        status: "OK",
-        service: "Performance Microservice",
-        timestamp: new Date().toISOString()
-    });
-});
+// Read CORS settings from environment
+const corsOrigin = process.env.CORS_ORIGIN ?? "*";
+const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];
 
-// Initialize services and routes after DB connection
-export const initializeApp = async (): Promise<Application> => {
-    await AppDataSource.initialize();
+// Protected microservice from unauthorized access
+app.use(cors({
+  origin: corsOrigin,
+  methods: corsMethods,
+}));
+
+    initialize_database();
 
     // Repositories
-    const reportRepository = AppDataSource.getRepository(PerformanceReport);
+    const reportRepository = Db.getRepository(PerformanceReport);
 
     // Services
     const communicationService = new CommunicationService();
@@ -42,8 +42,5 @@ export const initializeApp = async (): Promise<Application> => {
 
     // Public routes - gateway handles authentication
     app.use("/api/v1", performanceController.getRouter());
-
-    return app;
-};
 
 export default app;

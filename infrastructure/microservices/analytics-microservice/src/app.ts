@@ -1,7 +1,8 @@
-import express, { Application, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { AppDataSource } from "./Database/DbConnectionPool";
+import { Db } from "./Database/DbConnectionPool";
+import { initialize_database } from "./Database/InitializeConnection";
 import { FiscalReceipt } from "./Domain/models/FiscalReceipt";
 import { AnalysisReport } from "./Domain/models/AnalysisReport";
 import { CommunicationService } from "./Services/CommunicationService";
@@ -9,32 +10,29 @@ import { FiscalReceiptService } from "./Services/FiscalReceiptService";
 import { AnalyticsService } from "./Services/AnalyticsService";
 import { PDFService } from "./Services/PDFService";
 import { AnalyticsController } from "./WebAPI/controllers/AnalyticsController";
-import { authMiddleware } from "./Helpers/authMiddleware";
 
 dotenv.config({ quiet: true });
 
-const app: Application = express();
+const app = express();
 
-// Middleware
-app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get("/health", (req: Request, res: Response) => {
-    res.status(200).json({
-        status: "OK",
-        service: "Analytics Microservice",
-        timestamp: new Date().toISOString()
-    });
-});
+// Read CORS settings from environment
+const corsOrigin = process.env.CORS_ORIGIN ?? "*";
+const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];
 
-// Initialize services and routes after DB connection
-export const initializeApp = async (): Promise<Application> => {
-    await AppDataSource.initialize();
+// Protected microservice from unauthorized access
+app.use(cors({
+  origin: corsOrigin,
+  methods: corsMethods,
+}));
+
+    initialize_database();
 
     // Repositories
-    const receiptRepository = AppDataSource.getRepository(FiscalReceipt);
-    const reportRepository = AppDataSource.getRepository(AnalysisReport);
+    const receiptRepository = Db.getRepository(FiscalReceipt);
+    const reportRepository = Db.getRepository(AnalysisReport);
 
     // Services
     const communicationService = new CommunicationService();
@@ -46,8 +44,5 @@ export const initializeApp = async (): Promise<Application> => {
     const analyticsController = new AnalyticsController(analyticsService, pdfService, fiscalReceiptService);
 
     app.use("/api/v1", analyticsController.getRouter());
-
-    return app;
-};
 
 export default app;

@@ -29,11 +29,10 @@ app.use(cors({
   methods: corsMethods,
 }));
 
+initialize_database();
+
 const logRepository = Db.getRepository(Log);
 const logService: ILogService = new LogService(logRepository);
-//const logerService: ILogerService = new LogerService();
-
-initialize_database();
 
 const logController = new LogController(logService);
 

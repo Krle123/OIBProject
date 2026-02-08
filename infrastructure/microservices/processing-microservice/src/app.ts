@@ -33,14 +33,15 @@ app.use(cors({
   methods: corsMethods,
 }));
 
+initialize_database();
+
 const processingRepository = Db.getRepository(Perfume);
 const packagingRepository = Db.getRepository(Packaging);
+
 const communicationService: ICommunicationService = new CommunicationService();
 const logerService: ILogerService = new LogerService();
 const processingService: IProcessingService = new ProcessingService(communicationService, processingRepository, logerService);
 const packagingService = new PackagingService(packagingRepository, processingRepository, logerService);
-
-initialize_database();
 
 const processingController = new ProcessingController(processingService, packagingService);
 

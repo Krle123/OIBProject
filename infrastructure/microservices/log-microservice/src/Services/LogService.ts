@@ -13,9 +13,7 @@ export class LogService implements ILogService {
             type: type as LogType,
             description: description,
         });
-        console.log("LogService.addLog: Created log entry:", logEntry);
         await this.logRepository.save(logEntry);  
-        console.log("LogService.addLog: Log entry saved to database"); 
     }
 
     async updateLog(id: number, description: string): Promise<void> 

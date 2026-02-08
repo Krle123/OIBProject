@@ -26,7 +26,6 @@ export class LogController {
   private async addLog(req: Request, res: Response): Promise<void> {
     try {
       const { type, description } = req.body;
-      console.log("LogController.addLog called with:", { type, description });
 
       // Basic validation
       if (!type || !description) {
@@ -41,7 +40,6 @@ export class LogController {
       }
 
       await this.logService.addLog(type, description);
-      console.log("LogController.addLog: Log added successfully");
       res.status(201).json({ success: true, message: "Log added successfully" });
     } catch (error) {
       console.error("LogController.addLog error:", error);

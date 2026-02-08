@@ -41,23 +41,29 @@ export class PlantAPI implements IPlantAPI {
     return response.data;
   }
 
-  async createPlant(plant: PlantDTO, token: string): Promise<PlantDTO> {
-    const response: AxiosResponse<PlantDTO> = await this.axiosInstance.post("/plants", plant, {
+  async plantHerb(plantId: number, quantity: number, token: string): Promise<boolean> {
+    const response: AxiosResponse<{ success: boolean; data: boolean }> = await this.axiosInstance.post("/production/plant", {
+      plantId,
+      quantity,
+    }, {
       headers: this.getAuthHeaders(token),
     });
-    return response.data;
+    return response.data.data;
   }
 
-  async updatePlant(id: number, plant: PlantDTO, token: string): Promise<PlantDTO> {
-    const response: AxiosResponse<PlantDTO> = await this.axiosInstance.put(`/plants/${id}`, plant, {
+  async changeAromaticPower(id: number, changePercentage: number, token: string): Promise<boolean> {
+    const response: AxiosResponse<{ success: boolean; data: boolean }> = await this.axiosInstance.put(`/production/aromatic-power/${id}`, {
+      changePercentage,
+    }, {
       headers: this.getAuthHeaders(token),
     });
-    return response.data;
+    return response.data.data;
   }
 
-  async deletePlant(id: number, token: string): Promise<void> {
-    await this.axiosInstance.delete(`/plants/${id}`, {
+  async harvestPlant(plantId: number, quantity: number, token: string): Promise<boolean> {
+    const response: AxiosResponse<{ success: boolean; message: string }> = await this.axiosInstance.post(`/production/harvest`, { plantId, quantity }, {
       headers: this.getAuthHeaders(token),
     });
+    return response.data.success;
   }
 }

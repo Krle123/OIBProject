@@ -1,72 +1,60 @@
-import axios from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IPerformanceAPI } from "./IPerformanceAPI";
 
-const GATEWAY_URL = import.meta.env.VITE_GATEWAY_URL || "http://localhost:4000/api/v1";
-
 export class PerformanceAPI implements IPerformanceAPI {
-    async runSimulation(token: string, algorithmType: string, numberOfPackages: number): Promise<any> {
-        try {
-            const response = await axios.post(`${GATEWAY_URL}/performance/simulate`, {
-                algorithmType,
-                numberOfPackages
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data?.data || response.data;
-        } catch (error: any) {
-            console.error("Failed to run simulation:", error);
-            throw error;
-        }
-    }
+  private readonly axiosInstance: AxiosInstance;
 
-    async getAllReports(token: string): Promise<any[]> {
-        try {
-            const response = await axios.get(`${GATEWAY_URL}/performance/reports`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = response.data?.data || response.data || [];
-            return Array.isArray(data) ? data : [];
-        } catch (error: any) {
-            console.error("Failed to get reports:", error);
-            return [];
-        }
-    }
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_GATEWAY_URL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
 
-    async getReportById(token: string, id: number): Promise<any> {
-        try {
-            const response = await axios.get(`${GATEWAY_URL}/performance/reports/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data?.data || response.data;
-        } catch (error) {
-            console.error("Failed to get report:", error);
-            throw error;
-        }
-    }
+  private getAuthHeaders(token: string) {
+    return { Authorization: `Bearer ${token}` };
+  }
 
-    async getReportsByAlgorithmType(token: string, algorithmType: string): Promise<any[]> {
-        try {
-            const response = await axios.get(`${GATEWAY_URL}/performance/reports/algorithm/${algorithmType}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = response.data?.data?.data || response.data?.data || [];
-            return Array.isArray(data) ? data : [];
-        } catch (error) {
-            console.error("Failed to get reports by algorithm type:", error);
-            return [];
-        }
-    }
+  async runSimulation(token: string, algorithmType: string, numberOfPackages: number): Promise<any> {
+    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.post("/simulate", {
+      algorithmType,
+      numberOfPackages,
+    }, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
 
-    async downloadReportPDF(token: string, id: number): Promise<Blob> {
-        try {
-            const response = await axios.get(`${GATEWAY_URL}/performance/reports/${id}/pdf`, {
-                headers: { Authorization: `Bearer ${token}` },
-                responseType: 'blob'
-            });
-            return response.data;
-        } catch (error) {
-            console.error("Failed to download report PDF:", error);
-            throw error;
-        }
-    }
+  async getAllReports(token: string): Promise<any[]> {
+    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get("/performance/reports", {
+      headers: this.getAuthHeaders(token),
+    });
+    const data = response.data.data;
+    return Array.isArray(data) ? data : [];
+  }
+
+  async getReportById(token: string, id: number): Promise<any> {
+    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.get(`/performance/reports/${id}`, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
+
+  async getReportsByAlgorithmType(token: string, algorithmType: string): Promise<any[]> {
+    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get(`/performance/reports/algorithm/${algorithmType}`, {
+      headers: this.getAuthHeaders(token),
+    });
+    const data = response.data.data;
+    return Array.isArray(data) ? data : [];
+  }
+
+  async downloadReportPDF(token: string, id: number): Promise<Blob> {
+    const response: AxiosResponse<Blob> = await this.axiosInstance.get(`/performance/reports/${id}/pdf`, {
+      headers: this.getAuthHeaders(token),
+      responseType: 'blob',
+    });
+    return response.data;
+  }
 }

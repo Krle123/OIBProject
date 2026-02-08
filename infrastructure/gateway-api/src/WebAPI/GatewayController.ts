@@ -81,7 +81,7 @@ export class GatewayController {
     // Sales
     this.router.post("/sales/process", authenticate, authorize("admin", "seller"), this.processSale.bind(this));
     this.router.get("/sales/receipts", authenticate, authorize("admin", "seller"), this.getAllReceipts.bind(this));
-    this.router.get("/sales/receipts/:id", authenticate, authorize("admin", "seller"), this.getReceiptById.bind(this));
+    this.router.get("/sales/receipt/:id", authenticate, authorize("admin", "seller"), this.getReceiptById.bind(this));
     this.router.get("/sales/catalog", authenticate, authorize("admin", "seller"), this.getCatalog.bind(this));
   }
 
@@ -170,7 +170,7 @@ export class GatewayController {
       const { id } = req.params;
       const plants = await this.gatewayService.getPlantsById(parseInt(id));
       await this.gatewayService.addLog("INFO", `Fetched plants by ID: ${id} requested by user ID: ${req.user?.id}`);
-      res.status(200).json({ success: true, plants });
+      res.status(200).json({ success: true, data: plants });
     } catch (error) {
       console.error("GatewayController.getPlantsById error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching plants by ID: ${(error as Error).message}`);
@@ -183,7 +183,7 @@ export class GatewayController {
       const { state } = req.params;
       const plants = await this.gatewayService.getPlantsByState(state as PlantState);
       await this.gatewayService.addLog("INFO", `Fetched plants by state: ${state} requested by user ID: ${req.user?.id}`);
-      res.status(200).json({ success: true, plants });
+      res.status(200).json({ success: true, data: plants });
     } catch (error) {
       console.error("GatewayController.getPlantsByState error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching plants by state: ${(error as Error).message}`);
@@ -253,6 +253,7 @@ export class GatewayController {
   private async harvestPlant(req: Request, res: Response): Promise<void> {
     try {
       const { plantId, quantity } = req.body;
+      console.log(`Received harvest request for plantId: ${plantId}, quantity: ${quantity}`);
       const success = await this.gatewayService.harvestPlant(plantId, quantity);
       if (success) {
         await this.gatewayService.addLog("INFO", `Harvested plant ID: ${plantId} with quantity: ${quantity} by user ID: ${req.user?.id}`);
@@ -274,7 +275,7 @@ export class GatewayController {
       const perfumes = await this.gatewayService.createPerfumeBatch(perfume, numberOfBottles);
       if (perfumes.length > 0) {
         await this.gatewayService.addLog("INFO", `Created perfume batch of size: ${numberOfBottles} by user ID: ${req.user?.id}`);
-        res.status(201).json({ success: true, perfumes });
+        res.status(201).json({ success: true, data: perfumes });
       } else {
         res.status(400).json({ success: false, message: "Failed to create perfume batch" });
       }
@@ -334,7 +335,7 @@ export class GatewayController {
       const { month, year } = req.query;
       const userId = req.user?.id;
       const report = await this.gatewayService.calculateSalesByMonth(parseInt(month as string), parseInt(year as string), userId);
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.calculateSalesByMonth error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -346,7 +347,7 @@ export class GatewayController {
       const { year } = req.query;
       const userId = req.user?.id;
       const report = await this.gatewayService.calculateSalesByYear(parseInt(year as string), userId);
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.calculateSalesByYear error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -358,7 +359,7 @@ export class GatewayController {
       const { weekNumber, year } = req.query;
       const userId = req.user?.id;
       const report = await this.gatewayService.calculateSalesByWeek(parseInt(weekNumber as string), parseInt(year as string), userId);
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.calculateSalesByWeek error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -369,7 +370,7 @@ export class GatewayController {
     try {
       const userId = req.user?.id;
       const report = await this.gatewayService.calculateTotalSales(userId);
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.calculateTotalSales error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -381,7 +382,7 @@ export class GatewayController {
       const { startDate, endDate } = req.query;
       const userId = req.user?.id;
       const report = await this.gatewayService.analyzeSalesTrend(startDate as string, endDate as string, userId);
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.analyzeSalesTrend error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -392,7 +393,7 @@ export class GatewayController {
     try {
       const userId = req.user?.id;
       const reports = await this.gatewayService.getTop10BestSellingPerfumes(userId);
-      res.status(200).json({ success: true, reports });
+      res.status(200).json({ success: true, data: reports });
     } catch (error) {
       console.error("GatewayController.getTop10BestSellingPerfumes error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -403,7 +404,7 @@ export class GatewayController {
     try {
       const userId = req.user?.id;
       const reports = await this.gatewayService.getTop10RevenueByPerfume(userId);
-      res.status(200).json({ success: true, reports });
+      res.status(200).json({ success: true, data: reports });
     } catch (error) {
       console.error("GatewayController.getTop10RevenueByPerfume error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -413,7 +414,7 @@ export class GatewayController {
   private async getAllAnalysisReports(req: Request, res: Response): Promise<void> {
     try {
       const reports = await this.gatewayService.getAllAnalysisReports();
-      res.status(200).json({ success: true, reports });
+      res.status(200).json({ success: true, data: reports });
     } catch (error) {
       console.error("GatewayController.getAllAnalysisReports error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -424,7 +425,7 @@ export class GatewayController {
     try {
       const { id } = req.params;
       const report = await this.gatewayService.getAnalysisReportById(parseInt(id));
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.getAnalysisReportById error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -435,7 +436,7 @@ export class GatewayController {
     try {
       const { type } = req.params;
       const reports = await this.gatewayService.getAnalysisReportsByType(type as AnalysisType);
-      res.status(200).json({ success: true, reports });
+      res.status(200).json({ success: true, data: reports });
     } catch (error) {
       console.error("GatewayController.getAnalysisReportsByType error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -461,7 +462,7 @@ export class GatewayController {
       const { algorithmType, numberOfPackages } = req.body;
       const userId = req.user?.id;
       const report = await this.gatewayService.runSimulation(algorithmType, numberOfPackages, userId);
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.runSimulation error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -471,7 +472,7 @@ export class GatewayController {
   private async getAllPerformanceReports(req: Request, res: Response): Promise<void> {
     try {
       const reports = await this.gatewayService.getAllPerformanceReports();
-      res.status(200).json({ success: true, reports });
+      res.status(200).json({ success: true, data: reports });
     } catch (error) {
       console.error("GatewayController.getAllPerformanceReports error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -482,7 +483,7 @@ export class GatewayController {
     try {
       const { id } = req.params;
       const report = await this.gatewayService.getPerformanceReportById(parseInt(id));
-      res.status(200).json({ success: true, report });
+      res.status(200).json({ success: true, data: report });
     } catch (error) {
       console.error("GatewayController.getPerformanceReportById error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -493,7 +494,7 @@ export class GatewayController {
     try {
       const { algorithmType } = req.params;
       const reports = await this.gatewayService.getPerformanceReportsByAlgorithmType(algorithmType as PerformanceAlgorithmType);
-      res.status(200).json({ success: true, reports });
+      res.status(200).json({ success: true, data: reports });
     } catch (error) {
       console.error("GatewayController.getPerformanceReportsByAlgorithmType error:", error);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
@@ -518,7 +519,7 @@ export class GatewayController {
     try {
       await this.gatewayService.addLog("INFO", `Fetching all storages requested by user ID: ${req.user?.id}`);
       const storages = await this.gatewayService.getAllStorages();
-      res.status(200).json({ success: true, storages });
+      res.status(200).json({ success: true, data: storages });
     } catch (error) {
       console.error("GatewayController.getAllStorages error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching all storages: ${(error as Error).message}`);
@@ -531,7 +532,7 @@ export class GatewayController {
       const { id } = req.params;
       await this.gatewayService.addLog("INFO", `Fetching storage ID: ${id} requested by user ID: ${req.user?.id}`);
       const storage = await this.gatewayService.getStorageById(parseInt(id));
-      res.status(200).json({ success: true, storage });
+      res.status(200).json({ success: true, data: storage });
     } catch (error) {
       console.error("GatewayController.getStorageById error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching storage: ${(error as Error).message}`);
@@ -545,7 +546,7 @@ export class GatewayController {
       await this.gatewayService.addLog("INFO", `Creating storage: ${name} by user ID: ${req.user?.id}`);
       const storage = await this.gatewayService.createStorage({ name, location, maxCapacity, type, currentCapacity: 0 });
       await this.gatewayService.addLog("INFO", `Storage created successfully: ${name}`);
-      res.status(201).json({ success: true, storage });
+      res.status(201).json({ success: true, data: storage });
     } catch (error) {
       console.error("GatewayController.createStorage error:", error);
       await this.gatewayService.addLog("ERROR", `Error creating storage: ${(error as Error).message}`);
@@ -560,7 +561,7 @@ export class GatewayController {
       await this.gatewayService.addLog("INFO", `Updating storage capacity for ID: ${id} by user ID: ${req.user?.id}`);
       const storage = await this.gatewayService.updateStorageCapacity(parseInt(id), increment);
       await this.gatewayService.addLog("INFO", `Storage capacity updated for ID: ${id}`);
-      res.status(200).json({ success: true, storage });
+      res.status(200).json({ success: true, data: storage });
     } catch (error) {
       console.error("GatewayController.updateStorageCapacity error:", error);
       await this.gatewayService.addLog("ERROR", `Error updating storage capacity: ${(error as Error).message}`);
@@ -582,7 +583,7 @@ export class GatewayController {
         req.user?.role || "SELLER"
       );
       await this.gatewayService.addLog("INFO", `Sale processed successfully for perfume: ${perfumeSerialNumber}`);
-      res.status(201).json({ success: true, receipt });
+      res.status(201).json({ success: true, data: receipt });
     } catch (error) {
       console.error("GatewayController.processSale error:", error);
       await this.gatewayService.addLog("ERROR", `Error processing sale: ${(error as Error).message}`);
@@ -594,9 +595,9 @@ export class GatewayController {
     try {
       await this.gatewayService.addLog("INFO", `Fetching all receipts requested by user ID: ${req.user?.id}`);
       const receipts = await this.gatewayService.getAllReceipts();
-      res.status(200).json({ success: true, receipts });
+      res.status(200).json({ success: true, data: receipts });
     } catch (error) {
-      console.error("GatewayController.getAllReceipts error:", error);
+      console.log("GatewayController.getAllReceipts body:", req.body);
       await this.gatewayService.addLog("ERROR", `Error fetching receipts: ${(error as Error).message}`);
       res.status(500).json({ success: false, message: "Server error", error: (error as Error).message });
     }
@@ -607,7 +608,7 @@ export class GatewayController {
       const { id } = req.params;
       await this.gatewayService.addLog("INFO", `Fetching receipt ID: ${id} requested by user ID: ${req.user?.id}`);
       const receipt = await this.gatewayService.getReceiptById(parseInt(id));
-      res.status(200).json({ success: true, receipt });
+      res.status(200).json({ success: true, data: receipt });
     } catch (error) {
       console.error("GatewayController.getReceiptById error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching receipt: ${(error as Error).message}`);
@@ -619,7 +620,7 @@ export class GatewayController {
     try {
       await this.gatewayService.addLog("INFO", `Fetching perfume catalog requested by user ID: ${req.user?.id}`);
       const catalog = await this.gatewayService.getCatalog();
-      res.status(200).json({ success: true, catalog });
+      res.status(200).json({ success: true, data: catalog });
     } catch (error) {
       console.error("GatewayController.getCatalog error:", error);
       await this.gatewayService.addLog("ERROR", `Error fetching catalog: ${(error as Error).message}`);

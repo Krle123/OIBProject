@@ -3,26 +3,26 @@ import { IPlantAPI } from "../api/plants/IPlantAPI";
 import { IUserAPI } from "../api/users/IUserAPI";
 import { DashboardNavbar } from "../components/dashboard/navbar/Navbar";
 import { useAuth } from "../hooks/useAuthHook";
+import { PlantDTO } from "../models/plants/PlantDTO";
+import { PlantState } from "../enums/PlantState";
 
 type ProductionPageProps = {
     plantAPI: IPlantAPI;
     userAPI: IUserAPI;
 };
 
-type ActionMode = "plant" | "harvest" | "strength" | null;
+type ActionMode = "plant" | "harvest" | null;
 
 export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAPI }) => {
     const { token } = useAuth();
-    const [plants, setPlants] = useState<any[]>([]);
+    const [fieldPlants, setFieldPlants] = useState<any[]>([]);
+    const [plants, setPlants] = useState<PlantDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [actionMode, setActionMode] = useState<ActionMode>(null);
     const [showSuccess, setShowSuccess] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
-        plantName: "",
-        latinName: "",
-        countryOrigin: "",
         quantity: 1,
         strength: 5,
         selectedPlantId: null as number | null,
@@ -37,7 +37,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
 
         setIsLoading(true);
         try {
-            const plantsData = await plantAPI.getAllFieldPlants(token);
+            const fieldPlantsData = await plantAPI.getAllFieldPlants(token);
+            setFieldPlants(fieldPlantsData);
+            const plantsData = await plantAPI.getAllPlants(token);
             setPlants(plantsData);
         } catch (error) {
             console.error("Failed to load plants:", error);
@@ -49,9 +51,6 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
     const handleActionButtonClick = (mode: ActionMode) => {
         setActionMode(actionMode === mode ? null : mode);
         setFormData({
-            plantName: "",
-            latinName: "",
-            countryOrigin: "",
             quantity: 1,
             strength: 5,
             selectedPlantId: null,
@@ -66,15 +65,13 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
     };
 
     const handlePlantSeed = async () => {
-        if (!token || !formData.plantName || !formData.latinName || !formData.countryOrigin) {
-            alert("Molimo popunite sve podatke!");
+        if (!token || !formData.selectedPlantId) {
+            alert("Molimo izaberite биљку!");
             return;
         }
 
         try {
-            
-
-            //await plantAPI.createPlant(); messed up here
+            await plantAPI.plantHerb(formData.selectedPlantId, formData.quantity, token);
             setShowSuccess(true);
             setActionMode(null);
             loadData();
@@ -92,16 +89,10 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
         }
 
         try {
-            // Assuming harvest reduces quantity or marks as harvested
-            const plant = plants.find(p => p.id === formData.selectedPlantId);
+            const plant = fieldPlants.find(p => p.id === formData.selectedPlantId);
             if (!plant) return;
 
-            const updatedPlant = {
-                ...plant,
-                quantity: Math.max(0, (plant.quantity || 1) - (formData.quantity || 1)),
-            };
-
-            await plantAPI.updatePlant(formData.selectedPlantId, updatedPlant, token);
+            await plantAPI.harvestPlant(formData.selectedPlantId, formData.quantity, token);
             setShowSuccess(true);
             setActionMode(null);
             loadData();
@@ -112,41 +103,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
         }
     };
 
-    const handleChangeStrength = async () => {
-        if (!token || !formData.selectedPlantId) {
-            alert("Molimo izaberite биљку!");
-            return;
-        }
-
-        try {
-            const plant = plants.find(p => p.id === formData.selectedPlantId);
-            if (!plant) return;
-
-            const updatedPlant = {
-                ...plant,
-                strength: formData.strength,
-            };
-
-            await plantAPI.updatePlant(formData.selectedPlantId, updatedPlant, token);
-            setShowSuccess(true);
-            setActionMode(null);
-            loadData();
-            setTimeout(() => setShowSuccess(false), 3000);
-        } catch (error: any) {
-            console.error("Error updating strength:", error);
-            alert(`Greška при промени јачине! ${error?.response?.data?.message || error.message}`);
-        }
-    };
-
-    const getStatusBadge = (strength: number) => {
-        if (strength >= 8) return "Позитивна";
-        if (strength >= 5) return "Обична";
-        return "Преболна";
-    };
-
     const getStatusColor = (status: string) => {
-        if (status === "Позитивна") return "#10b981"; // Green
-        if (status === "Обична") return "#f59e0b"; // Yellow
+        if (status === PlantState.PLANTED) return "#10b981"; // Green
+        if (status === PlantState.PROCESSED) return "#f59e0b"; // Yellow
         return "#ef4444"; // Red
     };
 
@@ -178,42 +137,32 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                     >
                         ↓ Убери биљку
                     </button>
-                    <button
-                        onClick={() => handleActionButtonClick("strength")}
-                        className={`production-btn ${actionMode === "strength" ? "active" : ""}`}
-                    >
-                        ≈ Промени јачину
-                    </button>
                 </div>
 
                 {/* Action Forms */}
                 {actionMode === "plant" && (
                     <div className="production-action-panel">
                         <div className="production-form-group">
-                            <label>Назив:</label>
-                            <input
-                                type="text"
-                                placeholder="Назив биљке"
-                                value={formData.plantName}
-                                onChange={(e) => handleInputChange("plantName", e.target.value)}
-                            />
+                            <label>Изаберите биљку:</label>
+                            <select
+                                value={formData.selectedPlantId || ""}
+                                onChange={(e) => handleInputChange("selectedPlantId", parseInt(e.target.value))}
+                            >
+                                <option value="">-- Изаберите биљку --</option>
+                                {plants.map((plant) => (
+                                    <option key={plant.id} value={plant.id}>
+                                        {plant.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="production-form-group">
-                            <label>Латински назив:</label>
+                            <label>Количина за засађивање:</label>
                             <input
-                                type="text"
-                                placeholder="Латински назив"
-                                value={formData.latinName}
-                                onChange={(e) => handleInputChange("latinName", e.target.value)}
-                            />
-                        </div>
-                        <div className="production-form-group">
-                            <label>Земља:</label>
-                            <input
-                                type="text"
-                                placeholder="Земља порекла"
-                                value={formData.countryOrigin}
-                                onChange={(e) => handleInputChange("countryOrigin", e.target.value)}
+                                type="number"
+                                min="1"
+                                value={formData.quantity}
+                                onChange={(e) => handleInputChange("quantity", parseInt(e.target.value))}
                             />
                         </div>
                         <button onClick={handlePlantSeed} className="production-submit-btn">
@@ -232,9 +181,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                             >
                                 <option value="">-- Изаберите биљку --</option>
                                 {plants.map((plant) => (
-                                    <option key={plant.id} value={plant.id}>
-                                        {plant.name}
-                                    </option>
+                                        <option key={plant.id} value={plant.id}>
+                                            {plant.name}
+                                        </option>
                                 ))}
                             </select>
                         </div>
@@ -252,72 +201,35 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                         </button>
                     </div>
                 )}
-
-                {actionMode === "strength" && (
-                    <div className="production-action-panel">
-                        <div className="production-form-group">
-                            <label>Изаберите биљку:</label>
-                            <select
-                                value={formData.selectedPlantId || ""}
-                                onChange={(e) => handleInputChange("selectedPlantId", parseInt(e.target.value))}
-                            >
-                                <option value="">-- Изаберите биљку --</option>
-                                {plants.map((plant) => (
-                                    <option key={plant.id} value={plant.id}>
-                                        {plant.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="production-form-group">
-                            <label>Јачина (1-10):</label>
-                            <input
-                                type="number"
-                                min="1"
-                                max="10"
-                                value={formData.strength}
-                                onChange={(e) => handleInputChange("strength", parseInt(e.target.value))}
-                            />
-                        </div>
-                        <button onClick={handleChangeStrength} className="production-submit-btn">
-                            Промени јачину
-                        </button>
-                    </div>
-                )}
-
                 {/* Plants Table */}
                 <div className="production-table-container">
                     {isLoading ? (
                         <div className="production-loading">Учитавање...</div>
-                    ) : plants.length === 0 ? (
+                    ) : fieldPlants.length === 0 ? (
                         <div className="production-empty">Нема биљака</div>
                     ) : (
                         <table className="production-table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Назив</th>
                                     <th>Латински назив</th>
-                                    <th>Јачина</th>
-                                    <th>Количина</th>
                                     <th>Стање</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {plants.map((plant) => {
-                                    const strength = plant.strength || 5;
-                                    const status = getStatusBadge(strength);
+                                {fieldPlants.map((plant) => {
                                     return (
                                         <tr key={plant.id}>
+                                            <td>{plant.id}</td>
                                             <td>{plant.name}</td>
                                             <td><em>{plant.latinName}</em></td>
-                                            <td>{strength}</td>
-                                            <td>{plant.quantity || 1}</td>
                                             <td>
                                                 <span
                                                     className="production-status-badge"
-                                                    style={{ backgroundColor: getStatusColor(status) }}
+                                                    style={{ backgroundColor: getStatusColor(plant.state) }}
                                                 >
-                                                    {status}
+                                                    {plant.state}
                                                 </span>
                                             </td>
                                         </tr>

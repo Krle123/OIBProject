@@ -23,7 +23,6 @@ export class StorageController {
     private async getAllStorages(req: Request, res: Response): Promise<void> {
         try {
             const storages = await this.storageService.getAllStorages();
-
             res.status(200).json({
                 success: true,
                 data: storages,

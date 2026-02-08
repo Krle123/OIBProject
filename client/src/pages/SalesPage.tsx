@@ -32,6 +32,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
                 salesAPI.getStorages(token),
                 salesAPI.getReceipts(token)
             ]);
+            console.log("Učitana skladišta:", storagesData);
             setStorages(storagesData);
             setReceipts(receiptsData);
         } catch (error) {

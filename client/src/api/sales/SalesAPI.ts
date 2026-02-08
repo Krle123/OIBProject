@@ -20,10 +20,12 @@ export class SalesAPI implements ISalesAPI {
 
     async getStorages(token: string): Promise<any[]> {
         try {
-            const response = await axios.get(`${GATEWAY_URL}/storages`, {
+            const response = await axios.get(`${GATEWAY_URL}/storage/all`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Handle nested response: {success, data: {success, data: [...]}}
+            console.log("SalesAPI.getStorages - Response:", response);
+            console.log("SalesAPI.getStorages - Response data:", response.data);
             const data = response.data?.data?.data || response.data?.data || [];
             return Array.isArray(data) ? data : [];
         } catch (error) {

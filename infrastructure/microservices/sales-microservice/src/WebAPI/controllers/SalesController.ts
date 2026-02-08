@@ -90,6 +90,7 @@ export class SalesController {
                 count: receipts.length
             });
         } catch (error: any) {
+            console.error("Error fetching receipts:", error);
             res.status(500).json({
                 success: false,
                 message: error.message || "Failed to retrieve receipts"

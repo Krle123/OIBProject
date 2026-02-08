@@ -84,9 +84,9 @@ CREATE TABLE IF NOT EXISTS perfumes (
     expirationDate DATE
 );
 
-CREATE DATABASE IF NOT EXISTS izvestaji_analize;
+CREATE DATABASE IF NOT EXISTS analytics_db;
 
-USE izvestaji_analize;
+USE analytics_db;
 
 CREATE TABLE IF NOT EXISTS fiscal_receipts (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -126,48 +126,9 @@ CREATE TABLE IF NOT EXISTS analysis_reports (
     periodEnd DATE NULL
 );
 
+CREATE DATABASE IF NOT EXISTS performance_db;
 
-GRANT ALL PRIVILEGES ON izvestaji_analize.* TO 'root'@'localhost';
-FLUSH PRIVILEGES;
-
--- Sales Database
-CREATE DATABASE IF NOT EXISTS sales_db;
-
-USE sales_db;
-
-CREATE TABLE IF NOT EXISTS storages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-
-    name VARCHAR(100) NOT NULL,
-
-    location VARCHAR(255) NOT NULL,
-
-    maxCapacity INT NOT NULL,
-
-    currentCapacity INT DEFAULT 0,
-
-    type ENUM('DISTRIBUTION_CENTER', 'WAREHOUSE_CENTER') NOT NULL DEFAULT 'WAREHOUSE_CENTER'
-);
-
-CREATE TABLE IF NOT EXISTS fiscal_receipts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-
-    saleType ENUM('RETAIL', 'WHOLESALE') NOT NULL,
-
-    paymentMethod ENUM('CASH', 'BANK_TRANSFER', 'CARD') NOT NULL,
-
-    soldPerfumes JSON NOT NULL,
-
-    totalAmount DECIMAL(10, 2) NOT NULL,
-
-    saleDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    sellerId INT NULL
-);
-
-CREATE DATABASE IF NOT EXISTS izvestaji_performanse;
-
-USE izvestaji_performanse;
+USE performance_db;
 
 CREATE TABLE IF NOT EXISTS performance_reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -193,7 +154,24 @@ CREATE TABLE IF NOT EXISTS performance_reports (
     totalSimulationTime DECIMAL(10, 2) DEFAULT 0
 );
 
--- Insert initial storage data
+CREATE DATABASE IF NOT EXISTS storage_db;
+
+USE storage_db;
+
+CREATE TABLE IF NOT EXISTS storages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100) NOT NULL,
+
+    location VARCHAR(255) NOT NULL,
+
+    maxCapacity INT NOT NULL,
+
+    currentCapacity INT DEFAULT 0,
+
+    type ENUM('DISTRIBUTION_CENTER', 'WAREHOUSE_CENTER') NOT NULL DEFAULT 'WAREHOUSE_CENTER'
+);
+
 INSERT INTO storages (name, location, maxCapacity, currentCapacity, type) VALUES
 ('Distribution Center Paris', 'Rue de la Paix, Paris', 500, 250, 'DISTRIBUTION_CENTER'),
 ('Warehouse Center Marseille', 'Port de Marseille, Marseille', 300, 150, 'WAREHOUSE_CENTER'),

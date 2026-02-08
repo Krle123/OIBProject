@@ -33,14 +33,14 @@ app.use(cors({
   methods: corsMethods,
 }));
 
+initialize_database();
+
 const fieldPlantRepository: Repository<FieldPlant> = Db.getRepository(FieldPlant);
 const plantRepository: Repository<Plant> = Db.getRepository(Plant);
 
 const logerService: ILogerService = new LogerService();
 const productionService: IProductionService = new ProductionService(fieldPlantRepository, plantRepository, logerService);
 const plantService: IPlantService = new PlantService(plantRepository, fieldPlantRepository, logerService);
-
-initialize_database();
 
 const productionController = new ProductionController(productionService, plantService);
 

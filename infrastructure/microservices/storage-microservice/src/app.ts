@@ -30,6 +30,8 @@ app.use(cors({
   methods: corsMethods,
 }));
 
+initialize_database();
+
 const storageRepository: Repository<Storage> = Db.getRepository(Storage);
 
 const communicationService: ICommunicationService = new CommunicationService();
@@ -37,6 +39,6 @@ const storageService: IStorageService = new StorageService(storageRepository, co
 
 const storageController = new StorageController(storageService);
 
-initialize_database();
+app.use('/api/v1', storageController.getRouter());
 
 export default app;

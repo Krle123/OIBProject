@@ -221,9 +221,12 @@ export class AnalyticsController {
 
     private async getAllReceipts (req: Request, res: Response): Promise<void> {
         try {
+            console.log("AnalyticsController.getAllReceipts called");
             const receipts = await this.fiscalReceiptService.getAllReceipts();
+            console.log(`AnalyticsController.getAllReceipts - Retrieved ${receipts.length} receipts`);
             res.status(200).json({ success: true, data: receipts });
         } catch (error: any) {
+            console.log("AnalyticsController.getAllReceipts - Error:", error);
             res.status(500).json({ error: error.message });
         }
     };

@@ -1,137 +1,61 @@
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { PerfumeDTO } from "../../models/perfume/PerfumeDTO";
 import { IProcessingAPI } from "./IProcessingAPI";
 
 export class ProcessingAPI implements IProcessingAPI {
-    private apiUrl: string;
+  private readonly axiosInstance: AxiosInstance;
 
-    constructor(apiUrl: string = "http://localhost:3002") {
-        this.apiUrl = apiUrl;
-    }
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_GATEWAY_URL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
 
-    async getAllPerfumes(token: string): Promise<PerfumeDTO[]> {
-        try {
-            const response = await fetch(`${this.apiUrl}/api/perfumes`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
+  private getAuthHeaders(token: string) {
+    return { Authorization: `Bearer ${token}` };
+  }
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch perfumes: ${response.statusText}`);
-            }
+  async getAllPerfumes(token: string): Promise<PerfumeDTO[]> {
+    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO[] }> = await this.axiosInstance.get("/processing/perfumes", {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
 
-            return await response.json();
-        } catch (error) {
-            console.error("Error fetching perfumes:", error);
-            throw error;
-        }
-    }
+  async getPerfumeById(id: number, token: string): Promise<PerfumeDTO> {
+    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.get(`/processing/perfumes/${id}`, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
 
-    async getPerfumeById(id: number, token: string): Promise<PerfumeDTO> {
-        try {
-            const response = await fetch(`${this.apiUrl}/api/perfumes/${id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
+  async createPerfume(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
+    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.post("/processing/perfumes", perfume, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch perfume: ${response.statusText}`);
-            }
+  async updatePerfume(id: number, perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
+    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.put(`/processing/perfumes/${id}`, perfume, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
 
-            return await response.json();
-        } catch (error) {
-            console.error("Error fetching perfume:", error);
-            throw error;
-        }
-    }
+  async deletePerfume(id: number, token: string): Promise<void> {
+    await this.axiosInstance.delete(`/processing/perfumes/${id}`, {
+      headers: this.getAuthHeaders(token),
+    });
+  }
 
-    async createPerfume(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
-        try {
-            const response = await fetch(`${this.apiUrl}/api/perfumes`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(perfume)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to create perfume: ${response.statusText}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error creating perfume:", error);
-            throw error;
-        }
-    }
-
-    async updatePerfume(id: number, perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
-        try {
-            const response = await fetch(`${this.apiUrl}/api/perfumes/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(perfume)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to update perfume: ${response.statusText}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error updating perfume:", error);
-            throw error;
-        }
-    }
-
-    async deletePerfume(id: number, token: string): Promise<void> {
-        try {
-            const response = await fetch(`${this.apiUrl}/api/perfumes/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to delete perfume: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error("Error deleting perfume:", error);
-            throw error;
-        }
-    }
-
-    async startProcessing(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
-        try {
-            const response = await fetch(`${this.apiUrl}/api/perfumes/${perfume.id}/start-processing`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(perfume)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to start processing: ${response.statusText}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error starting processing:", error);
-            throw error;
-        }
-    }
+  async startProcessing(perfume: PerfumeDTO, token: string): Promise<PerfumeDTO> {
+    const response: AxiosResponse<{ success: boolean; data: PerfumeDTO }> = await this.axiosInstance.post(`/processing/perfumes/${perfume.id}/start-processing`, perfume, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
+  }
 }

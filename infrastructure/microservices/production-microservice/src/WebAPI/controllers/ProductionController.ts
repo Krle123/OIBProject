@@ -66,6 +66,7 @@ export class ProductionController {
     private async harvestPlant(req: Request, res: Response): Promise<void> {
         try {
             const { plantId, quantity } = req.body;
+            console.log(`Received harvest request for plantId: ${plantId}, quantity: ${quantity}`);
             const harvestedPlants = await this.productionService.harvestPlant(plantId, quantity);
             if (harvestedPlants.length > 0) {
                 res.status(200).json({ success: true, data: harvestedPlants });

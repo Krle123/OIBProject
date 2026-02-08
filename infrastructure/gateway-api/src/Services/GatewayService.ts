@@ -26,6 +26,8 @@ export class GatewayService implements IGatewayService {
   private readonly processingClient: AxiosInstance;
   private readonly storageClient: AxiosInstance;
   private readonly salesClient: AxiosInstance;
+  private readonly analyticsClient: AxiosInstance;
+  private readonly performanceClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
@@ -35,6 +37,8 @@ export class GatewayService implements IGatewayService {
     const processingBaseURL = process.env.PROCESSING_SERVICE_API;
     const storageBaseURL = process.env.STORAGE_SERVICE_API;
     const salesBaseURL = process.env.SALES_SERVICE_API;
+    const analyticsBaseURL = process.env.ANALYTICS_SERVICE_API;
+    const performanceBaseURL = process.env.PERFORMANCE_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -74,6 +78,18 @@ export class GatewayService implements IGatewayService {
 
     this.salesClient = axios.create({
       baseURL: salesBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.analyticsClient = axios.create({
+      baseURL: analyticsBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.performanceClient = axios.create({
+      baseURL: performanceBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -162,8 +178,6 @@ export class GatewayService implements IGatewayService {
 
   async getAllPlants(): Promise<PlantDTO[]> {
     const response = await this.productionClient.get<{ success: boolean; data: PlantDTO[] }>(`/plants`);
-    console.log("GatewayService.getAllPlants response:", response);
-    console.log("GatewayService.getAllPlants response data:", response.data);
     return response.data.data;
   }
 
@@ -182,8 +196,9 @@ export class GatewayService implements IGatewayService {
     return response.data;
   }
 
-  async harvestPlant(fieldPlantId: number, quantity: number): Promise<boolean> {
-    const response = await this.productionClient.post<boolean>(`/production/harvest`, { fieldPlantId, quantity });
+  async harvestPlant(plantId: number, quantity: number): Promise<boolean> {
+    console.log(`GatewayService.harvestPlant - Sending harvest request for plantId: ${plantId}, quantity: ${quantity}`);
+    const response = await this.productionClient.post<boolean>(`/production/harvest`, { plantId: plantId, quantity });
     return response.data;
   }
 
@@ -197,94 +212,94 @@ export class GatewayService implements IGatewayService {
   async calculateSalesByMonth(month: number, year: number, userId?: number) {
     const params: any = { month, year };
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/by-month`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/by-month`, { params });
     return response.data.data;
   }
   
   async calculateSalesByYear(year: number, userId?: number) {
     const params: any = { year };
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/by-year`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/by-year`, { params });
     return response.data.data;
   }
 
   async calculateSalesByWeek(weekNumber: number, year: number, userId?: number) {
     const params: any = { weekNumber, year };
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/by-week`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/by-week`, { params });
     return response.data.data;
   }
 
   async calculateTotalSales(userId?: number) {
     const params: any = {};
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/total`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/total`, { params });
     return response.data.data;
   }
 
   async analyzeSalesTrend(startDate: string, endDate: string, userId?: number) {
     const params: any = { startDate, endDate };
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/trend`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/sales/trend`, { params });
     return response.data.data;
   }
 
   async getTop10BestSellingPerfumes(userId?: number) {
     const params: any = {};
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/top-10/best-selling`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/top-10/best-selling`, { params });
     return response.data.data;
   }
 
   async getTop10RevenueByPerfume(userId?: number) {
     const params: any = {};
     if (userId) params.userId = userId;
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/top-10/revenue`, { params });
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/top-10/revenue`, { params });
     return response.data.data;
   }
 
   async getAllAnalysisReports(): Promise<AnalysisReportDTO[]> {
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/reports`);
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/reports`);
     return response.data.data;
   }
 
   async getAnalysisReportById(reportId: number): Promise<AnalysisReportDTO> {
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/reports/${reportId}`);
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO }>(`/analytics/reports/${reportId}`);
     return response.data.data;
   }
 
   async getAnalysisReportsByType(type: AnalysisType): Promise<AnalysisReportDTO[]> {
-    const response = await this.processingClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/reports/type/${type}`);
+    const response = await this.analyticsClient.get<{ success: boolean; data: AnalysisReportDTO[] }>(`/analytics/reports/type/${type}`);
     return response.data.data;
   }
 
   async downloadAnalysisReportPDF(reportId: number): Promise<Buffer> {
-    const response = await this.processingClient.get(`/analytics/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
+    const response = await this.analyticsClient.get(`/analytics/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
     return Buffer.from(response.data);
   }
 
   async createFiscalReceipt(saleData: FiscalReceiptDTO): Promise<FiscalReceiptDTO> {
-    const response = await this.processingClient.post<{ success: boolean; data: FiscalReceiptDTO }>(`/analytics/receipts`, saleData);
+    const response = await this.analyticsClient.post<{ success: boolean; data: FiscalReceiptDTO }>(`/analytics/receipts`, saleData);
     return response.data.data;
   }
 
   async getAllReceipts(): Promise<FiscalReceiptDTO[]> {
-    const response = await this.processingClient.get<{ success: boolean; data: FiscalReceiptDTO[] }>(`/analytics/receipts`);
+    const response = await this.analyticsClient.get<{ success: boolean; data: FiscalReceiptDTO[] }>(`/analytics/receipts`);
     return response.data.data;
   }
 
   async getReceiptById(receiptId: number): Promise<FiscalReceiptDTO> {
-    const response = await this.processingClient.get<{ success: boolean; data: FiscalReceiptDTO }>(`/analytics/receipts/${receiptId}`);
+    const response = await this.analyticsClient.get<{ success: boolean; data: FiscalReceiptDTO }>(`/analytics/receipts/${receiptId}`);
     return response.data.data;
   }
 
   async getReceiptByNumber(receiptNumber: string): Promise<FiscalReceiptDTO> {
-    const response = await this.processingClient.get<{ success: boolean; data: FiscalReceiptDTO }>(`/analytics/receipts/number/${receiptNumber}`);
+    const response = await this.analyticsClient.get<{ success: boolean; data: FiscalReceiptDTO }>(`/analytics/receipts/number/${receiptNumber}`);
     return response.data.data;
   }
 
   async downloadReceiptPDF(receiptId: number): Promise<Buffer> {
-    const response = await this.processingClient.get(`/analytics/receipts/${receiptId}/pdf`, { responseType: "arraybuffer" });
+    const response = await this.analyticsClient.get(`/analytics/receipts/${receiptId}/pdf`, { responseType: "arraybuffer" });
     return Buffer.from(response.data);
   }
 
@@ -292,18 +307,18 @@ export class GatewayService implements IGatewayService {
   async runSimulation(algorithmType: PerformanceAlgorithmType, numberOfPackages: number, userId?: number): Promise<PerformanceReportDTO> {
     const params: any = { algorithmType, numberOfPackages };
     if (userId) params.userId = userId;
-    const response = await this.processingClient.post<{ success: boolean; data: PerformanceReportDTO }>(`/performance/simulate`, params);
+    const response = await this.performanceClient.post<{ success: boolean; data: PerformanceReportDTO }>(`/performance/simulate`, params);
     return response.data.data;
   }
 
   async getAllPerformanceReports(): Promise<PerformanceReportDTO[]> {
-    const response = await this.processingClient.get<{ success: boolean; data: PerformanceReportDTO[] }>(`/performance/reports`);
+    const response = await this.performanceClient.get<{ success: boolean; data: PerformanceReportDTO[] }>(`/performance/reports`);
     return response.data.data;
   }
 
   async getPerformanceReportById(id: number): Promise<PerformanceReportDTO | null> {
     try {
-      const response = await this.processingClient.get<{ success: boolean; data: PerformanceReportDTO }>(`/performance/reports/${id}`);
+      const response = await this.performanceClient.get<{ success: boolean; data: PerformanceReportDTO }>(`/performance/reports/${id}`);
       return response.data.data;
     } catch (err) {
       console.warn("GatewayService: failed to get performance report by id:", (err as Error).message);
@@ -312,38 +327,40 @@ export class GatewayService implements IGatewayService {
   }
 
   async getPerformanceReportsByAlgorithmType(algorithmType: PerformanceAlgorithmType): Promise<PerformanceReportDTO[]> {
-    const response = await this.processingClient.get<{ success: boolean; data: PerformanceReportDTO[] }>(`/performance/reports/algorithm/${algorithmType}`);
+    const response = await this.performanceClient.get<{ success: boolean; data: PerformanceReportDTO[] }>(`/performance/reports/algorithm/${algorithmType}`);
     return response.data.data;
   }
 
   async downloadPerformanceReportPDF(reportId: number): Promise<Buffer> {
-    const response = await this.processingClient.get(`/performance/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
+    const response = await this.performanceClient.get(`/performance/reports/${reportId}/pdf`, { responseType: "arraybuffer" });
     return Buffer.from(response.data);
   }
 
   // Storage microservice
   async getAllStorages(): Promise<StorageDTO[]> {
-    const response = await this.storageClient.get<any>(`/api/v1/storages`);
+    const response = await this.storageClient.get<{ success: boolean; data: StorageDTO[] }>(`/storages`);
+    console.log("GatewayService.getAllStorages - Response:", response);
+    console.log("GatewayService.getAllStorages - Response data:", response.data);
     return response.data.data;
   }
 
   async getStorageById(id: number): Promise<StorageDTO> {
-    const response = await this.storageClient.get<any>(`/api/v1/storages/${id}`);
+    const response = await this.storageClient.get<any>(`/storages/${id}`);
     return response.data.data;
   }
 
   async createStorage(data: { name: string; location: string; maxCapacity: number; type?: string; currentCapacity?: number }): Promise<StorageDTO> {
-    const response = await this.storageClient.post<any>(`/api/v1/storages`, data);
+    const response = await this.storageClient.post<any>(`/storages`, data);
     return response.data.data;
   }
 
   async updateStorageCapacity(id: number, increment: number): Promise<StorageDTO> {
-    const response = await this.storageClient.put<any>(`/api/v1/storages/${id}/capacity`, { increment });
+    const response = await this.storageClient.put<any>(`/storages/${id}/capacity`, { increment });
     return response.data.data;
   }
 
   async sendPackagingFromStorage(perfumeSerialNumber: string, quantity: number, userRole: string): Promise<any[]> {
-    const response = await this.storageClient.post<any>(`/api/v1/storages/send-packaging`, { perfumeSerialNumber, quantity, userRole });
+    const response = await this.storageClient.post<any>(`/storages/send-packaging`, { perfumeSerialNumber, quantity, userRole });
     return response.data;
   }
 
@@ -356,7 +373,7 @@ export class GatewayService implements IGatewayService {
     sellerId?: number,
     userRole?: string
   ): Promise<FiscalReceiptDTO> {
-    const response = await this.salesClient.post<any>(`/api/v1/sales/process`, {
+    const response = await this.salesClient.post<any>(`/sales/process`, {
       perfumeSerialNumber,
       quantity,
       saleType,
@@ -368,7 +385,7 @@ export class GatewayService implements IGatewayService {
   }
 
   async getCatalog(): Promise<any[]> {
-    const response = await this.salesClient.get<any>(`/api/v1/sales/catalog`);
+    const response = await this.salesClient.get<any>(`/sales/catalog`);
     return response.data.data;
   }
 }

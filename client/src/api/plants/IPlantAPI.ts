@@ -3,7 +3,7 @@ export interface IPlantAPI {
   getAllPlants(token: string): Promise<PlantDTO[]>;
   getAllFieldPlants(token: string): Promise<PlantDTO[]>;
   getPlantById(id: number, token: string): Promise<PlantDTO>;
-  createPlant(plant: PlantDTO, token: string): Promise<PlantDTO>;
-  updatePlant(id: number, plant: PlantDTO, token: string): Promise<PlantDTO>;
-  deletePlant(id: number, token: string): Promise<void>;
+  plantHerb(plantId: number, quantity: number, token: string): Promise<boolean>;
+  changeAromaticPower(id: number, changePercentage: number, token: string): Promise<boolean>;
+  harvestPlant(plantId: number, quantity: number, token: string): Promise<boolean>;
 }

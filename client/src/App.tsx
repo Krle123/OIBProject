@@ -67,7 +67,7 @@ function App() {
           path="/Prerada"
           element={
             <ProtectedRoute requiredRole="seller,manager">
-              <ProcessingPage processingAPI={processing_api} userAPI={user_api}/>
+              <ProcessingPage processingAPI={processing_api} plantAPI={plant_api} userAPI={user_api} />
             </ProtectedRoute>
           }
         />

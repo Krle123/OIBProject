@@ -43,8 +43,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
         <button className="btn btn-ghost" onClick={() => navigate("/Pregled")}>Pregled</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Proizvodnja")}>Proizvodnja</button>
         <button className="btn btn-ghost" onClick={() => navigate("/Prerada")}>Prerada</button>
-        <button className="btn btn-ghost" onClick={() => navigate("/Pakovanje")}>Pakovanje</button>
-        <button className="btn btn-ghost" onClick={() => navigate("/Skladistenje")}>Skladistenje</button>
+     
         <button className="btn btn-ghost" onClick={() => navigate("/Prodaja")}>Prodaja</button>
         {(user?.role === "admin" || user?.role === "ADMIN") && (
           <button className="btn btn-ghost" onClick={() => navigate("/Analiza")}>Analiza</button>

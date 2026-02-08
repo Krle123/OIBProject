@@ -64,7 +64,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, process
             perfumeId: perfume.id,
             serialNumber: perfume.serialNumber || perfume.id.toString(),
             name: perfume.name || "Unknown",
-            price: perfume.price || 0
+            price: perfume.price || 500
         });
         setQuantity(1);
     };

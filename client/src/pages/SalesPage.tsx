@@ -210,7 +210,29 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, process
                                         <div className="sales-perfume-name">{selectedPerfume.name}</div>
                                         <div className="sales-perfume-price">{selectedPerfume.price} RSD/kom</div>
                                     </div>
-                                    
+
+                                    {/* Dropdown for Type */}
+                                    <div className="sales-perfume-type">
+                                        <label>Tip:</label>
+                                        <select
+                                        /*Logic*/
+                                        >
+                                            <option value="PERFUME">Parfem</option>
+                                            <option value="COLOGNE">Kolonjska voda</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Dropdown for Bottle Size */}
+                                    <div className="sales-perfume-size">
+                                        <label>Veličina bočice:</label>
+                                        <select
+                                        /*Logic*/
+                                        >
+                                            <option value="150ml">150ml</option>
+                                            <option value="250ml">250ml</option>
+                                        </select>
+                                    </div>
+
                                     <div className="sales-quantity-section">
                                         <label>Količina:</label>
                                         <input
@@ -225,12 +247,12 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, process
                                             className="sales-quantity-input"
                                         />
                                     </div>
-                                    
+
                                     <div className="sales-perfume-subtotal">
-                                        <strong>Ukupno: </strong>
+                                        <label>Ukupno: </label>
                                         {(selectedPerfume.price * quantity).toLocaleString()} RSD
                                     </div>
-                                    
+
                                     <button
                                         onClick={handleRemovePerfume}
                                         className="sales-remove-btn"

@@ -963,6 +963,15 @@ hr {
     padding: 20px;
     font-size: 14px;
 }
+.sales-perfume-name,
+.sales-perfume-price,
+.sales-quantity-section,
+.sales-perfume-subtotal,
+.sales-perfume-size,
+.sales-perfume-type
+ {
+    color: black;
+}
 
 @media (max-width: 1024px) {
     .sales-grid {

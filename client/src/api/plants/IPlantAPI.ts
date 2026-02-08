@@ -6,4 +6,5 @@ export interface IPlantAPI {
   plantHerb(plantId: number, quantity: number, token: string): Promise<boolean>;
   changeAromaticPower(id: number, changePercentage: number, token: string): Promise<boolean>;
   harvestPlant(plantId: number, quantity: number, token: string): Promise<boolean>;
+  getProductionLogs(token: string): Promise<any[]>;
 }

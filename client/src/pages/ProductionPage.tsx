@@ -4,6 +4,7 @@ import { IUserAPI } from "../api/users/IUserAPI";
 import { DashboardNavbar } from "../components/dashboard/navbar/Navbar";
 import { useAuth } from "../hooks/useAuthHook";
 import { PlantDTO } from "../models/plants/PlantDTO";
+import { LogDTO } from "../models/log/LogDTO";
 import { PlantState } from "../enums/PlantState";
 
 type ProductionPageProps = {
@@ -17,6 +18,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
     const { token } = useAuth();
     const [fieldPlants, setFieldPlants] = useState<any[]>([]);
     const [plants, setPlants] = useState<PlantDTO[]>([]);
+    const [logs, setLogs] = useState<LogDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [actionMode, setActionMode] = useState<ActionMode>(null);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -37,10 +39,14 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
 
         setIsLoading(true);
         try {
-            const fieldPlantsData = await plantAPI.getAllFieldPlants(token);
-            setFieldPlants(fieldPlantsData);
-            const plantsData = await plantAPI.getAllPlants(token);
-            setPlants(plantsData);
+            const [fieldPlantsData, plantsData, logsData] = await Promise.all([
+                plantAPI.getAllFieldPlants(token),
+                plantAPI.getAllPlants(token),
+                plantAPI.getProductionLogs(token),
+            ]);
+            setFieldPlants(fieldPlantsData || []);
+            setPlants(plantsData || []);
+            setLogs(logsData || []);
         } catch (error) {
             console.error("Failed to load plants:", error);
         } finally {
@@ -110,6 +116,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
     };
 
     return (
+
     <div className="dashboard-root">
         <DashboardNavbar userAPI={userAPI} />
 
@@ -251,11 +258,20 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                 <div className="production-journal-header">
                     <h2>Dnevnik proizvodnje</h2>
                 </div>
-                <div className="production-journal-content">
-                    <p className="production-journal-empty">
-                        Nema zapisa
-                    </p>
-                </div>
+                    <div className="production-journal-content">
+                        {logs.length === 0 ? (
+                            <p className="production-journal-empty">Nema zapisa</p>
+                        ) : (
+                            logs.slice().reverse().map((log) => (
+                                <div className="production-journal-item" key={log.id}>
+                                    <div className="journal-date">{log.ts ? new Date(log.ts).toLocaleString('sr-RS') : '-'}</div>
+                                    <div>
+                                        <div className="journal-action">{log.type} — {log.description}</div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
             </div>
 
         </div>

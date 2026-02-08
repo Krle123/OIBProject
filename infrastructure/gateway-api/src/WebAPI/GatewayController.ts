@@ -29,7 +29,7 @@ export class GatewayController {
 
     // Users
     this.router.get("/users", authenticate, authorize("admin"), this.getAllUsers.bind(this));
-    this.router.get("/users/:id", authenticate, authorize("admin", "seller"), this.getUserById.bind(this));
+    this.router.get("/users/:id", authenticate, authorize("admin", "manager", "seller"), this.getUserById.bind(this));
 
     // Logs
     this.router.post("/logs/add", authenticate, authorize("admin", "seller"), this.addLog.bind(this));
@@ -98,7 +98,9 @@ export class GatewayController {
   private async register(req: Request, res: Response): Promise<void> {
     await this.gatewayService.addLog("INFO", `Registration attempt for user: ${req.body.username}`);
     const data: RegistrationUserDTO = req.body;
+    console.log("GatewayController.register - Request body:", req.body);
     const result = await this.gatewayService.register(data);
+    console.log("GatewayController.register - Registration result:", result);
     await this.gatewayService.addLog("INFO", `User registered: ${data.username}`);
     res.status(200).json(result);
   }

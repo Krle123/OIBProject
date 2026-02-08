@@ -67,12 +67,14 @@ export class AuthController {
   private async register(req: Request, res: Response): Promise<void> {
     try {
       this.logerService.logEvent("INFO", "Registration request received");
+      console.log("AuthController.register - Request body:", req.body);
 
       const data: RegistrationUserDTO = req.body as RegistrationUserDTO;
 
       // Validate registration input
       const validation = validateRegistrationData(data);
       if (!validation.success) {
+        console.log("AuthController.register - Validation failed for user:", data.username);
         res.status(400).json({ success: false, message: validation.message });
         return;
       }
@@ -88,6 +90,7 @@ export class AuthController {
 
         res.status(201).json({ success: true, message: "Registration successful", token });
       } else {
+        console.log("AuthController.register - Registration failed for user:", data.username);
         res.status(400).json({ success: false, message: "Registration failed. Username or email may already exist." });
       }
     } catch (error) {

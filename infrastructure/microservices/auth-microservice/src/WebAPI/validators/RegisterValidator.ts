@@ -12,6 +12,7 @@ export function validateRegistrationData(data: RegistrationUserDTO): { success: 
     return { success: false, message: "Invalid email address" };
   }
   if (!Object.values(UserRole).includes(data.role)) {
+    console.log("RegisterValidator - Invalid role provided:", data.role);
     return { success: false, message: "Invalid role" };
   }
   return { success: true };

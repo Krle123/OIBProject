@@ -107,9 +107,12 @@ export class GatewayService implements IGatewayService {
 
   async register(data: RegistrationUserDTO): Promise<AuthResponseType> {
     try {
+      console.log("data:", data);
       const response = await this.authClient.post<AuthResponseType>("/auth/register", data);
       return response.data;
-    } catch {
+    } catch (err) {
+      console.log("GatewayService.register - Registration failed for user:", data.username);
+      console.log("GatewayService.register - Error details:", (err as Error).message);
       return { authenificated: false };
     }
   }

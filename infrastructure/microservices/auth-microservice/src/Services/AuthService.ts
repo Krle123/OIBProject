@@ -78,15 +78,4 @@ export class AuthService implements IAuthService {
       },
     };
   }
-
-  async initializeUser(): Promise<void> {
-    const newUser = this.userRepository.create({
-      username: 'test',
-      email: 'test@gmail.com',
-      role: UserRole.SELLER,
-      password: await bcrypt.hash('123456', this.saltRounds),
-      profileImage: null,
-    });
-    await this.userRepository.save(newUser);
-  }
 }

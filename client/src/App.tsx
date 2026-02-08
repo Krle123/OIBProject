@@ -19,12 +19,15 @@ import { OverviewPage } from "./pages/OverviewPage";
 import { PlantAPI } from "./api/plants/PlantAPI";
 import { IPlantAPI } from "./api/plants/IPlantAPI";
 import { ProductionPage } from "./pages/ProductionPage";
+import { ProcessingPage } from "./pages/ProcessingPage";
+import { IProcessingAPI } from "./api/processing/IProcessingAPI";
+import { ProcessingAPI } from "./api/processing/ProcessingAPI";
 
 const auth_api: IAuthAPI = new AuthAPI();
 const user_api: IUserAPI = new UserAPI();
 const sales_api: ISalesAPI = new SalesAPI();
 const plant_api: IPlantAPI = new PlantAPI();
-//const processing_api: IProcessingAPI = new ProcessingAPI();
+const processing_api: IProcessingAPI = new ProcessingAPI();
 const analytics_api: IAnalyticsAPI = new AnalyticsAPI();
 const performance_api: IPerformanceAPI = new PerformanceAPI();
 
@@ -59,16 +62,16 @@ function App() {
           }
         />
         
-        {/* }
+        
          <Route
           path="/Prerada"
           element={
             <ProtectedRoute requiredRole="seller,manager">
-              <ProcessingPage processingAPI={processing_api} salesAPI={sales_api} userAPI={user_api}/>
+              <ProcessingPage processingAPI={processing_api} userAPI={user_api}/>
             </ProtectedRoute>
           }
         />
-        */}
+       
 
         <Route
           path="/Pakovanje"

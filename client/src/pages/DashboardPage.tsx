@@ -14,7 +14,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ userAPI }) => {
             <div className="dashboard-content">
                 
                 <h1 style={{ color: "black" }}>Dobrodošli!</h1>
-
             </div>
         </div>
     );

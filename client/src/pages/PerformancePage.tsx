@@ -15,11 +15,11 @@ export const PerformancePage: React.FC<PerformancePageProps> = ({ performanceAPI
     const [isSimulating, setIsSimulating] = useState(false);
     const [activeTab, setActiveTab] = useState<"simulation" | "reports">("simulation"); // Start on reports tab to show data
 
-    // Simulation form
+    
     const [algorithmType, setAlgorithmType] = useState<string>("DISTRIBUTIVE_CENTER");
     const [numberOfPackages, setNumberOfPackages] = useState<number>(10);
 
-    // Reports
+    
     const [reports, setReports] = useState<any[]>([]);
     const [selectedReport, setSelectedReport] = useState<any | null>(null);
     const [filterAlgorithm, setFilterAlgorithm] = useState<string>("all");

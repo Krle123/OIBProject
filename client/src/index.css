@@ -2130,3 +2130,151 @@ hr {
     color: #1a1a1a;
     font-size: 13px;
 }
+
+/* Processing Page Styles */
+.processing-page-content {
+    flex: 1;
+    padding: 0;
+    background: #eef2f7;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.processing-header {
+    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    color: white;
+    padding: 24px;
+    text-align: left;
+}
+
+.processing-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+.processing-controls {
+    padding: 16px 24px;
+    background: #eef2f7;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-start-processing {
+    background: #9c27b0;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-start-processing:hover {
+    background: #7b1fa2;
+}
+
+.btn-start-processing:active {
+    transform: scale(0.98);
+}
+
+.processing-panel {
+    background: white;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.processing-panel .panel-header {
+    background: #2f6fed;
+    color: white;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.processing-table-container {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+}
+
+.processing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.processing-table thead {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.processing-table th {
+    background: #f8fafc;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #1a1a1a;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.processing-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.processing-table tbody tr:hover {
+    background: #f0f7ff;
+}
+
+.processing-empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.processing-footer {
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 13px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-produced {
+    background: #c8e6c9;
+    color: #2e7d32;
+}
+
+.badge-packaged {
+    background: #fff9c4;
+    color: #f57f17;
+}

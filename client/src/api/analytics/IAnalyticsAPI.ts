@@ -2,17 +2,17 @@ import { AnalysisReportDTO } from "../../models/analysis/AnalysisReportDTO";
 import { FiscalReceiptDTO } from "../../models/analysis/FiscalReceiptDTO";
 
 export interface IAnalyticsAPI {
-    getSalesByMonth(token: string, month: number, year: number): Promise<any>;
-    getSalesByWeek(token: string, week: number, year: number): Promise<any>;
-    getSalesByYear(token: string, year: number): Promise<any>;
-    getTotalSales(token: string): Promise<any>;
-    getSalesTrend(token: string, startDate: string, endDate: string): Promise<any>;
-    getTop10BestSelling(token: string): Promise<any>;
-    getTop10Revenue(token: string): Promise<any>;
-    getAllReports(token: string): Promise<any[]>;
+    getSalesByMonth(token: string, month: number, year: number): Promise<AnalysisReportDTO>;
+    getSalesByWeek(token: string, week: number, year: number): Promise<AnalysisReportDTO>;
+    getSalesByYear(token: string, year: number): Promise<AnalysisReportDTO>;
+    getTotalSales(token: string): Promise<AnalysisReportDTO>;
+    getSalesTrend(token: string, startDate: string, endDate: string): Promise<AnalysisReportDTO>;
+    getTop10BestSelling(token: string): Promise<AnalysisReportDTO>;
+    getTop10Revenue(token: string): Promise<AnalysisReportDTO>;
+    getAllReports(token: string): Promise<AnalysisReportDTO[]>;
     getReportById(token: string, id: number): Promise<AnalysisReportDTO>;
     downloadReportPDF(token: string, id: number): Promise<Blob>;
-    getReceipts(token: string): Promise<any[]>;
+    getReceipts(token: string): Promise<FiscalReceiptDTO[]>;
     downloadReceiptPDF(token: string, id: number): Promise<Blob>;
     getReceiptById(token: string, id: number): Promise<FiscalReceiptDTO>;
 }

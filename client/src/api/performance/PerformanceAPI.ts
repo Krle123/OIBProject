@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IPerformanceAPI } from "./IPerformanceAPI";
+import { AnalysisReportDTO } from "../../models/analysis/AnalysisReportDTO";
 
 export class PerformanceAPI implements IPerformanceAPI {
   private readonly axiosInstance: AxiosInstance;
@@ -17,8 +18,8 @@ export class PerformanceAPI implements IPerformanceAPI {
     return { Authorization: `Bearer ${token}` };
   }
 
-  async runSimulation(token: string, algorithmType: string, numberOfPackages: number): Promise<any> {
-    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.post("/simulate", {
+  async runSimulation(token: string, algorithmType: string, numberOfPackages: number): Promise<AnalysisReportDTO> {
+    const response: AxiosResponse<{ success: boolean; data: AnalysisReportDTO }> = await this.axiosInstance.post("/simulate", {
       algorithmType,
       numberOfPackages,
     }, {
@@ -27,23 +28,23 @@ export class PerformanceAPI implements IPerformanceAPI {
     return response.data.data;
   }
 
-  async getAllReports(token: string): Promise<any[]> {
-    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get("/performance/reports", {
+  async getAllReports(token: string): Promise<AnalysisReportDTO[]> {
+    const response: AxiosResponse<{ success: boolean; data: AnalysisReportDTO[] }> = await this.axiosInstance.get("/performance/reports", {
       headers: this.getAuthHeaders(token),
     });
     const data = response.data.data;
     return Array.isArray(data) ? data : [];
   }
 
-  async getReportById(token: string, id: number): Promise<any> {
-    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.get(`/performance/reports/${id}`, {
+  async getReportById(token: string, id: number): Promise<AnalysisReportDTO> {
+    const response: AxiosResponse<{ success: boolean; data: AnalysisReportDTO }> = await this.axiosInstance.get(`/performance/reports/${id}`, {
       headers: this.getAuthHeaders(token),
     });
     return response.data.data;
   }
 
-  async getReportsByAlgorithmType(token: string, algorithmType: string): Promise<any[]> {
-    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get(`/performance/reports/algorithm/${algorithmType}`, {
+  async getReportsByAlgorithmType(token: string, algorithmType: string): Promise<AnalysisReportDTO[]> {
+    const response: AxiosResponse<{ success: boolean; data: AnalysisReportDTO[] }> = await this.axiosInstance.get(`/performance/reports/algorithm/${algorithmType}`, {
       headers: this.getAuthHeaders(token),
     });
     const data = response.data.data;

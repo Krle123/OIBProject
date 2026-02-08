@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { PerfumeDTO } from "../../models/perfume/PerfumeDTO";
 import { IProcessingAPI } from "./IProcessingAPI";
 import { CatalogPerfumeDTO } from "../../models/perfume/CatalogPerfumeDTO";
+import { PackagingDTO } from "../../models/packaging/PackagingDTO";
 
 export class ProcessingAPI implements IProcessingAPI {
   private readonly axiosInstance: AxiosInstance;
@@ -38,8 +39,8 @@ export class ProcessingAPI implements IProcessingAPI {
     return response.data.data;
   }
 
-  async packagePerfume(serialNumber: string, numberOfBottles: number, token: string): Promise<any> {
-    const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.post("/processing/packaging/package-perfume", {
+  async packagePerfume(serialNumber: string, numberOfBottles: number, token: string): Promise<PackagingDTO> {
+    const response: AxiosResponse<{ success: boolean; data: PackagingDTO }> = await this.axiosInstance.post("/processing/packaging/package-perfume", {
       serialNumber,
       numberOfBottles,
     }, {

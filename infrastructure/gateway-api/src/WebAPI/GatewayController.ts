@@ -32,34 +32,34 @@ export class GatewayController {
     this.router.get("/users/:id", authenticate, authorize("admin", "manager", "seller"), this.getUserById.bind(this));
 
     // Logs
-    this.router.post("/logs/add", authenticate, authorize("admin", "seller"), this.addLog.bind(this));
+    this.router.post("/logs/add", authenticate, authorize("admin"), this.addLog.bind(this));
     this.router.put("/logs/update/:id", authenticate, authorize("admin"), this.updateLog.bind(this));
     this.router.delete("/logs/:id", authenticate, authorize("admin"), this.deleteLog.bind(this));
     this.router.get("/logs", authenticate, authorize("admin"), this.searchLogs.bind(this));
 
     // Production
-    this.router.get("/plants/:id", authenticate, authorize("admin", "seller"), this.getPlantsById.bind(this));
-    this.router.get("/plants", authenticate, authorize("admin", "seller"), this.getAllPlants.bind(this));
-    this.router.get("/field-plants/state/:state", authenticate, authorize("admin", "seller"), this.getPlantsByState.bind(this));
-    this.router.get("/field-plants", authenticate, authorize("admin", "seller"), this.getAllFieldPlants.bind(this));
-    this.router.post("/production/plant", authenticate, authorize("admin", "seller"), this.plantHerb.bind(this));
-    this.router.put("/production/aromatic-power/:id", authenticate, authorize("admin", "seller"), this.changeAromaticPower.bind(this));
-    this.router.post("/production/harvest", authenticate, authorize("admin", "seller"), this.harvestPlant.bind(this));
+    this.router.get("/plants/:id", authenticate, authorize("admin", "seller", "manager"), this.getPlantsById.bind(this));
+    this.router.get("/plants", authenticate, authorize("admin", "seller", "manager"), this.getAllPlants.bind(this));
+    this.router.get("/field-plants/state/:state", authenticate, authorize("admin", "seller", "manager"), this.getPlantsByState.bind(this));
+    this.router.get("/field-plants", authenticate, authorize("admin", "seller", "manager"), this.getAllFieldPlants.bind(this));
+    this.router.post("/production/plant", authenticate, authorize("manager", "seller"), this.plantHerb.bind(this));
+    this.router.put("/production/aromatic-power/:id", authenticate, authorize("manager", "seller"), this.changeAromaticPower.bind(this));
+    this.router.post("/production/harvest", authenticate, authorize("manager", "seller"), this.harvestPlant.bind(this));
 
     // Processing
-    this.router.post("/processing/perfumes/create", authenticate, authorize("admin", "seller"), this.createPerfumeBatch.bind(this));
-    this.router.post('/processing/packaging/send-to-storage', authenticate, authorize("admin", "seller"), this.sendPackagingToStorage.bind(this));
-    this.router.post('/processing/packaging/package-perfume', authenticate, authorize("admin", "seller"), this.packagePerfume.bind(this));
-    this.router.get('/processing/perfumes', authenticate, authorize("admin", "seller"), this.getCatalogPerfumes.bind(this));
+    this.router.post("/processing/perfumes/create", authenticate, authorize("manager", "seller"), this.createPerfumeBatch.bind(this));
+    this.router.post('/processing/packaging/send-to-storage', authenticate, authorize("manager", "seller"), this.sendPackagingToStorage.bind(this));
+    this.router.post('/processing/packaging/package-perfume', authenticate, authorize("manager", "seller"), this.packagePerfume.bind(this));
+    this.router.get('/processing/perfumes', authenticate, authorize("manager", "seller"), this.getCatalogPerfumes.bind(this));
 
     // Analytics
-    this.router.get("/analytics/sales/by-month", authenticate, authorize("admin", "seller"), this.calculateSalesByMonth.bind(this));
-    this.router.get("/analytics/sales/by-year", authenticate, authorize("admin", "seller"), this.calculateSalesByYear.bind(this));
-    this.router.get("/analytics/sales/by-week", authenticate, authorize("admin", "seller"), this.calculateSalesByWeek.bind(this));
-    this.router.get("/analytics/sales/total", authenticate, authorize("admin", "seller"), this.calculateTotalSales.bind(this));
-    this.router.get("/analytics/sales/trend", authenticate, authorize("admin", "seller"), this.analyzeSalesTrend.bind(this));
+    this.router.get("/analytics/sales/by-month", authenticate, authorize("admin"), this.calculateSalesByMonth.bind(this));
+    this.router.get("/analytics/sales/by-year", authenticate, authorize("admin"), this.calculateSalesByYear.bind(this));
+    this.router.get("/analytics/sales/by-week", authenticate, authorize("admin"), this.calculateSalesByWeek.bind(this));
+    this.router.get("/analytics/sales/total", authenticate, authorize("admin"), this.calculateTotalSales.bind(this));
+    this.router.get("/analytics/sales/trend", authenticate, authorize("admin"), this.analyzeSalesTrend.bind(this));
 
-    this.router.get("/analytics/sales/top-10/best-selling", authenticate, authorize("admin", "seller"), this.getTop10BestSellingPerfumes.bind(this));
+    this.router.get("/analytics/sales/top-10/best-selling", authenticate, authorize("admin"), this.getTop10BestSellingPerfumes.bind(this));
 
     this.router.get("/analytics/reports", authenticate, authorize("admin"), this.getAllAnalysisReports.bind(this));
     this.router.get("/analytics/reports/:id", authenticate, authorize("admin"), this.getAnalysisReportById.bind(this));
@@ -74,16 +74,16 @@ export class GatewayController {
     this.router.get("/performance/reports/:id/pdf", authenticate, authorize("admin"), this.downloadPerformanceReportPDF.bind(this));
 
     // Storage
-    this.router.get("/storage/all", authenticate, authorize("admin", "seller"), this.getAllStorages.bind(this));
-    this.router.get("/storage/:id", authenticate, authorize("admin", "seller"), this.getStorageById.bind(this));
-    this.router.post("/storage/create", authenticate, authorize("admin"), this.createStorage.bind(this));
-    this.router.put("/storage/:id/capacity", authenticate, authorize("admin", "seller"), this.updateStorageCapacity.bind(this));
+    this.router.get("/storage/all", authenticate, authorize("manager", "seller"), this.getAllStorages.bind(this));
+    this.router.get("/storage/:id", authenticate, authorize("manager", "seller"), this.getStorageById.bind(this));
+    this.router.post("/storage/create", authenticate, authorize("manager"), this.createStorage.bind(this));
+    this.router.put("/storage/:id/capacity", authenticate, authorize("manager", "seller"), this.updateStorageCapacity.bind(this));
 
     // Sales
-    this.router.post("/sales/process", authenticate, authorize("admin", "seller"), this.processSale.bind(this));
-    this.router.get("/sales/receipts", authenticate, authorize("admin", "seller"), this.getAllReceipts.bind(this));
-    this.router.get("/sales/receipt/:id", authenticate, authorize("admin", "seller"), this.getReceiptById.bind(this));
-    this.router.get("/sales/catalog", authenticate, authorize("admin", "seller"), this.getCatalog.bind(this));
+    this.router.post("/sales/process", authenticate, authorize("manager", "seller"), this.processSale.bind(this));
+    this.router.get("/sales/receipts", authenticate, authorize("manager", "seller", "admin"), this.getAllReceipts.bind(this));
+    this.router.get("/sales/receipt/:id", authenticate, authorize("manager", "seller"), this.getReceiptById.bind(this));
+    this.router.get("/sales/catalog", authenticate, authorize("manager", "seller"), this.getCatalog.bind(this));
   }
 
   // Auth

@@ -117,18 +117,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ analyticsAPI, user
     const handleDownloadPDF = async (type: "report" | "receipt", id: number) => {
         if (!token) return;
         try {
-            const blob = type === "report"
-                ? await analyticsAPI.downloadReportPDF(token, id)
-                : await analyticsAPI.downloadReceiptPDF(token, id);
-
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${type}-${id}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            
+            alert("Nije implementirano");
         } catch (error) {
             alert("Greska pri preuzimanju PDF-a");
         }

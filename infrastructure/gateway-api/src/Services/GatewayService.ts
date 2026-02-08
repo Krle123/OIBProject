@@ -321,7 +321,7 @@ export class GatewayService implements IGatewayService {
   async runSimulation(algorithmType: PerformanceAlgorithmType, numberOfPackages: number, userId?: number): Promise<PerformanceReportDTO> {
     const params: any = { algorithmType, numberOfPackages };
     if (userId) params.userId = userId;
-    const response = await this.performanceClient.post<{ success: boolean; data: PerformanceReportDTO }>(`/performance/simulate`, params);
+    const response = await this.performanceClient.post<{ success: boolean; data: PerformanceReportDTO }>(`/simulate`, {params});
     return response.data.data;
   }
 

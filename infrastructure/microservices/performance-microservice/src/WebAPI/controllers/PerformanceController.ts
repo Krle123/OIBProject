@@ -27,6 +27,7 @@ export class PerformanceController {
 
     private async runSimulation (req: Request, res: Response): Promise<void> {
         try {
+            console.log("Received simulation request with body:", req.body);
             const { algorithmType, numberOfPackages } = req.body;
             const userId = (req as any).user?.userId;
 

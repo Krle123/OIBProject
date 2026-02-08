@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IAnalyticsAPI } from "./IAnalyticsAPI";
+import { AnalysisReportDTO } from "../../models/analysis/AnalysisReportDTO";
+import { FiscalReceiptDTO } from "../../models/analysis/FiscalReceiptDTO";
 
 export class AnalyticsAPI implements IAnalyticsAPI {
   private readonly axiosInstance: AxiosInstance;
@@ -78,7 +80,7 @@ export class AnalyticsAPI implements IAnalyticsAPI {
     return Array.isArray(data) ? data : [];
   }
 
-  async getReportById(token: string, id: number): Promise<any> {
+  async getReportById(token: string, id: number): Promise<AnalysisReportDTO> {
     const response: AxiosResponse<{ success: boolean; data: any }> = await this.axiosInstance.get(`/analytics/reports/${id}`, {
       headers: this.getAuthHeaders(token),
     });
@@ -94,11 +96,18 @@ export class AnalyticsAPI implements IAnalyticsAPI {
   }
 
   async getReceipts(token: string): Promise<any[]> {
-    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get("/analytics/receipts", {
+    const response: AxiosResponse<{ success: boolean; data: any[] }> = await this.axiosInstance.get("/sales/receipts", {
       headers: this.getAuthHeaders(token),
     });
     const data = response.data.data;
     return Array.isArray(data) ? data : [];
+  }
+
+  async getReceiptById(token: string, id: number): Promise<FiscalReceiptDTO> {
+    const response: AxiosResponse<{ success: boolean; data: FiscalReceiptDTO }> = await this.axiosInstance.get(`/sales/receipts/${id}`, {
+      headers: this.getAuthHeaders(token),
+    });
+    return response.data.data;
   }
 
   async downloadReceiptPDF(token: string, id: number): Promise<Blob> {

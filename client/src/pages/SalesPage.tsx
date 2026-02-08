@@ -3,19 +3,24 @@ import { ISalesAPI } from "../api/sales/ISalesAPI";
 import { IUserAPI } from "../api/users/IUserAPI";
 import { DashboardNavbar } from "../components/dashboard/navbar/Navbar";
 import { useAuth } from "../hooks/useAuthHook";
+import { CatalogPerfumeDTO } from "../models/perfume/CatalogPerfumeDTO";
+import { FiscalReceiptDTO } from "../models/analysis/FiscalReceiptDTO";
+import { IProcessingAPI } from "../api/processing/IProcessingAPI";
 
 type SalesPageProps = {
     salesAPI: ISalesAPI;
     userAPI: IUserAPI;
+    processingAPI: IProcessingAPI;
 };
 
-export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
+export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, processingAPI }) => {
     const { token } = useAuth();
-    const [catalog, setCatalog] = useState<any[]>([]);
+    const [catalog, setCatalog] = useState<CatalogPerfumeDTO[]>([]);
     const [storages, setStorages] = useState<any[]>([]);
-    const [receipts, setReceipts] = useState<any[]>([]);
+    const [receipts, setReceipts] = useState<FiscalReceiptDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedPerfumes, setSelectedPerfumes] = useState<{ perfumeId: string; serialNumber: string; name: string; price: number; quantity: number }[]>([]);
+    const [selectedPerfumes, setSelectedPerfumes] = useState<{ perfumeId: number; serialNumber: string; name: string; price: number; quantity: number }[]>([]);
+    const [selectedPerfumeDropdown, setSelectedPerfumeDropdown] = useState<string>("");
     const [saleType, setSaleType] = useState<"RETAIL" | "WHOLESALE">("RETAIL");
     const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD" | "BANK_TRANSFER">("CASH");
     const [showSuccess, setShowSuccess] = useState(false);
@@ -32,7 +37,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
         setError("");
         try {
             const [catalogData, storagesData, receiptsData] = await Promise.all([
-                salesAPI.getCatalog(token),
+                processingAPI.getCatalogPerfumes(token),
                 salesAPI.getStorages(token),
                 salesAPI.getReceipts(token)
             ]);
@@ -54,14 +59,29 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
             alert("Molimo izaberite parfem");
             return;
         }
-        const newPerfume = {
-            perfumeId: perfume.id,
-            serialNumber: perfume.serialNumber || perfume.id,
-            name: perfume.name || "Unknown",
-            price: perfume.price || 0,
-            quantity: 1
-        };
-        setSelectedPerfumes([...selectedPerfumes, newPerfume]);
+
+        // Check if perfume is already selected
+        const existingIndex = selectedPerfumes.findIndex(p => p.perfumeId === perfume.id);
+        
+        if (existingIndex >= 0) {
+            // If already selected, increment quantity
+            const updated = [...selectedPerfumes];
+            updated[existingIndex] = {
+                ...updated[existingIndex],
+                quantity: updated[existingIndex].quantity + 1
+            };
+            setSelectedPerfumes(updated);
+        } else {
+            // If not selected, add new perfume
+            const newPerfume = {
+                perfumeId: perfume.id,
+                serialNumber: perfume.serialNumber || perfume.id,
+                name: perfume.name || "Unknown",
+                price: perfume.price || 0,
+                quantity: 1
+            };
+            setSelectedPerfumes([...selectedPerfumes, newPerfume]);
+        }
     };
 
     const handleRemovePerfume = (index: number) => {
@@ -185,14 +205,14 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
                                 {/* Perfume selector dropdown */}
                                 <div className="sales-perfume-selector">
                                     <select 
-                                        defaultValue=""
+                                        value={selectedPerfumeDropdown}
                                         onChange={(e) => {
                                             const selectedPerfumeId = e.target.value;
                                             if (selectedPerfumeId) {
-                                                const perfume = catalog.find(p => p.id === selectedPerfumeId);
+                                                const perfume = catalog.find(p => p.id.toString() === selectedPerfumeId);
                                                 if (perfume) {
                                                     handleAddPerfume(perfume);
-                                                    e.target.value = "";
+                                                    setSelectedPerfumeDropdown("");
                                                 }
                                             }
                                         }}
@@ -205,7 +225,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
                                         ) : (
                                             catalog.map((perfume) => (
                                                 <option key={perfume.id} value={perfume.id}>
-                                                    {perfume.name} - {perfume.price || 0} RSD
+                                                    {perfume.name}
                                                 </option>
                                             ))
                                         )}

@@ -86,7 +86,7 @@ function App() {
           path="/Prodaja"
           element={
             <ProtectedRoute requiredRole="seller,manager">
-              <SalesPage salesAPI={sales_api} userAPI={user_api}/>
+              <SalesPage salesAPI={sales_api} userAPI={user_api} processingAPI={processing_api} />
             </ProtectedRoute>
           }
         />

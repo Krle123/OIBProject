@@ -43,7 +43,7 @@ const catalogRepository = Db.getRepository(CatalogPerfume);
 const communicationService: ICommunicationService = new CommunicationService();
 const logerService: ILogerService = new LogerService();
 const processingService: IProcessingService = new ProcessingService(communicationService, processingRepository, logerService);
-const packagingService = new PackagingService(packagingRepository, processingRepository, catalogRepository, logerService);
+const packagingService = new PackagingService(packagingRepository, processingRepository, catalogRepository, logerService, processingService);
 
 const processingController = new ProcessingController(processingService, packagingService);
 

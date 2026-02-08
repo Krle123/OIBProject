@@ -14,7 +14,6 @@
     "install:microservice:performance": "npm --prefix ./infrastructure/microservices/performance-microservice install",
     "install:microservice:sales": "npm --prefix ./infrastructure/microservices/sales-microservice install",
     "install:microservice:storage": "npm --prefix ./infrastructure/microservices/storage-microservice install",
-
     "start:gateway": "npm --prefix ./infrastructure/gateway-api run start",
     "start:client": "npm --prefix ./client run start",
     "start:microservice:auth": "npm --prefix ./infrastructure/microservices/auth-microservice run start",
@@ -26,7 +25,6 @@
     "start:microservice:performance": "npm --prefix ./infrastructure/microservices/performance-microservice run start",
     "start:microservice:sales": "npm --prefix ./infrastructure/microservices/sales-microservice run start",
     "start:microservice:storage": "npm --prefix ./infrastructure/microservices/storage-microservice run start",
-
     "start": "npm-run-all -p start:microservice:auth start:microservice:user start:microservice:log start:gateway start:microservice:production start:microservice:processing start:microservice:analytics start:microservice:performance start:microservice:sales start:microservice:storage"
   },
   "engines": {
@@ -39,6 +37,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mysql": "^2.15.27",
     "@types/node": "^25.0.3",
+    "@types/pdfkit": "^0.17.4",
     "npm-run-all": "^4.1.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
@@ -52,6 +51,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.16.0",
+    "pdfkit": "^0.17.2",
     "typeorm": "^0.3.28"
   }
 }

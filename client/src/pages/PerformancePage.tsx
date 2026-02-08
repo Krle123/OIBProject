@@ -167,8 +167,8 @@ export const PerformancePage: React.FC<PerformancePageProps> = ({ performanceAPI
                                             </select>
                                             <small>
                                                 {algorithmType === "DISTRIBUTIVE_CENTER"
-                                                    ? "Omogućava slanje 3 ambaлаже odjednom, vreme: 0.5s po paketu"
-                                                    : "Omogućava slanje 1 ambaлаже odjednom, vreme: 2.5s po paketu"}
+                                                    ? "Omogućava slanje 3 ambalaže odjednom, vreme: 0.5s po paketu"
+                                                    : "Omogućava slanje 1 ambalaže odjednom, vreme: 2.5s po paketu"}
                                             </small>
                                         </div>
 

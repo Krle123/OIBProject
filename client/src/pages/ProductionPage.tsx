@@ -66,7 +66,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
 
     const handlePlantSeed = async () => {
         if (!token || !formData.selectedPlantId) {
-            alert("Molimo izaberite биљку!");
+            alert("Molimo izaberite biljku!");
             return;
         }
 
@@ -78,13 +78,13 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
             setTimeout(() => setShowSuccess(false), 3000);
         } catch (error: any) {
             console.error("Error planting:", error);
-            alert(`Greška pri zasađivању! ${error?.response?.data?.message || error.message}`);
+            alert(`Greška pri zasadađivanju! ${error?.response?.data?.message || error.message}`);
         }
     };
 
     const handleHarvest = async () => {
         if (!token || !formData.selectedPlantId) {
-            alert("Molimo izaberite биљку!");
+            alert("Molimo izaberite biljku!");
             return;
         }
 
@@ -99,7 +99,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
             setTimeout(() => setShowSuccess(false), 3000);
         } catch (error: any) {
             console.error("Error harvesting:", error);
-            alert(`Greška при жетви! ${error?.response?.data?.message || error.message}`);
+            alert(`Greška pri žetvi! ${error?.response?.data?.message || error.message}`);
         }
     };
 
@@ -115,12 +115,12 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
 
             <div className="production-page-content">
                 <div className="production-header">
-                    <h1>Управљање биљакама</h1>
+                    <h1>Upravljanje biljkama</h1>
                 </div>
 
                 {showSuccess && (
                     <div className="production-success-message">
-                        Операција успешно извршена!
+                        Operacija uspešno izvršena!
                     </div>
                 )}
 
@@ -129,13 +129,13 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                         onClick={() => handleActionButtonClick("plant")}
                         className={`production-btn production-btn-primary ${actionMode === "plant" ? "active" : ""}`}
                     >
-                        + Засади биљку
+                        + Zasadi biljku
                     </button>
                     <button
                         onClick={() => handleActionButtonClick("harvest")}
                         className={`production-btn ${actionMode === "harvest" ? "active" : ""}`}
                     >
-                        ↓ Убери биљку
+                        ↓ Uberi biljku
                     </button>
                 </div>
 
@@ -143,12 +143,12 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                 {actionMode === "plant" && (
                     <div className="production-action-panel">
                         <div className="production-form-group">
-                            <label>Изаберите биљку:</label>
+                            <label>Izaberi biljku:</label>
                             <select
                                 value={formData.selectedPlantId || ""}
                                 onChange={(e) => handleInputChange("selectedPlantId", parseInt(e.target.value))}
                             >
-                                <option value="">-- Изаберите биљку --</option>
+                                <option value="">-- Izaberi biljku --</option>
                                 {plants.map((plant) => (
                                     <option key={plant.id} value={plant.id}>
                                         {plant.name}
@@ -157,7 +157,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                             </select>
                         </div>
                         <div className="production-form-group">
-                            <label>Количина за засађивање:</label>
+                            <label>Količina za zasadađivanje:</label>
                             <input
                                 type="number"
                                 min="1"
@@ -166,7 +166,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                             />
                         </div>
                         <button onClick={handlePlantSeed} className="production-submit-btn">
-                            Засади
+                            Zasadi
                         </button>
                     </div>
                 )}
@@ -174,12 +174,12 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                 {actionMode === "harvest" && (
                     <div className="production-action-panel">
                         <div className="production-form-group">
-                            <label>Изаберите биљку:</label>
+                            <label>Izaberi biljku:</label>
                             <select
                                 value={formData.selectedPlantId || ""}
                                 onChange={(e) => handleInputChange("selectedPlantId", parseInt(e.target.value))}
                             >
-                                <option value="">-- Изаберите биљку --</option>
+                                <option value="">-- Izaberi biljku --</option>
                                 {plants.map((plant) => (
                                         <option key={plant.id} value={plant.id}>
                                             {plant.name}
@@ -188,7 +188,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                             </select>
                         </div>
                         <div className="production-form-group">
-                            <label>Количина:</label>
+                            <label>Količina:</label>
                             <input
                                 type="number"
                                 min="1"
@@ -197,7 +197,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                             />
                         </div>
                         <button onClick={handleHarvest} className="production-submit-btn">
-                            Убери
+                            Uberi
                         </button>
                     </div>
                 )}
@@ -212,9 +212,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({ plantAPI, userAP
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Назив</th>
-                                    <th>Латински назив</th>
-                                    <th>Стање</th>
+                                    <th>Naziv</th>
+                                    <th>Latinski naziv</th>
+                                    <th>Stanje</th>
                                 </tr>
                             </thead>
                             <tbody>

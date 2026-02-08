@@ -61,18 +61,18 @@ export const ProcessingPage: React.FC<ProcessingPageProps> = ({ processingAPI, u
 
             <div className="processing-page-content">
                 <div className="processing-header">
-                    <h1>Преда́да билъка у парфеме</h1>
+                    <h1>Prerada biljaka u parfeme</h1>
                 </div>
 
                 <div className="processing-controls">
                     <button className="btn-start-processing" onClick={handleStartProcessing}>
-                        Започни преради
+                        Započni preradu
                     </button>
                 </div>
 
                 <div className="processing-panel">
                     <div className="panel-header">
-                        Парфеми ({perfumes.length})
+                        Parfemi ({perfumes.length})
                     </div>
                     <div className="processing-table-container">
                         {isLoading ? (
@@ -83,12 +83,12 @@ export const ProcessingPage: React.FC<ProcessingPageProps> = ({ processingAPI, u
                             <table className="processing-table">
                                 <thead>
                                     <tr>
-                                        <th>Назив парфема</th>
-                                        <th>Тип</th>
-                                        <th>Запремина</th>
-                                        <th>Серијски број</th>
-                                        <th>Рок трајања</th>
-                                        <th>Статус</th>
+                                        <th>Naziv parfema</th>
+                                        <th>Tip</th>
+                                        <th>Zapremina</th>
+                                        <th>Serijski broj</th>
+                                        <th>Rok trajanja</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -108,7 +108,7 @@ export const ProcessingPage: React.FC<ProcessingPageProps> = ({ processingAPI, u
                     </div>
                     {!isLoading && perfumes.length > 0 && (
                         <div className="processing-footer">
-                            Укупно парфема: {perfumes.length}
+                            Ukupno parfema: {perfumes.length}
                         </div>
                     )}
                 </div>

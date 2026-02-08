@@ -37,7 +37,7 @@ export class FiscalReceiptService implements IFiscalReceiptService {
                 `Fiscal receipt created successfully: ${receiptNumber}`
             );
 
-            return new FiscalReceiptDTO(savedReceipt);
+            return savedReceipt as FiscalReceiptDTO;
         } catch (error: any) {
             await this.communicationService.logEvent(
                 "ERROR",
@@ -51,17 +51,17 @@ export class FiscalReceiptService implements IFiscalReceiptService {
         const receipts = await this.receiptRepository.find({
             order: { saleDate: "DESC" }
         });
-        return receipts.map(receipt => new FiscalReceiptDTO(receipt));
+        return receipts.map(receipt => receipt as FiscalReceiptDTO);
     }
 
     async getReceiptById(id: number): Promise<FiscalReceiptDTO | null> {
         const receipt = await this.receiptRepository.findOne({ where: { id } });
-        return receipt ? new FiscalReceiptDTO(receipt) : null;
+        return receipt ? receipt as FiscalReceiptDTO : null;
     }
 
     async getReceiptByNumber(receiptNumber: string): Promise<FiscalReceiptDTO | null> {
         const receipt = await this.receiptRepository.findOne({ where: { receiptNumber } });
-        return receipt ? new FiscalReceiptDTO(receipt) : null;
+        return receipt ? receipt as FiscalReceiptDTO : null;
     }
 
     private generateUniqueReceiptNumber(): string {

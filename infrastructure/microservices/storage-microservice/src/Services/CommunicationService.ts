@@ -22,10 +22,10 @@ export class CommunicationService implements ICommunicationService {
         });
     }
 
-    async getPackagingsFromStorage(storageId: number, numberOfPackages: number): Promise<any[]> {
+    async getPackagingsFromStorage(storageId: number, numberOfPackages: number, perfumeSerialNumber?: string): Promise<any[]> {
         try {
-            const response = await this.processingClient.get("/packaging/from-storage", {
-                params: { storageId, numberOfPackages },
+            const response = await this.processingClient.get("/packaging/send-to-storage", {
+                params: { storageId, numberOfPackages, perfumeSerialNumber },
             });
             await this.logEvent("INFO", `Retrieved ${numberOfPackages} packages from storage ${storageId}`);
             return response.data;

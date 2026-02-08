@@ -8,7 +8,6 @@ import { AnalysisReport } from "./Domain/models/AnalysisReport";
 import { CommunicationService } from "./Services/CommunicationService";
 import { FiscalReceiptService } from "./Services/FiscalReceiptService";
 import { AnalyticsService } from "./Services/AnalyticsService";
-import { PDFService } from "./Services/PDFService";
 import { AnalyticsController } from "./WebAPI/controllers/AnalyticsController";
 
 dotenv.config({ quiet: true });
@@ -38,10 +37,9 @@ app.use(cors({
     const communicationService = new CommunicationService();
     const fiscalReceiptService = new FiscalReceiptService(receiptRepository, communicationService);
     const analyticsService = new AnalyticsService(receiptRepository, reportRepository, communicationService);
-    const pdfService = new PDFService();
 
     // Controllers
-    const analyticsController = new AnalyticsController(analyticsService, pdfService, fiscalReceiptService);
+    const analyticsController = new AnalyticsController(analyticsService, fiscalReceiptService);
 
     app.use("/api/v1", analyticsController.getRouter());
 

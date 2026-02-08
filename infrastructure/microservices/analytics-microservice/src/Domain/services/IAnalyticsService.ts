@@ -13,7 +13,6 @@ export interface IAnalyticsService {
 
     // Top performers
     getTop10BestSellingPerfumes(userId?: number): Promise<AnalysisReportDTO>;
-    getTop10RevenueByPerfume(userId?: number): Promise<AnalysisReportDTO>;
 
     // Report management
     getAllReports(): Promise<AnalysisReportDTO[]>;

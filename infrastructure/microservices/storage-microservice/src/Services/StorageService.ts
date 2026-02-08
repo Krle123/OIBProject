@@ -37,7 +37,14 @@ export class StorageService implements IStorageService {
                     "WARNING",
                     `Insufficient packages in storage ${storage.id}. Requested: ${quantity}, Available: ${storage.currentCapacity}`
                 );
-                throw new Error(`Insufficient packages in storage. Available: ${storage.currentCapacity}, Requested: ${quantity}`);
+                // Try to retrieve remaining packages and ensure they contain the requested perfume.
+                const remaining = storage.currentCapacity;
+                let retrieved = await this.communicationService.getPackagingsFromStorage(storage.id, remaining);
+                if (!this.packagesContainPerfume(retrieved, perfumeSerialNumber)) {
+                    // Retry asking for packages that specifically contain the perfume serial
+                    retrieved = await this.communicationService.getPackagingsFromStorage(storage.id, remaining, perfumeSerialNumber);
+                }
+                await this.updateStorageCapacity(storage.id, -storage.currentCapacity);
             }
 
             // Log perfume being requested
@@ -68,10 +75,22 @@ export class StorageService implements IStorageService {
                     quantity - packages.length
                 );
 
-                const retrievedPackages = await this.communicationService.getPackagingsFromStorage(
+                let retrievedPackages = await this.communicationService.getPackagingsFromStorage(
                     storage.id,
                     packagesInThisDelivery
                 );
+
+                // If retrieved packages do not contain the requested perfume, ask for targeted packages
+                if (!this.packagesContainPerfume(retrievedPackages, perfumeSerialNumber)) {
+                    const targeted = await this.communicationService.getPackagingsFromStorage(
+                        storage.id,
+                        packagesInThisDelivery,
+                        perfumeSerialNumber
+                    );
+                    if (Array.isArray(targeted) && targeted.length > 0) {
+                        retrievedPackages = targeted;
+                    }
+                }
 
                 packages.push(...retrievedPackages);
 
@@ -154,5 +173,30 @@ export class StorageService implements IStorageService {
 
     private delay(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    private packageContainsPerfume(pkg: any, perfumeSerialNumber: string): boolean {
+        if (!pkg) return false;
+        // Try numeric id match if serial is numeric and package exposes perfumeIds
+        const maybeId = Number(perfumeSerialNumber);
+        if (!Number.isNaN(maybeId) && Array.isArray(pkg.perfumeIds)) {
+            if (pkg.perfumeIds.includes(maybeId)) return true;
+        }
+
+        // Fallback: check string serial properties
+        if (typeof pkg.perfumeSerial === 'string' && pkg.perfumeSerial === perfumeSerialNumber) return true;
+        if (typeof pkg.perfumeSerialNumber === 'string' && pkg.perfumeSerialNumber === perfumeSerialNumber) return true;
+
+        // Some DTOs may store perfumes as objects
+        if (Array.isArray(pkg.perfumes)) {
+            if (pkg.perfumes.some((p: any) => p.serialNumber === perfumeSerialNumber || p.serial === perfumeSerialNumber)) return true;
+        }
+
+        return false;
+    }
+
+    private packagesContainPerfume(pkgs: any[] | undefined, perfumeSerialNumber: string): boolean {
+        if (!Array.isArray(pkgs) || pkgs.length === 0) return false;
+        return pkgs.some(p => this.packageContainsPerfume(p, perfumeSerialNumber));
     }
 }

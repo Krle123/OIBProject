@@ -60,12 +60,10 @@ export class GatewayController {
     this.router.get("/analytics/sales/trend", authenticate, authorize("admin", "seller"), this.analyzeSalesTrend.bind(this));
 
     this.router.get("/analytics/sales/top-10/best-selling", authenticate, authorize("admin", "seller"), this.getTop10BestSellingPerfumes.bind(this));
-    this.router.get("/analytics/sales/top-10/revenue", authenticate, authorize("admin", "seller"), this.getTop10RevenueByPerfume.bind(this));
 
     this.router.get("/analytics/reports", authenticate, authorize("admin"), this.getAllAnalysisReports.bind(this));
     this.router.get("/analytics/reports/:id", authenticate, authorize("admin"), this.getAnalysisReportById.bind(this));
     this.router.get("/analytics/reports/type/:type", authenticate, authorize("admin"), this.getAnalysisReportsByType.bind(this));
-    this.router.get("/analytics/reports/download/:id", authenticate, authorize("admin"), this.downloadAnalysisReportPDF.bind(this));
 
     // Performance
     this.router.post("/simulate", authenticate, authorize("admin"), this.runSimulation.bind(this));

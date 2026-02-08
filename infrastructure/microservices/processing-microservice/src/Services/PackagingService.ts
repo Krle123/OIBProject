@@ -6,13 +6,15 @@ import { PackagingStatus } from "../Domain/enums/PackagingStatus";
 import { PerfumeState } from "../Domain/enums/PerfumeState";
 import { ILogerService } from "../Domain/services/ILogerService";
 import { CatalogPerfume } from "../Domain/models/CatalogPerfume";
+import { IProcessingService } from "../Domain/services/IProcessingService";
 
 export class PackagingService implements IPackagingService {
     constructor(
         private readonly packagingRepository: Repository<Packaging>,
         private readonly perfumeRepository: Repository<Perfume>,
         private readonly catalogRepository: Repository<CatalogPerfume>,
-        private readonly logerService: ILogerService
+        private readonly logerService: ILogerService,
+        private readonly processingClient: IProcessingService
     ) {}
 
     async packagePerfume(serialNumber: string, numberOfBottles: number): Promise<Packaging> {
@@ -49,20 +51,36 @@ export class PackagingService implements IPackagingService {
         return saved;
     }
 
-    async sendPackagingToStoraging(storageId: number): Promise<Packaging> {
+    async sendPackagingToStoraging(storageId: number, numberOfPackages: number, perfumeSerialNumber?: string): Promise<Packaging> {
         await this.logerService.logEvent("INFO", `Request to send packaging to storage ${storageId}`);
+        let packaging: Packaging | undefined;
 
-        let packaging = await this.packagingRepository.findOne({ where: { status: PackagingStatus.PACKAGED }, order: { id: "ASC" } });
+        if (perfumeSerialNumber) {
+            // Find any perfumes already packaged with this serial
+            const packagedPerfumes = await this.perfumeRepository.find({ where: { serialNumber: perfumeSerialNumber, state: PerfumeState.PACKAGED } });
 
-        if (!packaging) {
-            await this.logerService.logEvent("INFO", `No packaged items available, attempting to create one`);
-            const produced = await this.perfumeRepository.find({ where: { state: PerfumeState.PRODUCED }, order: { id: "ASC" }, take: 1 });
-            if (!produced || produced.length === 0) {
-                await this.logerService.logEvent("ERROR", `No produced perfumes available to package and send`);
-                throw new Error("No produced perfumes available to package and send");
+            if (packagedPerfumes && packagedPerfumes.length > 0) {
+                const packagedIds = packagedPerfumes.map(p => p.id);
+                const candidates = await this.packagingRepository.find({ where: { status: PackagingStatus.PACKAGED }, order: { id: "ASC" } });
+                packaging = candidates.find(pkg => Array.isArray((pkg as any).perfumeIds) && (pkg as any).perfumeIds.some((id: number) => packagedIds.includes(id)));
             }
 
-            packaging = await this.packagePerfume(produced[0].serialNumber, 1);
+            if (!packaging) {
+                await this.logerService.logEvent("INFO", `No packaged items containing serial ${perfumeSerialNumber} found — creating ${numberOfPackages} package(s)`);
+                const createdPackages: Packaging[] = [];
+                for (let i = 0; i < numberOfPackages; i++) {
+                    const created = await this.packagePerfume(perfumeSerialNumber, 1);
+                    createdPackages.push(created);
+                }
+                packaging = createdPackages[0];
+            }
+        } else {
+            packaging = await this.packagingRepository.findOne({ where: { status: PackagingStatus.PACKAGED }, order: { id: "ASC" } }) || undefined;
+        }
+
+        if (!packaging) {
+            await this.logerService.logEvent("ERROR", `No packaging available to send to storage ${storageId}`);
+            throw new Error(`No packaging available to send`);
         }
 
         packaging.status = PackagingStatus.SENT;

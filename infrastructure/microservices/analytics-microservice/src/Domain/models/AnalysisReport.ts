@@ -15,11 +15,23 @@ export class AnalysisReport {
     @Column({ type: "varchar", length: 255 })
     title!: string;
 
-    @Column("json")
-    data!: any;
-
     @Column({ type: "text", nullable: true })
     description!: string | null;
+
+    @Column({ type: "double", nullable: true })
+    total!: number | null;
+
+    @Column({ type: "json", nullable: true })
+    receipts!: any[] | null;
+
+    @Column({ type: "json", nullable: true })
+    perfumes!: any[] | null;
+
+    @Column({ type: "json", nullable: true })
+    trend!: { date: string; value: number }[] | null;
+
+    @Column({ type: "double", nullable: true })
+    extraData!: number | null;
 
     @CreateDateColumn()
     createdAt!: Date;

@@ -11,13 +11,15 @@ type SalesPageProps = {
 
 export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
     const { token } = useAuth();
+    const [catalog, setCatalog] = useState<any[]>([]);
     const [storages, setStorages] = useState<any[]>([]);
     const [receipts, setReceipts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedPerfumes, setSelectedPerfumes] = useState<{ name: string; quantity: number }[]>([]);
+    const [selectedPerfumes, setSelectedPerfumes] = useState<{ perfumeId: string; serialNumber: string; name: string; price: number; quantity: number }[]>([]);
     const [saleType, setSaleType] = useState<"RETAIL" | "WHOLESALE">("RETAIL");
     const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD" | "BANK_TRANSFER">("CASH");
     const [showSuccess, setShowSuccess] = useState(false);
+    const [error, setError] = useState<string>("");
 
     useEffect(() => {
         loadData();
@@ -27,23 +29,39 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
         if (!token) return;
 
         setIsLoading(true);
+        setError("");
         try {
-            const [storagesData, receiptsData] = await Promise.all([
+            const [catalogData, storagesData, receiptsData] = await Promise.all([
+                salesAPI.getCatalog(token),
                 salesAPI.getStorages(token),
                 salesAPI.getReceipts(token)
             ]);
+            console.log("Učitan katalog:", catalogData);
             console.log("Učitana skladišta:", storagesData);
+            setCatalog(catalogData);
             setStorages(storagesData);
             setReceipts(receiptsData);
         } catch (error) {
             console.error("Failed to load data:", error);
+            setError("Greška pri učitavanju podataka");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleAddPerfume = () => {
-        setSelectedPerfumes([...selectedPerfumes, { name: "", quantity: 1 }]);
+    const handleAddPerfume = (perfume: any) => {
+        if (!perfume || !perfume.id) {
+            alert("Molimo izaberite parfem");
+            return;
+        }
+        const newPerfume = {
+            perfumeId: perfume.id,
+            serialNumber: perfume.serialNumber || perfume.id,
+            name: perfume.name || "Unknown",
+            price: perfume.price || 0,
+            quantity: 1
+        };
+        setSelectedPerfumes([...selectedPerfumes, newPerfume]);
     };
 
     const handleRemovePerfume = (index: number) => {
@@ -52,32 +70,33 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
 
     const handlePerfumeChange = (index: number, field: string, value: any) => {
         const updated = [...selectedPerfumes];
-        updated[index] = { ...updated[index], [field]: value };
+        if (field === "quantity") {
+            const qty = parseInt(value) || 1;
+            updated[index] = { ...updated[index], [field]: qty > 0 ? qty : 1 };
+        } else {
+            updated[index] = { ...updated[index], [field]: value };
+        }
         setSelectedPerfumes(updated);
     };
 
     const handleCreateSale = async () => {
         if (!token || selectedPerfumes.length === 0) {
-            alert("Molimo dodajte barem jedan parfem!");
+            setError("Molimo dodajte barem jedan parfem!");
             return;
         }
 
-        const invalidPerfumes = selectedPerfumes.filter(p => !p.name || p.quantity <= 0);
+        const invalidPerfumes = selectedPerfumes.filter(p => !p.serialNumber || p.quantity <= 0);
         if (invalidPerfumes.length > 0) {
-            alert("Molimo popunite sve podatke o parfemima!");
+            setError("Molimo popunite sve podatke o parfemima!");
             return;
         }
 
         try {
-            console.log("Token:", token);
-            console.log("Selected perfumes:", selectedPerfumes);
-            console.log("Sale type:", saleType);
-            console.log("Payment method:", paymentMethod);
-
+            setError("");
             // Process each perfume as a separate sale
             for (const perfume of selectedPerfumes) {
                 const saleData = {
-                    perfumeSerialNumber: perfume.name, // Using name as serial number for now
+                    perfumeSerialNumber: perfume.serialNumber,
                     quantity: perfume.quantity,
                     saleType,
                     paymentMethod,
@@ -86,7 +105,6 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
                 };
 
                 console.log("Šaljem podatke o prodaji:", saleData);
-                console.log("URL koji se poziva:", `${import.meta.env.VITE_GATEWAY_URL || "http://localhost:4000/api/v1"}/sales/process`);
                 const response = await salesAPI.processSale(token, saleData);
                 console.log("Odgovor sa servera:", response);
             }
@@ -103,7 +121,8 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
             console.error("Detaljna greška:", error);
             console.error("Response data:", error?.response?.data);
             console.error("Status:", error?.response?.status);
-            alert(`Greška pri kreiranju prodaje! ${error?.response?.data?.message || error.message}`);
+            const errorMessage = error?.response?.data?.message || error.message || "Nepoznata greška";
+            setError(`Greška pri kreiranju prodaje! ${errorMessage}`);
         }
     };
 
@@ -117,6 +136,12 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
                 {showSuccess && (
                     <div className="sales-success-message">
                         Prodaja uspešno kreirana!
+                    </div>
+                )}
+
+                {error && (
+                    <div className="sales-error-message">
+                        {error}
                     </div>
                 )}
 
@@ -155,23 +180,56 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
 
                             {/* Parfemi */}
                             <div className="sales-form-group">
-                                <label>Parfemi:</label>
+                                <label>Dodaj parfeme:</label>
+                                
+                                {/* Perfume selector dropdown */}
+                                <div className="sales-perfume-selector">
+                                    <select 
+                                        defaultValue=""
+                                        onChange={(e) => {
+                                            const selectedPerfumeId = e.target.value;
+                                            if (selectedPerfumeId) {
+                                                const perfume = catalog.find(p => p.id === selectedPerfumeId);
+                                                if (perfume) {
+                                                    handleAddPerfume(perfume);
+                                                    e.target.value = "";
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <option value="">-- Izaberite parfem --</option>
+                                        {isLoading ? (
+                                            <option disabled>Učitavanje...</option>
+                                        ) : catalog.length === 0 ? (
+                                            <option disabled>Nema dostupnih parfema</option>
+                                        ) : (
+                                            catalog.map((perfume) => (
+                                                <option key={perfume.id} value={perfume.id}>
+                                                    {perfume.name} - {perfume.price || 0} RSD
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                </div>
 
+                                {/* Selected perfumes list */}
                                 {selectedPerfumes.map((perfume, index) => (
                                     <div key={index} className="sales-perfume-row">
-                                        <input
-                                            type="text"
-                                            placeholder="Naziv parfema"
-                                            value={perfume.name}
-                                            onChange={(e) => handlePerfumeChange(index, "name", e.target.value)}
-                                        />
+                                        <div className="sales-perfume-info">
+                                            <div className="sales-perfume-name">{perfume.name}</div>
+                                            <div className="sales-perfume-price">{perfume.price} RSD/kom</div>
+                                        </div>
                                         <input
                                             type="number"
                                             placeholder="Količina"
                                             min="1"
                                             value={perfume.quantity}
-                                            onChange={(e) => handlePerfumeChange(index, "quantity", parseInt(e.target.value))}
+                                            onChange={(e) => handlePerfumeChange(index, "quantity", e.target.value)}
+                                            className="sales-perfume-quantity"
                                         />
+                                        <div className="sales-perfume-subtotal">
+                                            {(perfume.price * perfume.quantity).toLocaleString()} RSD
+                                        </div>
                                         <button
                                             onClick={() => handleRemovePerfume(index)}
                                             className="sales-remove-btn"
@@ -180,17 +238,13 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI }) => {
                                         </button>
                                     </div>
                                 ))}
-
-                                <button onClick={handleAddPerfume} className="sales-add-btn">
-                                    + Dodaj parfem
-                                </button>
                             </div>
 
                             {/* Ukupan iznos */}
                             {selectedPerfumes.length > 0 && (
                                 <div className="sales-total-box">
                                     <strong>Ukupan iznos: </strong>
-                                    {selectedPerfumes.reduce((sum, p) => sum + (p.quantity * 1000), 0)} RSD
+                                    {selectedPerfumes.reduce((sum, p) => sum + (p.quantity * p.price), 0).toLocaleString()} RSD
                                 </div>
                             )}
 

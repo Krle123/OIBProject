@@ -57,7 +57,14 @@ export class SalesController {
                 });
                 return;
             }
-
+            console.log(" SALES: Processing sale with data:", {
+                perfumeSerialNumber,
+                quantity,
+                saleType,
+                paymentMethod,
+                sellerId,
+                userRole
+            });
             const receipt = await this.salesService.processSale(
                 perfumeSerialNumber,
                 quantity,

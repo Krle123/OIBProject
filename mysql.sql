@@ -91,6 +91,18 @@ CREATE TABLE IF NOT EXISTS perfumes (
     expirationDate DATE
 );
 
+INSERT INTO perfumes (serialNumber, name, type, quantity, plantId, state, expirationDate) VALUES
+('PP-2026-1', 'Rose Elegance', 'PERFUME', 100, 1, 'PRODUCED', '2027-02-08'),
+('PP-2026-2', 'Midnight Rose', 'PERFUME', 80, 1, 'PRODUCED', '2027-02-08'),
+('PP-2026-3', 'Jasmine Dream', 'PERFUME', 90, 2, 'PRODUCED', '2027-02-08'),
+('PP-2026-4', 'White Jasmine Mist', 'COLOGNE', 110, 2, 'PRODUCED', '2027-02-08'),
+('PP-2026-5', 'Lavender Calm', 'PERFUME', 85, 3, 'PRODUCED', '2027-02-08'),
+('PP-2026-6', 'Provence Lavender', 'PERFUME', 95, 3, 'PRODUCED', '2027-02-08'),
+('PP-2026-7', 'Golden Sunflower', 'COLOGNE', 75, 4, 'PRODUCED', '2027-02-08'),
+('PP-2026-8', 'Summer Fields', 'COLOGNE', 88, 4, 'PRODUCED', '2027-02-08'),
+('PP-2026-9', 'Aloe Fresh', 'COLOGNE', 92, 5, 'PRODUCED', '2027-02-08'),
+('PP-2026-10', 'Desert Aloe Breeze', 'PERFUME', 105, 5, 'PRODUCED', '2027-02-08');
+
 CREATE TABLE IF NOT EXISTS catalog (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     
@@ -116,6 +128,21 @@ INSERT INTO catalog (serialNumber, name, plantId) VALUES
 
 ('PP-2026-9', 'Aloe Fresh', 5),
 ('PP-2026-10', 'Desert Aloe Breeze', 5);
+
+CREATE TABLE IF NOT EXISTS packagings (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    adress VARCHAR(255) NOT NULL,
+    storageId INT NOT NULL,
+    perfumeIds JSON NOT NULL,
+    status ENUM ('SENT', 'PACKAGED') NOT NULL
+);
+
+INSERT INTO packagings (name, adress, storageId, perfumeIds, status) VALUES
+('Package Load 1', 'Warehouse Center Marseille', 1, '[1, 2, 3]', 'PACKAGED'),
+('Package Load 2', 'Warehouse Center Marseille', 1, '[4, 5, 6]', 'PACKAGED'),
+('Package Load 3', 'Distribution Center Paris', 2, '[7, 8]', 'PACKAGED'),
+('Package Load 4', 'Warehouse Center Marseille', 1, '[9, 10]', 'PACKAGED');
 
 CREATE DATABASE IF NOT EXISTS analytics_db;
 

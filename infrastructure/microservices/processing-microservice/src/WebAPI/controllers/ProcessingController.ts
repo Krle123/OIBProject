@@ -44,7 +44,7 @@ export class ProcessingController {
         try {
             const storageId: number = req.body.storageId;
             const numberOfPackages: number = req.body.numberOfPackages;
-            const perfumeSerialNumber: string | undefined = req.body.perfumeSerialNumber;
+            const perfumeSerialNumber: string = req.body.perfumeSerialNumber;
             console.log("ProcessingController.sendPackagingToStorage called with:", { storageId, numberOfPackages, perfumeSerialNumber });
             const packaging = await this.packagingService.sendPackagingToStoraging(storageId, numberOfPackages, perfumeSerialNumber);
             res.status(200).json({ success: true, data: packaging });

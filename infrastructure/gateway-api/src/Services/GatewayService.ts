@@ -79,7 +79,7 @@ export class GatewayService implements IGatewayService {
     this.salesClient = axios.create({
       baseURL: salesBaseURL,
       headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      timeout: 30000,
     });
 
     this.analyticsClient = axios.create({

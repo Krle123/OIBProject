@@ -11,6 +11,8 @@ import { UsersService } from './Services/UsersService';
 import { UsersController } from './WebAPI/controllers/UsersController';
 import { ILogerService } from './Domain/services/ILogerService';
 import { LogerService } from './Services/LogerService';
+import { UserRole } from './Domain/enums/UserRole';
+import { hash } from 'crypto';
 
 dotenv.config({ quiet: true });
 

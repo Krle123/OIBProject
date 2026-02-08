@@ -16,6 +16,6 @@ export const Db = new DataSource({
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [CatalogPerfume, Packaging, Perfume],
 });

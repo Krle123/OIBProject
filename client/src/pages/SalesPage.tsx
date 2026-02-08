@@ -19,8 +19,8 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, process
     const [storages, setStorages] = useState<any[]>([]);
     const [receipts, setReceipts] = useState<FiscalReceiptDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedPerfumes, setSelectedPerfumes] = useState<{ perfumeId: number; serialNumber: string; name: string; price: number; quantity: number }[]>([]);
-    const [selectedPerfumeDropdown, setSelectedPerfumeDropdown] = useState<string>("");
+    const [selectedPerfume, setSelectedPerfume] = useState<{ perfumeId: number; serialNumber: string; name: string; price: number } | null>(null);
+    const [quantity, setQuantity] = useState<number>(1);
     const [saleType, setSaleType] = useState<"RETAIL" | "WHOLESALE">("RETAIL");
     const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD" | "BANK_TRANSFER">("CASH");
     const [showSuccess, setShowSuccess] = useState(false);
@@ -60,77 +60,49 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, process
             return;
         }
 
-        // Check if perfume is already selected
-        const existingIndex = selectedPerfumes.findIndex(p => p.perfumeId === perfume.id);
-        
-        if (existingIndex >= 0) {
-            // If already selected, increment quantity
-            const updated = [...selectedPerfumes];
-            updated[existingIndex] = {
-                ...updated[existingIndex],
-                quantity: updated[existingIndex].quantity + 1
-            };
-            setSelectedPerfumes(updated);
-        } else {
-            // If not selected, add new perfume
-            const newPerfume = {
-                perfumeId: perfume.id,
-                serialNumber: perfume.serialNumber || perfume.id,
-                name: perfume.name || "Unknown",
-                price: perfume.price || 0,
-                quantity: 1
-            };
-            setSelectedPerfumes([...selectedPerfumes, newPerfume]);
-        }
+        setSelectedPerfume({
+            perfumeId: perfume.id,
+            serialNumber: perfume.serialNumber || perfume.id.toString(),
+            name: perfume.name || "Unknown",
+            price: perfume.price || 0
+        });
+        setQuantity(1);
     };
 
-    const handleRemovePerfume = (index: number) => {
-        setSelectedPerfumes(selectedPerfumes.filter((_, i) => i !== index));
-    };
-
-    const handlePerfumeChange = (index: number, field: string, value: any) => {
-        const updated = [...selectedPerfumes];
-        if (field === "quantity") {
-            const qty = parseInt(value) || 1;
-            updated[index] = { ...updated[index], [field]: qty > 0 ? qty : 1 };
-        } else {
-            updated[index] = { ...updated[index], [field]: value };
-        }
-        setSelectedPerfumes(updated);
+    const handleRemovePerfume = () => {
+        setSelectedPerfume(null);
+        setQuantity(1);
     };
 
     const handleCreateSale = async () => {
-        if (!token || selectedPerfumes.length === 0) {
-            setError("Molimo dodajte barem jedan parfem!");
+        if (!token || !selectedPerfume) {
+            setError("Molimo dodajte parfem!");
             return;
         }
 
-        const invalidPerfumes = selectedPerfumes.filter(p => !p.serialNumber || p.quantity <= 0);
-        if (invalidPerfumes.length > 0) {
-            setError("Molimo popunite sve podatke o parfemima!");
+        if (!selectedPerfume.serialNumber || quantity <= 0) {
+            setError("Molimo popunite sve podatke!");
             return;
         }
 
         try {
             setError("");
-            // Process each perfume as a separate sale
-            for (const perfume of selectedPerfumes) {
-                const saleData = {
-                    perfumeSerialNumber: perfume.serialNumber,
-                    quantity: perfume.quantity,
-                    saleType,
-                    paymentMethod,
-                    sellerId: null,
-                    userRole: "SELLER"
-                };
+            const saleData = {
+                perfumeSerialNumber: selectedPerfume.serialNumber,
+                quantity: quantity,
+                saleType,
+                paymentMethod,
+                sellerId: null,
+                userRole: "SELLER"
+            };
 
-                console.log("Šaljem podatke o prodaji:", saleData);
-                const response = await salesAPI.processSale(token, saleData);
-                console.log("Odgovor sa servera:", response);
-            }
+            console.log("Šaljem podatke o prodaji:", saleData);
+            const response = await salesAPI.processSale(token, saleData);
+            console.log("Odgovor sa servera:", response);
 
             setShowSuccess(true);
-            setSelectedPerfumes([]);
+            setSelectedPerfume(null);
+            setQuantity(1);
 
             // Reload receipts
             const receiptsData = await salesAPI.getReceipts(token);
@@ -200,78 +172,78 @@ export const SalesPage: React.FC<SalesPageProps> = ({ salesAPI, userAPI, process
 
                             {/* Parfemi */}
                             <div className="sales-form-group">
-                                <label>Dodaj parfeme:</label>
+                                <label>Parfem:</label>
                                 
                                 {/* Perfume selector dropdown */}
-                                <div className="sales-perfume-selector">
-                                    <select 
-                                        value={selectedPerfumeDropdown}
-                                        onChange={(e) => {
-                                            const selectedPerfumeId = e.target.value;
-                                            if (selectedPerfumeId) {
-                                                const perfume = catalog.find(p => p.id.toString() === selectedPerfumeId);
-                                                if (perfume) {
-                                                    handleAddPerfume(perfume);
-                                                    setSelectedPerfumeDropdown("");
-                                                }
+                                <select 
+                                    value={selectedPerfume?.perfumeId || ""}
+                                    onChange={(e) => {
+                                        const perfumeId = e.target.value;
+                                        if (perfumeId) {
+                                            const perfume = catalog.find(p => p.id.toString() === perfumeId);
+                                            if (perfume) {
+                                                handleAddPerfume(perfume);
                                             }
-                                        }}
-                                    >
-                                        <option value="">-- Izaberite parfem --</option>
-                                        {isLoading ? (
-                                            <option disabled>Učitavanje...</option>
-                                        ) : catalog.length === 0 ? (
-                                            <option disabled>Nema dostupnih parfema</option>
-                                        ) : (
-                                            catalog.map((perfume) => (
-                                                <option key={perfume.id} value={perfume.id}>
-                                                    {perfume.name}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                </div>
+                                        }
+                                    }}
+                                    className="sales-perfume-dropdown"
+                                >
+                                    <option value="">-- Izaberite parfem --</option>
+                                    {isLoading ? (
+                                        <option disabled>Učitavanje...</option>
+                                    ) : catalog.length === 0 ? (
+                                        <option disabled>Nema dostupnih parfema</option>
+                                    ) : (
+                                        catalog.map((perfume) => (
+                                            <option key={perfume.id} value={perfume.id}>
+                                                {perfume.name}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                            </div>
 
-                                {/* Selected perfumes list */}
-                                {selectedPerfumes.map((perfume, index) => (
-                                    <div key={index} className="sales-perfume-row">
-                                        <div className="sales-perfume-info">
-                                            <div className="sales-perfume-name">{perfume.name}</div>
-                                            <div className="sales-perfume-price">{perfume.price} RSD/kom</div>
-                                        </div>
+                            {/* Selected perfume with quantity */}
+                            {selectedPerfume && (
+                                <div className="sales-perfume-selection">
+                                    <div className="sales-perfume-info">
+                                        <div className="sales-perfume-name">{selectedPerfume.name}</div>
+                                        <div className="sales-perfume-price">{selectedPerfume.price} RSD/kom</div>
+                                    </div>
+                                    
+                                    <div className="sales-quantity-section">
+                                        <label>Količina:</label>
                                         <input
                                             type="number"
                                             placeholder="Količina"
                                             min="1"
-                                            value={perfume.quantity}
-                                            onChange={(e) => handlePerfumeChange(index, "quantity", e.target.value)}
-                                            className="sales-perfume-quantity"
+                                            value={quantity}
+                                            onChange={(e) => {
+                                                const qty = parseInt(e.target.value) || 1;
+                                                setQuantity(qty > 0 ? qty : 1);
+                                            }}
+                                            className="sales-quantity-input"
                                         />
-                                        <div className="sales-perfume-subtotal">
-                                            {(perfume.price * perfume.quantity).toLocaleString()} RSD
-                                        </div>
-                                        <button
-                                            onClick={() => handleRemovePerfume(index)}
-                                            className="sales-remove-btn"
-                                        >
-                                            ✕
-                                        </button>
                                     </div>
-                                ))}
-                            </div>
-
-                            {/* Ukupan iznos */}
-                            {selectedPerfumes.length > 0 && (
-                                <div className="sales-total-box">
-                                    <strong>Ukupan iznos: </strong>
-                                    {selectedPerfumes.reduce((sum, p) => sum + (p.quantity * p.price), 0).toLocaleString()} RSD
+                                    
+                                    <div className="sales-perfume-subtotal">
+                                        <strong>Ukupno: </strong>
+                                        {(selectedPerfume.price * quantity).toLocaleString()} RSD
+                                    </div>
+                                    
+                                    <button
+                                        onClick={handleRemovePerfume}
+                                        className="sales-remove-btn"
+                                    >
+                                        ✕ Ukloni
+                                    </button>
                                 </div>
                             )}
 
                             {/* Dugme za kreiranje */}
                             <button
                                 onClick={handleCreateSale}
-                                disabled={selectedPerfumes.length === 0}
+                                disabled={!selectedPerfume}
                                 className="sales-submit-btn"
                             >
                                 Kreiraj Prodaju

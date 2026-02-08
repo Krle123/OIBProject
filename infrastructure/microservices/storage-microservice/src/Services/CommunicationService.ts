@@ -22,13 +22,18 @@ export class CommunicationService implements ICommunicationService {
         });
     }
 
-    async getPackagingsFromStorage(storageId: number, numberOfPackages: number, perfumeSerialNumber?: string): Promise<any[]> {
+    async getPackagingsFromStorage(storageId: number, numberOfPackages: number, perfumeSerialNumber: string): Promise<any[]> {
         try {
-            const response = await this.processingClient.get("/packaging/send-to-storage", {
-                params: { storageId, numberOfPackages, perfumeSerialNumber },
+            console.log(`[CommunicationService.getPackagingsFromStorage] Requesting ${numberOfPackages} packages from storage ${storageId} with perfumeSerialNumber: ${perfumeSerialNumber}`);
+            const response = await this.processingClient.post("/processing/packaging/send-to-storage", {
+                storageId,
+                numberOfPackages,
+                perfumeSerialNumber
             });
             await this.logEvent("INFO", `Retrieved ${numberOfPackages} packages from storage ${storageId}`);
-            return response.data;
+            // Processing service returns a single package object, wrap it in an array
+            const data = response.data.data;
+            return Array.isArray(data) ? data : [data];
         } catch (error: any) {
             await this.logEvent("ERROR", `Failed to get packages from storage: ${error.message}`);
             throw new Error("Failed to get packages from storage");
@@ -37,7 +42,7 @@ export class CommunicationService implements ICommunicationService {
 
     async logEvent(type: string, description: string): Promise<void> {
         try {
-            await this.logClient.post("/logs", {
+            await this.logClient.post("/logs/add", {
                 type: type,
                 description: description,
             });

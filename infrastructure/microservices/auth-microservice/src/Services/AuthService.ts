@@ -6,6 +6,7 @@ import { LoginUserDTO } from "../Domain/DTOs/LoginUserDTO";
 import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../Domain/types/AuthResponse";
 import { ILogerService } from "../Domain/services/ILogerService";
+import { UserRole } from "../Domain/enums/UserRole";
 
 export class AuthService implements IAuthService {
   private readonly saltRounds: number = parseInt(process.env.SALT_ROUNDS || "10", 10);
@@ -76,5 +77,16 @@ export class AuthService implements IAuthService {
         role: savedUser.role,
       },
     };
+  }
+
+  async initializeUser(): Promise<void> {
+    const newUser = this.userRepository.create({
+      username: 'test',
+      email: 'test@gmail.com',
+      role: UserRole.SELLER,
+      password: await bcrypt.hash('123456', this.saltRounds),
+      profileImage: null,
+    });
+    await this.userRepository.save(newUser);
   }
 }

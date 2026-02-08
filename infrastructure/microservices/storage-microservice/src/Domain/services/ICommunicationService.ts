@@ -5,7 +5,7 @@ export interface ICommunicationService {
      * @param numberOfPackages Number of packages to retrieve
      * @returns Array of packaging
      */
-    getPackagingsFromStorage(storageId: number, numberOfPackages: number, perfumeSerialNumber?: string): Promise<any[]>;
+    getPackagingsFromStorage(storageId: number, numberOfPackages: number, perfumeSerialNumber: string): Promise<any[]>;
 
     /**
      * Log event to log microservice

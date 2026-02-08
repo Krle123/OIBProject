@@ -151,6 +151,11 @@ export class StorageController {
     private async sendPackagingFromStorage(req: Request, res: Response): Promise<void> {
         try {
             const { perfumeSerialNumber, quantity, userRole } = req.body;
+            console.log("Received sendPackagingFromStorage request with data:", {
+                perfumeSerialNumber,
+                quantity,
+                userRole
+            });
 
             if (!perfumeSerialNumber) {
                 res.status(400).json({
@@ -189,7 +194,8 @@ export class StorageController {
                 message: `Successfully retrieved ${quantity} packages of perfume ${perfumeSerialNumber} from storage`
             });
         } catch (error: any) {
-            res.status(400).json({
+            console.error("[StorageController.sendPackagingFromStorage] Error:", error.message, error);
+            res.status(500).json({
                 success: false,
                 message: error.message || "Failed to retrieve packages from storage"
             });

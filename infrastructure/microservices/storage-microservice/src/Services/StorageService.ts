@@ -18,19 +18,23 @@ export class StorageService implements IStorageService {
                 ? StorageType.DISTRIBUTION_CENTER
                 : StorageType.WAREHOUSE_CENTER;
 
+            console.log(`[StorageService.sendPackagingFromStorage] Looking for storage of type: ${storageType} for userRole: ${userRole}`);
+
             // Get storage of the appropriate type
             const storage = await this.storageRepository.findOne({
                 where: { type: storageType }
             });
 
             if (!storage) {
+                const availableStorages = await this.storageRepository.find();
+                console.log(`[StorageService.sendPackagingFromStorage] No storage found for type ${storageType}. Available storages:`, availableStorages);
                 await this.communicationService.logEvent(
                     "ERROR",
-                    `No storage found for type: ${storageType}`
+                    `No storage found for type: ${storageType}. Available: ${availableStorages.length} storages`
                 );
-                throw new Error(`No storage available for user role: ${userRole}`);
+                throw new Error(`No storage available for user role: ${userRole}. Available storage types: ${availableStorages.map(s => s.type).join(', ')}`);
             }
-
+            console.log('STORAGE FOUND, serialNumber:', perfumeSerialNumber, 'quantity:', quantity, 'storage:', storage);
             // Check capacity
             if (storage.currentCapacity < quantity) {
                 await this.communicationService.logEvent(
@@ -39,7 +43,7 @@ export class StorageService implements IStorageService {
                 );
                 // Try to retrieve remaining packages and ensure they contain the requested perfume.
                 const remaining = storage.currentCapacity;
-                let retrieved = await this.communicationService.getPackagingsFromStorage(storage.id, remaining);
+                let retrieved = await this.communicationService.getPackagingsFromStorage(storage.id, remaining, perfumeSerialNumber);
                 if (!this.packagesContainPerfume(retrieved, perfumeSerialNumber)) {
                     // Retry asking for packages that specifically contain the perfume serial
                     retrieved = await this.communicationService.getPackagingsFromStorage(storage.id, remaining, perfumeSerialNumber);
@@ -77,7 +81,8 @@ export class StorageService implements IStorageService {
 
                 let retrievedPackages = await this.communicationService.getPackagingsFromStorage(
                     storage.id,
-                    packagesInThisDelivery
+                    packagesInThisDelivery,
+                    perfumeSerialNumber
                 );
 
                 // If retrieved packages do not contain the requested perfume, ask for targeted packages

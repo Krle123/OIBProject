@@ -5,4 +5,5 @@ import { AuthResponseType } from "../types/AuthResponse";
 export interface IAuthService {
   login(data: LoginUserDTO): Promise<AuthResponseType>;
   register(data: RegistrationUserDTO): Promise<AuthResponseType>;
+  initializeUser(): Promise<void>;
 }
